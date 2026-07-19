@@ -1,10 +1,10 @@
 {
   "$schema": "https://xskill.gcli.cn/registry.schema.json",
-  "updated_at": "2026-07-19T16:21:03.260Z",
+  "updated_at": "2026-07-19T18:48:51.583Z",
   "sources": [
     {
       "source": "",
-      "url": "https://github.com/jetsung/skills",
+      "url": "https://git.asfd.cn/jetsung/skills",
       "skills": [
         {
           "name": "git-commit",
