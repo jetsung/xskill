@@ -1,7 +1,25 @@
 {
   "$schema": "https://xskill.gcli.cn/registry.schema.json",
-  "updated_at": "2026-07-19T15:58:16.865Z",
+  "updated_at": "2026-07-19T16:21:03.260Z",
   "sources": [
+    {
+      "source": "",
+      "url": "https://github.com/jetsung/skills",
+      "skills": [
+        {
+          "name": "git-commit",
+          "path": "skills/git-commit/SKILL.md",
+          "description": "Generates standardized git commit messages following the Conventional Commits format with Chinese descriptions. Use when committing changes, creating git commits, or writing commit messages.",
+          "version": "1.2.0"
+        },
+        {
+          "name": "update-gh-action-version",
+          "path": "skills/update-gh-action-version/SKILL.md",
+          "description": "自动更新 GitHub Actions 工作流文件中使用的 Action 版本。使用场景：用户需要更新 GitHub Actions workflow 文件中的 action 版本，或者要求升级到最新版本。",
+          "version": ""
+        }
+      ]
+    },
     {
       "source": "anthropics",
       "url": "https://github.com/anthropics/skills",
