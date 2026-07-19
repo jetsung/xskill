@@ -1,0 +1,885 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>XSkill&#x27;s Manual</title>
+                <meta name="robots" content="noindex" />
+                
+
+        <!-- Custom HTML head -->
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+                <link rel="icon" href="favicon.svg">
+                        <link rel="shortcut icon" href="favicon.png">
+                <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+                <link rel="stylesheet" href="css/print.css" media="print">
+        
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+                <link rel="stylesheet" href="fonts/fonts.css">
+        
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+            </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="introduction.html">Introduction</a></li><li class="chapter-item expanded "><a href="features.html"><strong aria-hidden="true">1.</strong> Features</a></li><li class="chapter-item expanded "><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="from-source.html"><strong aria-hidden="true">2.1.</strong> From source</a></li><li class="chapter-item expanded "><a href="requirements.html"><strong aria-hidden="true">2.2.</strong> Requirements</a></li><li class="chapter-item expanded "><a href="pre-built-binaries.html"><strong aria-hidden="true">2.3.</strong> Pre-built binaries</a></li></ol></li><li class="chapter-item expanded "><a href="quick-start.html"><strong aria-hidden="true">3.</strong> Quick Start</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="1-configure-a-source.html"><strong aria-hidden="true">3.1.</strong> Configure a source</a></li><li class="chapter-item expanded "><a href="2-query-available-skills.html"><strong aria-hidden="true">3.2.</strong> Query available skills</a></li><li class="chapter-item expanded "><a href="3-install-a-skill.html"><strong aria-hidden="true">3.3.</strong> Install a skill</a></li><li class="chapter-item expanded "><a href="4-list-installed-skills.html"><strong aria-hidden="true">3.4.</strong> List installed skills</a></li><li class="chapter-item expanded "><a href="5-remove-a-skill.html"><strong aria-hidden="true">3.5.</strong> Remove a skill</a></li></ol></li><li class="chapter-item expanded "><a href="commands.html"><strong aria-hidden="true">4.</strong> Commands</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="sources-—-manage-configured-sources.html"><strong aria-hidden="true">4.1.</strong> sources — Manage configured sources</a></li><li class="chapter-item expanded "><a href="platforms-—-list-configured-platforms.html"><strong aria-hidden="true">4.2.</strong> platforms — List configured platforms</a></li><li class="chapter-item expanded "><a href="add-—-install-a-skill.html"><strong aria-hidden="true">4.3.</strong> add — Install a skill</a></li><li class="chapter-item expanded "><a href="remove-—-remove-a-skill.html"><strong aria-hidden="true">4.4.</strong> remove — Remove a skill</a></li><li class="chapter-item expanded "><a href="update-—-update-installed-skills.html"><strong aria-hidden="true">4.5.</strong> update — Update installed skills</a></li><li class="chapter-item expanded "><a href="restore-—-restore-skills-from-lock-file.html"><strong aria-hidden="true">4.6.</strong> restore — Restore skills from lock file</a></li><li class="chapter-item expanded "><a href="list-—-list-installed-skills.html"><strong aria-hidden="true">4.7.</strong> list — List installed skills</a></li><li class="chapter-item expanded "><a href="query-—-query-skills-from-a-source.html"><strong aria-hidden="true">4.8.</strong> query — Query skills from a source</a></li><li class="chapter-item expanded "><a href="find-—-interactively-find-and-install-a-skill.html"><strong aria-hidden="true">4.9.</strong> find — Interactively find and install a skill</a></li><li class="chapter-item expanded "><a href="rec-—-manage-recommended-skills.html"><strong aria-hidden="true">4.10.</strong> rec — Manage recommended skills</a></li><li class="chapter-item expanded "><a href="cache-—-manage-skills-cache.html"><strong aria-hidden="true">4.11.</strong> cache — Manage skills cache</a></li><li class="chapter-item expanded "><a href="config-—-manage-configuration.html"><strong aria-hidden="true">4.12.</strong> config — Manage configuration</a></li><li class="chapter-item expanded "><a href="new-—-create-a-skill-project.html"><strong aria-hidden="true">4.13.</strong> new — Create a skill project</a></li></ol></li><li class="chapter-item expanded "><a href="configuration.html"><strong aria-hidden="true">5.</strong> Configuration</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="config-file-location.html"><strong aria-hidden="true">5.1.</strong> Config file location</a></li><li class="chapter-item expanded "><a href="configuration-structure.html"><strong aria-hidden="true">5.2.</strong> Configuration structure</a></li><li class="chapter-item expanded "><a href="full-example.html"><strong aria-hidden="true">5.3.</strong> Full example</a></li><li class="chapter-item expanded "><a href="platforms.html"><strong aria-hidden="true">5.4.</strong> Platforms</a></li><li class="chapter-item expanded "><a href="sources.html"><strong aria-hidden="true">5.5.</strong> Sources</a></li><li class="chapter-item expanded "><a href="recommended.html"><strong aria-hidden="true">5.6.</strong> Recommended</a></li><li class="chapter-item expanded "><a href="cache.html"><strong aria-hidden="true">5.7.</strong> Cache</a></li><li class="chapter-item expanded "><a href="registry.html"><strong aria-hidden="true">5.8.</strong> Registry</a></li><li class="chapter-item expanded "><a href="--from-parameter-resolution.html"><strong aria-hidden="true">5.9.</strong> --from parameter resolution</a></li><li class="chapter-item expanded "><a href="--skill-parameter.html"><strong aria-hidden="true">5.10.</strong> --skill parameter</a></li><li class="chapter-item expanded "><a href="--agent-validation.html"><strong aria-hidden="true">5.11.</strong> --agent validation</a></li><li class="chapter-item expanded "><a href="url-normalization.html"><strong aria-hidden="true">5.12.</strong> URL normalization</a></li></ol></li><li class="chapter-item expanded "><a href="installation-model:-canonical-directory-+-symlinks.html"><strong aria-hidden="true">6.</strong> Installation Model: Canonical Directory + Symlinks</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="global-vs-local-paths.html"><strong aria-hidden="true">6.1.</strong> Global vs local paths</a></li><li class="chapter-item expanded "><a href="symlink-rules.html"><strong aria-hidden="true">6.2.</strong> Symlink rules</a></li><li class="chapter-item expanded "><a href="fallback-mechanism.html"><strong aria-hidden="true">6.3.</strong> Fallback mechanism</a></li><li class="chapter-item expanded "><a href="platform-directory-behavior.html"><strong aria-hidden="true">6.4.</strong> Platform directory behavior</a></li></ol></li><li class="chapter-item expanded "><a href="lock-file.html"><strong aria-hidden="true">7.</strong> Lock File</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="locations.html"><strong aria-hidden="true">7.1.</strong> Locations</a></li><li class="chapter-item expanded "><a href="format.html"><strong aria-hidden="true">7.2.</strong> Format</a></li><li class="chapter-item expanded "><a href="entry-fields.html"><strong aria-hidden="true">7.3.</strong> Entry Fields</a></li><li class="chapter-item expanded "><a href="top-level-fields.html"><strong aria-hidden="true">7.4.</strong> Top-level Fields</a></li></ol></li><li class="chapter-item expanded "><a href="migrating-from-xskillyaml.html"><strong aria-hidden="true">8.</strong> Migrating from .xskill.yaml</a></li><li class="chapter-item expanded "><a href="editor-integration.html"><strong aria-hidden="true">9.</strong> Editor Integration</a></li><li class="chapter-item expanded "><a href="development.html"><strong aria-hidden="true">10.</strong> Development</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="building.html"><strong aria-hidden="true">10.1.</strong> Building</a></li><li class="chapter-item expanded "><a href="testing.html"><strong aria-hidden="true">10.2.</strong> Testing</a></li><li class="chapter-item expanded "><a href="project-structure.html"><strong aria-hidden="true">10.3.</strong> Project Structure</a></li></ol></li><li class="chapter-item expanded "><a href="license.html"><strong aria-hidden="true">11.</strong> License</a></li></ol>            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                                                <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                                            </div>
+
+                    <h1 class="menu-title">XSkill&#x27;s Manual</h1>
+
+                    <div class="right-buttons">
+                                                <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                                                                        <a href="https://github.com/jetsung/xskill" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                                                
+                    </div>
+                </div>
+
+                                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <p>A skills management tool for discovering, installing, and managing reusable agent skill packs across multiple AI coding platforms.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="features"><a class="header" href="#features">Features</a></h2>
+<ul>
+<li><strong>Multi-source support</strong>: Install skills from Git repositories, GitHub, GitLab, and any Git-compatible host</li>
+<li><strong>Platform management</strong>: Install skills to multiple AI coding platforms (Claude, Codex, etc.) with a single command</li>
+<li><strong>Lock file tracking</strong>: Track installed skills with <code>.xskill-lock.json</code> for reproducible installs</li>
+<li><strong>Global configuration</strong>: Single global config at <code>~/.xskill/settings.json</code> with <code>XSKILL_CONFIG</code> override</li>
+<li><strong>Recursive search</strong>: Automatically discover skills in nested directory structures within repositories</li>
+<li><strong>Batch operations</strong>: Install or remove all skills with <code>--all</code> flag or <code>*</code> wildcard</li>
+<li><strong>Cache support</strong>: Optional local cache for faster skill queries without network access</li>
+<li><strong>Interactive TUI</strong>: Fuzzy-find and install skills interactively with <code>find</code> command</li>
+<li><strong>Cross-platform</strong>: Works on Windows, macOS, and Linux</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="from-source"><a class="header" href="#from-source">From source</a></h3>
+<pre><code class="language-bash">git clone https://github.com/jetsung/xskill.git
+cd xskill
+cargo build --release
+cargo install --path .
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="requirements"><a class="header" href="#requirements">Requirements</a></h3>
+<ul>
+<li>Rust 1.70+</li>
+<li>Git (must be available in PATH)</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="pre-built-binaries"><a class="header" href="#pre-built-binaries">Pre-built binaries</a></h3>
+<p>Pre-built binaries for Linux, macOS, and Windows are available on the <a href="https://github.com/jetsung/xskill/releases">GitHub Releases</a> page.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="1-configure-a-source"><a class="header" href="#1-configure-a-source">1. Configure a source</a></h3>
+<p>Add a skill repository as a source:</p>
+<pre><code class="language-bash">xskill sources add -n my-skills -u https://github.com/example/skills
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="2-query-available-skills"><a class="header" href="#2-query-available-skills">2. Query available skills</a></h3>
+<p>List skills from a source:</p>
+<pre><code class="language-bash">xskill query -f my-skills
+</code></pre>
+<p>Query a specific skill:</p>
+<pre><code class="language-bash">xskill query -f my-skills -s vue
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="3-install-a-skill"><a class="header" href="#3-install-a-skill">3. Install a skill</a></h3>
+<p>Install to the project-level <code>.agents/</code> directory:</p>
+<pre><code class="language-bash">xskill add -f my-skills -s vue
+</code></pre>
+<p>Install to the global <code>~/.agents/</code> directory:</p>
+<pre><code class="language-bash">xskill add -f my-skills -s vue -g
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="4-list-installed-skills"><a class="header" href="#4-list-installed-skills">4. List installed skills</a></h3>
+<pre><code class="language-bash">xskill list
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="5-remove-a-skill"><a class="header" href="#5-remove-a-skill">5. Remove a skill</a></h3>
+<pre><code class="language-bash">xskill remove -s vue
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="commands"><a class="header" href="#commands">Commands</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="sources--manage-configured-sources"><a class="header" href="#sources--manage-configured-sources"><code>sources</code> — Manage configured sources</a></h3>
+<p>List, add, remove, or edit skill sources in the configuration.</p>
+<h4 id="sources-list"><a class="header" href="#sources-list"><code>sources list</code></a></h4>
+<p>List all configured sources:</p>
+<pre><code class="language-bash">xskill sources
+# or explicitly:
+xskill sources list
+</code></pre>
+<p>Output format:</p>
+<pre><code>NAME   TYPE URL
+antfu  git  https://github.com/antfu/skills
+</code></pre>
+<h4 id="sources-add"><a class="header" href="#sources-add"><code>sources add</code></a></h4>
+<p>Add a new source:</p>
+<pre><code class="language-bash">xskill sources add -n &lt;name&gt; -u &lt;url&gt; [-t git|api]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-n, --name</code> — Source name (optional, alphanumeric with <code>-</code> and <code>_</code>; when empty, the URL is used as the name)</li>
+<li><code>-u, --url</code> — Source URL (required, must start with <code>http://</code> or <code>https://</code>)</li>
+<li><code>-t, --type</code> — Source type: <code>git</code> or <code>api</code> (default: <code>git</code>)</li>
+</ul>
+<h4 id="sources-remove"><a class="header" href="#sources-remove"><code>sources remove</code></a></h4>
+<p>Remove a source by name and/or URL:</p>
+<pre><code class="language-bash">xskill sources remove -n &lt;name&gt;
+xskill sources remove -u &lt;url&gt;
+xskill sources remove -n &lt;name&gt; -u &lt;url&gt;
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-n, --name</code> — Source name to remove (optional)</li>
+<li><code>-u, --url</code> — Source URL to remove (optional)</li>
+</ul>
+<p>At least one of <code>--name</code> or <code>--url</code> is required. When both are provided, both must match for the source to be removed.</p>
+<h4 id="sources-edit"><a class="header" href="#sources-edit"><code>sources edit</code></a></h4>
+<p>Rename an existing source (only the name can be changed; <code>url</code> and <code>type</code> are immutable):</p>
+<pre><code class="language-bash">xskill sources edit -n &lt;name&gt; -N &lt;new-name&gt;
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-n, --name</code> — Current source name (or use <code>-u</code> to match by URL)</li>
+<li><code>-u, --url</code> — Current source URL (alternative identifier)</li>
+<li><code>-N, --new-name</code> — New name (required, pass empty string to clear the name)</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="platforms--list-configured-platforms"><a class="header" href="#platforms--list-configured-platforms"><code>platforms</code> — List configured platforms</a></h3>
+<p>List all configured AI coding platforms:</p>
+<pre><code class="language-bash">xskill platforms
+</code></pre>
+<p>Show detailed platform information:</p>
+<pre><code class="language-bash">xskill platforms -a
+</code></pre>
+<p>Detailed output includes path, skills directory, agents file, source file, and agents compatibility (<code>COMPAT</code>) for each platform. Platforms with <code>agents_compat: true</code> display <code>✓</code> in the COMPAT column, indicating they can reuse project-level <code>.agents/</code> resources.</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="add--install-a-skill"><a class="header" href="#add--install-a-skill"><code>add</code> — Install a skill</a></h3>
+<p>Install a skill from a source to a target directory.</p>
+<pre><code class="language-bash">xskill add [OPTIONS] --from &lt;SOURCE&gt; --skill &lt;SKILL&gt;
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-f, --from &lt;SOURCE&gt;</code> — Source name, <code>ORG/REPO</code>, or Git URL</li>
+<li><code>-s, --skill &lt;SKILL&gt;</code> — Skill name (use <code>'*'</code> for all skills)</li>
+<li><code>-g, --global</code> — Install to global <code>~/.agents/</code> directory</li>
+<li><code>-a, --agent &lt;AGENT&gt;</code> — Target platform (use <code>'*'</code> for all platforms)</li>
+<li><code>-A, --all</code> — Shorthand for <code>--skill '*' --agent '*'</code> (requires <code>--from</code>)</li>
+</ul>
+<h4 id="install-targets"><a class="header" href="#install-targets">Install targets</a></h4>
+<table><thead><tr><th>Flag</th><th>Target</th></tr></thead><tbody>
+<tr><td>(none)</td><td>Project-level <code>.agents/skills/</code></td></tr>
+<tr><td><code>-g</code></td><td>Global <code>~/.agents/skills/</code></td></tr>
+<tr><td><code>-a &lt;platform&gt;</code></td><td>Platform-specific directory (e.g., <code>.claude/skills/</code>)</td></tr>
+<tr><td><code>-a '*'</code></td><td>All configured platforms</td></tr>
+</tbody></table>
+<h4 id="source-info-display"><a class="header" href="#source-info-display">Source info display</a></h4>
+<p>Before installation, the source information is displayed: <code>Source: &lt;source-name&gt; (&lt;source-url&gt;)</code> (label in cyan bold).</p>
+<h4 id="multi-source-name-collision"><a class="header" href="#multi-source-name-collision">Multi-source name collision</a></h4>
+<p>When <code>-f</code> is not specified and multiple sources (including registry) contain identically named skills:</p>
+<ul>
+<li><strong>Interactive terminal</strong>: a skim single-select TUI is shown with three aligned columns: <code>[registry]</code> / <code>-</code> (first column — <code>[registry]</code> for registry entries, <code>-</code> for local sources), <code>source_name</code>, <code>url</code>. Registry entries show <code>-</code> as source name when empty or conflicting with a local source.</li>
+<li><strong>Non-interactive terminal</strong>: an error is shown listing all matching sources (with URLs), suggesting <code>xskill add -f &lt;source&gt; -s &lt;skill&gt;</code>.</li>
+</ul>
+<h4 id="output-style"><a class="header" href="#output-style">Output style</a></h4>
+<p>Labels (<code>Name</code>, <code>Description</code>, <code>Version</code>) are displayed in cyan bold. <code>Name</code> values are shown in yellow. Empty <code>Description</code> or <code>Version</code> lines are hidden.</p>
+<ul>
+<li><code>Installed</code> (green): canonical directory path.</li>
+<li><code>Symlinked</code> (green): platform directory path (no arrow or target shown, as <code>Installed</code> already displays the canonical path).</li>
+<li><code>Source</code> (cyan bold): <code>Source: &lt;name&gt; (&lt;url&gt;)</code>.</li>
+</ul>
+<h4 id="examples"><a class="header" href="#examples">Examples</a></h4>
+<pre><code class="language-bash"># Install to project
+xskill add -f antfu -s vue
+
+# Install to global
+xskill add -f antfu -s vue -g
+
+# Install to a specific platform
+xskill add -f antfu -s vue -a claude
+
+# Install to all platforms
+xskill add -f antfu -s vue -a '*'
+
+# Install all skills from a source
+xskill add -f antfu -s '*'
+
+# Install everything everywhere
+xskill add -f antfu -A
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="remove--remove-a-skill"><a class="header" href="#remove--remove-a-skill"><code>remove</code> — Remove a skill</a></h3>
+<p>Remove an installed skill and update the lock file.</p>
+<pre><code class="language-bash">xskill remove [OPTIONS] --skill &lt;SKILL&gt;
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-s, --skill &lt;SKILL&gt;</code> — Skill name (use <code>'*'</code> for all skills)</li>
+<li><code>-g, --global</code> — Remove from global directory</li>
+<li><code>-a, --agent &lt;AGENT&gt;</code> — Target platform (use <code>'*'</code> for all platforms)</li>
+<li><code>-A, --all</code> — Shorthand for <code>--skill '*' --agent '*'</code></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="update--update-installed-skills"><a class="header" href="#update--update-installed-skills"><code>update</code> — Update installed skills</a></h3>
+<p>Re-install skills from lock file records, preserving the original <code>installed_at</code> timestamps.</p>
+<pre><code class="language-bash">xskill update [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-g, --global</code> — Update global skills only</li>
+<li><code>-s, --skill &lt;SKILL&gt;</code> — Skill name (use <code>'*'</code> for all skills)</li>
+</ul>
+<p>Output style: labels (<code>Source</code>, <code>Updating</code>, <code>Name</code>, <code>Description</code>, <code>Version</code>, <code>Updated</code>) in cyan, <code>Name</code> value in yellow.</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="restore--restore-skills-from-lock-file"><a class="header" href="#restore--restore-skills-from-lock-file"><code>restore</code> — Restore skills from lock file</a></h3>
+<p>Read <code>.xskill-lock.json</code> from the current directory and install all recorded skills. Useful for setting up a new environment or restoring skills after cloning a project. Skills are grouped by <code>source_url</code> so each repository is cloned only once, avoiding redundant git operations.</p>
+<pre><code class="language-bash">xskill restore [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-g, --global</code> — Install to global <code>~/.agents/skills/</code> directory (default: project-level <code>.agents/skills/</code>)</li>
+<li><code>-a, --agent &lt;AGENT&gt;</code> — Target platform (use <code>'*'</code> for all platforms)</li>
+<li><code>-D, --dry-run</code> — Preview mode: list skills to restore without installing</li>
+</ul>
+<h4 id="install-targets-1"><a class="header" href="#install-targets-1">Install targets</a></h4>
+<table><thead><tr><th>Flag</th><th>Target</th></tr></thead><tbody>
+<tr><td>(none)</td><td>Project-level <code>.agents/skills/</code></td></tr>
+<tr><td><code>-g</code></td><td>Global <code>~/.agents/skills/</code></td></tr>
+<tr><td><code>-a &lt;platform&gt;</code></td><td>Platform-specific directory (e.g., <code>.claude/skills/</code>)</td></tr>
+<tr><td><code>-a '*'</code></td><td>All configured platforms</td></tr>
+</tbody></table>
+<h4 id="examples-1"><a class="header" href="#examples-1">Examples</a></h4>
+<pre><code class="language-bash"># Restore all skills to project
+xskill restore
+
+# Restore to global directory
+xskill restore --global
+
+# Restore to a specific platform
+xskill restore --agent claude
+
+# Preview what would be restored
+xskill restore --dry-run
+</code></pre>
+<p>Output format:</p>
+<pre><code>Restoring: vue
+  Source: https://github.com/antfu/skills.git
+  Target: .agents/skills/vue
+  Name: Vue
+  Description: Vue.js skill pack
+
+Restore complete: 3 succeeded, 0 failed
+</code></pre>
+<p>Dry-run output (grouped by skill name to avoid redundancy):</p>
+<pre><code>Skills to restore:
+
+NAME   SOURCE                                      TARGET
+vue    https://github.com/antfu/skills.git         .claude/skills/vue
+                                                    .codex/skills/vue
+react  https://github.com/antfu/skills.git         .claude/skills/react
+                                                    .codex/skills/react
+</code></pre>
+<p>Color rules: multi-target (<code>-a '*'</code> or multiple platforms) — table header in blue, continuation TARGET entries in dimmed gray. Single target (<code>-a &lt;name&gt;</code>) — no color.</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="list--list-installed-skills"><a class="header" href="#list--list-installed-skills"><code>list</code> — List installed skills</a></h3>
+<p>Display installed skills with aligned columns.</p>
+<pre><code class="language-bash">xskill list [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-g, --global</code> — List global skills</li>
+<li><code>-a, --agent &lt;AGENT&gt;</code> — Filter by platform name</li>
+</ul>
+<p>Output format:</p>
+<pre><code>Project Skills
+
+vue     ~/.agents/skills/vue     Agents: codebuddy, gemini
+react   ~/.agents/skills/react   Agents: codebuddy
+</code></pre>
+<ul>
+<li>Skill names are displayed in yellow, paths in dimmed gray (<code>~/</code> prefix replaces home directory).</li>
+<li><code>Agents:</code> prefix in dimmed gray, platform names in default white.</li>
+<li>With <code>-a &lt;agent&gt;</code>, skills not linked to that platform show <code>Agents: not symlinked</code> (<code>Agents:</code> dimmed gray, <code>not symlinked</code> yellow).</li>
+<li>Sorted by path alphabetically.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="query--query-skills-from-a-source"><a class="header" href="#query--query-skills-from-a-source"><code>query</code> — Query skills from a source</a></h3>
+<p>Query or list skills from a configured or remote source.</p>
+<pre><code class="language-bash">xskill query [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-f, --from &lt;SOURCE&gt;</code> — Source name, <code>ORG/REPO</code>, or Git URL</li>
+<li><code>-s, --skill &lt;SKILL&gt;</code> — Specific skill name (required; wildcard <code>*</code> is not supported)</li>
+</ul>
+<p>When <code>cache.enabled</code> is <code>true</code>, queries read from the local cache instead of fetching from the remote source. When <code>registry.enabled</code> is <code>true</code> and <code>--from</code> is not specified, the registry is also queried alongside configured sources.</p>
+<p>Output style: labels (<code>Source</code>, <code>Registry</code>, <code>Name</code>, <code>Description</code>, <code>Version</code>, <code>Path</code>) in cyan bold, <code>Name</code> value in yellow. Empty <code>Source</code> shows <code>-</code>. Empty <code>Description</code> or <code>Version</code> lines are hidden. Each skill block is separated by a blank line.</p>
+<p>When no skills are found and configured sources exist with <code>cache.enabled</code> true, a hint is displayed: <code>Hint: run 'xskill cache update' to refresh skills cache</code> (cyan).</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="find--interactively-find-and-install-a-skill"><a class="header" href="#find--interactively-find-and-install-a-skill"><code>find</code> — Interactively find and install a skill</a></h3>
+<p>Launch a multi-step interactive TUI to search, configure, and install skills.</p>
+<pre><code class="language-bash">xskill find [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-f, --from &lt;SOURCE&gt;</code> — Filter skills by source name or URL</li>
+<li><code>-s, --skill &lt;QUERY&gt;</code> — Pre-fill the filter query</li>
+<li><code>-g, --global</code> — Install to global <code>~/.agents/</code> directory (default: project-level <code>.agents/</code>)</li>
+</ul>
+<h4 id="how-it-works"><a class="header" href="#how-it-works">How it works</a></h4>
+<ol>
+<li><strong>Skill selection</strong> — Substring search (exact mode) from cached skills. Display format: <code>name [source]</code> (registry entries show <code>name [registry] [source]</code>). Non-selected names use default color, selected names use blue. Source tags are always dark gray; <code>[registry]</code> tags turn green when selected. Search box at bottom, list arranged upward. Keyboard hints: <code>up/down navigate | enter select | esc cancel</code>. Match count shown as <code>current/total</code> (e.g., <code>2/2</code>).</li>
+<li><strong>Platform selection</strong> — Multi-select target platforms. First item is <code>Default</code> (disabled, means no platform symlinks). Remaining items are all configured platforms. Press TAB to select/deselect, Enter to confirm. Selected rows use blue text with dark background highlight.</li>
+<li><strong>Install</strong> — Installs the skill to the canonical directory (<code>.agents/skills/&lt;name&gt;</code> or <code>~/.agents/skills/&lt;name&gt;</code> with <code>-g</code>), then creates relative symlinks for each selected platform. Reports <code>Installed:</code>, <code>Symlinked:</code>, and any <code>Failed:</code> platforms.</li>
+</ol>
+<p>Press Esc or Ctrl-C at any step to cancel.</p>
+<p><strong>Known issue:</strong> skim library list row numbers are 0-based (skim 5.2.0 behavior), not 1-based.</p>
+<h4 id="examples-2"><a class="header" href="#examples-2">Examples</a></h4>
+<pre><code class="language-bash"># Open the interactive finder
+xskill find
+
+# Pre-filter for skills matching &quot;git&quot;
+xskill find --skill git
+
+# Find only from a specific source
+xskill find --from antfu
+
+# Find from a URL (auto-cached for 10 minutes)
+xskill find --from https://github.com/example/skills
+</code></pre>
+<p><strong>Note:</strong> Requires a populated cache. Run <code>xskill cache update</code> first if you haven’t already. When using a URL with <code>--from</code>, the skill list is fetched and cached automatically.</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="rec--manage-recommended-skills"><a class="header" href="#rec--manage-recommended-skills"><code>rec</code> — Manage recommended skills</a></h3>
+<p>Manage recommended skills sources with list, add, and remove operations.</p>
+<pre><code class="language-bash">xskill rec &lt;COMMAND&gt;
+</code></pre>
+<h4 id="rec-list"><a class="header" href="#rec-list"><code>rec list</code></a></h4>
+<p>List all recommended sources:</p>
+<pre><code class="language-bash">xskill rec list
+</code></pre>
+<p>Output format:</p>
+<pre><code>SOURCE  NAME   URL                                  SKILLS
+true    antfu  https://github.com/antfu/skills       vue, react
+false   foo    invalid                              bar
+</code></pre>
+<ul>
+<li><code>SOURCE</code> column: <code>true</code> if the name matches a configured source with consistent URL, <code>false</code> otherwise.</li>
+<li><code>URL</code> shows <code>invalid</code> (red) when the name exists in sources but URL doesn’t match, or when no URL can be resolved.</li>
+</ul>
+<h4 id="rec-add"><a class="header" href="#rec-add"><code>rec add</code></a></h4>
+<p>Add skills to a recommended source. If the entry already exists, new skills are appended (duplicates ignored).</p>
+<pre><code class="language-bash">xskill rec add [-n &lt;name&gt;] [-u &lt;url&gt;] -s &lt;skills&gt;
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-n, --name</code> — Source name (must exist in sources if <code>--url</code> not provided)</li>
+<li><code>-u, --url</code> — Source URL (when name exists in sources and url matches, only name is saved)</li>
+<li><code>-s, --skills</code> — Comma-separated list of skill names (required)</li>
+</ul>
+<p>Parameter combination logic:</p>
+<ul>
+<li><strong>Only <code>-n</code> and <code>-s</code></strong>: Validate <code>-n</code> exists in sources, save name + skills</li>
+<li><strong><code>-n</code>, <code>-u</code>, and <code>-s</code></strong>:
+<ul>
+<li>If <code>-n</code> exists in sources AND url matches <code>-u</code>: save only name + skills (no url needed)</li>
+<li>If <code>-n</code> exists in sources BUT url doesn’t match: error</li>
+<li>If <code>-n</code> doesn’t exist in sources: save url + skills (name becomes url)</li>
+</ul>
+</li>
+<li><strong>Only <code>-u</code> and <code>-s</code></strong>: Save url + skills</li>
+</ul>
+<p>Append behavior: If entry “antfu” already has skills <code>vue</code>, running <code>rec add -n antfu -s react,angular</code> results in <code>vue,react,angular</code>.</p>
+<h4 id="rec-remove"><a class="header" href="#rec-remove"><code>rec remove</code></a></h4>
+<p>Remove a recommended source or specific skills:</p>
+<pre><code class="language-bash">xskill rec remove [-n &lt;name&gt;] [-u &lt;url&gt;] [-s &lt;skills&gt;]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-n, --name</code> — Source name (used to identify entry, or with <code>-u</code>/<code>-s</code> for specific removal)</li>
+<li><code>-u, --url</code> — Source URL (when both <code>-n</code> and <code>-u</code> provided, <code>-u</code> takes priority)</li>
+<li><code>-s, --skills</code> — Comma-separated list of skill names to remove (removes specific skills instead of entire entry)</li>
+</ul>
+<p>Priority logic:</p>
+<ul>
+<li>When both <code>-n</code> and <code>-u</code> provided: prioritize <code>-u</code> (fallback to <code>-n</code> if url not found)</li>
+<li>When only <code>-n</code>: delete entire entry with that name</li>
+<li>When <code>-n</code> and <code>-s</code>: delete specific skills from entry with that name</li>
+<li>When <code>-u</code> and <code>-s</code>: delete specific skills from entry with that url</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="cache--manage-skills-cache"><a class="header" href="#cache--manage-skills-cache"><code>cache</code> — Manage skills cache</a></h3>
+<p>Manage the local skills cache for offline queries.</p>
+<pre><code class="language-bash">xskill cache &lt;COMMAND&gt;
+</code></pre>
+<h4 id="cache-update"><a class="header" href="#cache-update"><code>cache update</code></a></h4>
+<p>Fetch skills list from remote sources and save to cache:</p>
+<pre><code class="language-bash">xskill cache update [-f &lt;source&gt;]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-f, --from &lt;source&gt;</code> — Update a specific source only (name or URL)</li>
+</ul>
+<p>Per-source output: <code>&lt;source_name&gt;: &lt;count&gt; skills</code>. Summary: <code>Cache updated: N sources, M skills total</code>.</p>
+<h4 id="cache-clear"><a class="header" href="#cache-clear"><code>cache clear</code></a></h4>
+<p>Clear cached skills data:</p>
+<pre><code class="language-bash">xskill cache clear [-f &lt;source&gt;]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-f, --from &lt;source&gt;</code> — Clear a specific source only (name or URL)</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="config--manage-configuration"><a class="header" href="#config--manage-configuration"><code>config</code> — Manage configuration</a></h3>
+<p>View or modify the global configuration file.</p>
+<pre><code class="language-bash">xskill config [OPTIONS]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-i, --init</code> — Initialize config file with default values (default platforms, cache, registry)</li>
+<li><code>-e, --edit</code> — Open config in <code>$EDITOR</code> (defaults to <code>vi</code>)</li>
+<li><code>-g, --get &lt;key&gt;</code> — Get a config value by dot path (e.g., <code>cache.enabled</code>)</li>
+<li><code>-s, --set &lt;key=value&gt;</code> — Set a config value by dot path (e.g., <code>cache.enabled=true</code>)</li>
+</ul>
+<h4 id="examples-3"><a class="header" href="#examples-3">Examples</a></h4>
+<pre><code class="language-bash"># Initialize config with defaults
+xskill config --init
+
+# Open config in editor
+xskill config --edit
+
+# Read a value
+xskill config --get cache.enabled
+
+# Set a value
+xskill config --set cache.enabled=true
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="new--create-a-skill-project"><a class="header" href="#new--create-a-skill-project"><code>new</code> — Create a skill project</a></h3>
+<p>Create a new skill project with a template <code>SKILL.md</code>.</p>
+<pre><code class="language-bash">xskill new --name &lt;name&gt; [--description &lt;desc&gt;] [--template &lt;template&gt;]
+</code></pre>
+<p>Options:</p>
+<ul>
+<li><code>-n, --name &lt;name&gt;</code> — Skill name (required, used as directory name)</li>
+<li><code>-d, --description &lt;desc&gt;</code> — Skill description</li>
+<li><code>-t, --template &lt;template&gt;</code> — Template type</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="configuration"><a class="header" href="#configuration">Configuration</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="config-file-location"><a class="header" href="#config-file-location">Config file location</a></h3>
+<table><thead><tr><th>Path</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>~/.xskill/settings.json</code></td><td>Global config (default)</td></tr>
+<tr><td><code>XSKILL_CONFIG</code> env var</td><td>Override config path (must point to a JSON file)</td></tr>
+</tbody></table>
+<p>There is no project-level configuration. Only one global config file is used.</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="configuration-structure"><a class="header" href="#configuration-structure">Configuration structure</a></h3>
+<pre><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://xskill.gcli.cn/xskill.schema.json&quot;,
+  &quot;platforms&quot;: { ... },
+  &quot;sources&quot;: [ ... ],
+  &quot;recommended&quot;: [ ... ],
+  &quot;cache&quot;: { ... },
+  &quot;registry&quot;: { ... }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="full-example"><a class="header" href="#full-example">Full example</a></h3>
+<pre><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://xskill.gcli.cn/xskill.schema.json&quot;,
+  &quot;platforms&quot;: {
+    &quot;claude&quot;: {
+      &quot;path&quot;: &quot;.claude&quot;,
+      &quot;skills&quot;: &quot;skills&quot;,
+      &quot;agents&quot;: &quot;CLAUDE.md&quot;,
+      &quot;agents_compat&quot;: false
+    },
+    &quot;codex&quot;: {
+      &quot;path&quot;: &quot;.codex&quot;,
+      &quot;skills&quot;: &quot;skills&quot;,
+      &quot;agents&quot;: &quot;AGENTS.md&quot;,
+      &quot;agents_compat&quot;: true
+    }
+  },
+  &quot;sources&quot;: [
+    {
+      &quot;name&quot;: &quot;antfu&quot;,
+      &quot;type&quot;: &quot;git&quot;,
+      &quot;url&quot;: &quot;https://github.com/antfu/skills&quot;
+    },
+    {
+      &quot;name&quot;: &quot;mattpocock&quot;,
+      &quot;url&quot;: &quot;https://github.com/mattpocock/skills&quot;
+    }
+  ],
+  &quot;recommended&quot;: [
+    {
+      &quot;name&quot;: &quot;antfu&quot;,
+      &quot;skills&quot;: [&quot;vue&quot;, &quot;react&quot;]
+    }
+  ],
+  &quot;cache&quot;: {
+    &quot;enabled&quot;: true,
+    &quot;ttl&quot;: 600
+  },
+  &quot;registry&quot;: {
+    &quot;enabled&quot;: false,
+    &quot;url&quot;: &quot;https://xskill.gcli.cn/skills.json&quot;
+  }
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="platforms"><a class="header" href="#platforms">Platforms</a></h3>
+<p>Each platform entry configures how skills are installed for a specific AI coding tool.</p>
+<h4 id="platform-fields"><a class="header" href="#platform-fields">Platform fields</a></h4>
+<table><thead><tr><th>Field</th><th>Required</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>path</code></td><td>Yes</td><td>—</td><td>Tool config directory (relative, absolute, or <code>~/...</code>)</td></tr>
+<tr><td><code>skills</code></td><td>No</td><td>—</td><td>Skills subdirectory name relative to <code>path</code>. Omit to skip skill installation</td></tr>
+<tr><td><code>agents</code></td><td>No</td><td>—</td><td>Agents config file name relative to <code>path</code>. Omit to skip agents installation</td></tr>
+<tr><td><code>source</code></td><td>No</td><td><code>&quot;AGENTS.md&quot;</code></td><td>Source file name under the fixed <code>.agents/</code> directory</td></tr>
+<tr><td><code>agents_compat</code></td><td>No</td><td><code>false</code></td><td>Whether this platform can reuse <code>.agents/</code> resources (project-level agents configuration)</td></tr>
+</tbody></table>
+<h4 id="symlink-behavior"><a class="header" href="#symlink-behavior">Symlink behavior</a></h4>
+<p>The <code>agents</code> file is symlinked to a source file under <code>.agents/</code>:</p>
+<pre><code>&lt;path&gt;/&lt;agents&gt;  →  .agents/&lt;source&gt;
+</code></pre>
+<p>For example, with <code>agents: &quot;AGENTS.md&quot;</code> and <code>source: &quot;AGENTS.md&quot;</code> (default):</p>
+<pre><code>.codex/AGENTS.md  →  .agents/AGENTS.md
+</code></pre>
+<p>With <code>agents: &quot;AGENTS.md&quot;</code> and <code>source: &quot;CLAUDE.md&quot;</code>:</p>
+<pre><code>.codex/AGENTS.md  →  .agents/CLAUDE.md
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="sources"><a class="header" href="#sources">Sources</a></h3>
+<p>Sources define where skills are fetched from.</p>
+<table><thead><tr><th>Field</th><th>Required</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>name</code></td><td>No</td><td>—</td><td>Unique identifier (alphanumeric, <code>-</code>, <code>_</code>); when empty or invalid, the URL is used as the name</td></tr>
+<tr><td><code>type</code></td><td>No</td><td><code>&quot;git&quot;</code></td><td>Source type: <code>git</code> or <code>api</code></td></tr>
+<tr><td><code>url</code></td><td>Yes</td><td>—</td><td>Repository URL (must start with <code>http://</code> or <code>https://</code>)</td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="recommended"><a class="header" href="#recommended">Recommended</a></h3>
+<p>Recommended skills are managed by the <code>rec</code> command for easy installation.</p>
+<table><thead><tr><th>Field</th><th>Required</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>name</code></td><td>Yes</td><td>Source name (must match a configured source)</td></tr>
+<tr><td><code>skills</code></td><td>Yes</td><td>Array of skill names to recommend</td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="cache"><a class="header" href="#cache">Cache</a></h3>
+<table><thead><tr><th>Field</th><th>Required</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>cache.enabled</code></td><td>No</td><td><code>false</code></td><td>Enable local skills cache for <code>query</code> command</td></tr>
+<tr><td><code>cache.ttl</code></td><td>No</td><td><code>600</code></td><td>Cache time-to-live in seconds (default: 10 minutes). Applies to both the main cache (<code>skills.json</code>) and URL cache (<code>source_&lt;md5&gt;.json</code>)</td></tr>
+</tbody></table>
+<p>When enabled, <code>xskill cache update</code> fetches skill metadata from all sources and stores it locally. Subsequent <code>query</code> commands read from cache instead of cloning repositories.</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="registry"><a class="header" href="#registry">Registry</a></h3>
+<p>The registry is an optional JSON API that provides a curated skill index. When enabled, <code>query</code> and <code>find</code> commands will also query the registry alongside configured sources.</p>
+<table><thead><tr><th>Field</th><th>Required</th><th>Default</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>registry.enabled</code></td><td>No</td><td><code>false</code></td><td>Enable registry lookup</td></tr>
+<tr><td><code>registry.url</code></td><td>No</td><td><code>https://xskill.gcli.cn/skills.json</code></td><td>Registry URL</td></tr>
+</tbody></table>
+<p>URL resolution rules:</p>
+<ul>
+<li>Bare domain or trailing <code>/</code> → auto-append <code>/skills.json</code></li>
+<li>Path ending with a file extension (e.g. <code>.json</code>) → use as-is</li>
+<li>Empty or invalid protocol → fall back to built-in default</li>
+</ul>
+<p>Deduplication (URL-normalized, local takes priority):</p>
+<ul>
+<li>If a registry source has the same <strong>URL</strong> as a configured source → skipped (local config wins).</li>
+<li>If a registry source has the same <strong>name</strong> but a <strong>different URL</strong> → kept as a separate source; registry entry’s source name is blanked (shown as <code>-</code> in <code>query</code>, or the source URL in <code>find</code>).</li>
+<li>No conflict → displayed normally.</li>
+<li><strong>Skill-level dedup</strong>: only skipped when URLs match. Different URLs with same skill name are kept as separate entries.</li>
+</ul>
+<p>Examples:</p>
+<pre><code class="language-bash"># Enable registry
+xskill config --set registry.enabled=true
+
+# Use a custom registry URL (bare domain)
+xskill config --set registry.url=https://example.com
+
+# Use a custom registry URL (with path)
+xskill config --set registry.url=https://example.com/api/v1/
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="--from-parameter-resolution"><a class="header" href="#--from-parameter-resolution"><code>--from</code> parameter resolution</a></h3>
+<p>The <code>-f</code> / <code>--from</code> parameter is resolved in this order:</p>
+<ol>
+<li><strong>Git URL</strong>: If the value starts with <code>http://</code> or <code>https://</code>, use it directly</li>
+<li><strong>Config name</strong>: Match against configured source names</li>
+<li><strong>GitHub shorthand</strong>: If the value contains <code>/</code> (e.g., <code>ORG/REPO</code>), expand to <code>https://github.com/ORG/REPO.git</code></li>
+<li><strong>Error</strong>: If none of the above match, report “source not found”</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="--skill-parameter"><a class="header" href="#--skill-parameter"><code>--skill</code> parameter</a></h3>
+<p>The <code>-s</code> / <code>--skill</code> parameter accepts:</p>
+<ul>
+<li>A specific skill name (e.g., <code>vue</code>) — <strong>exact match</strong> only, no fuzzy or substring matching</li>
+<li>The wildcard <code>*</code> to match all skills</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="--agent-validation"><a class="header" href="#--agent-validation"><code>--agent</code> validation</a></h3>
+<p>When <code>-a</code> / <code>--agent</code> specifies a platform name (not <code>*</code>), it must exist in the configured <code>platforms</code>. Otherwise, the following error is displayed:</p>
+<pre><code>Invalid agents: &lt;input&gt;           (yellow)
+Valid agents: platform1, platform2, ...  (bright black)
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="url-normalization"><a class="header" href="#url-normalization">URL normalization</a></h3>
+<p>All URL-related operations normalize URLs by stripping the <code>.git</code> suffix before comparison or caching. This applies to <code>cache update --from</code>, <code>query --from</code>, <code>find --from</code>, and URL cache file name generation (<code>source_&lt;md5&gt;.json</code>). For example, <code>https://github.com/org/repo.git</code> and <code>https://github.com/org/repo</code> are treated as the same URL.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="installation-model-canonical-directory--symlinks"><a class="header" href="#installation-model-canonical-directory--symlinks">Installation Model: Canonical Directory + Symlinks</a></h2>
+<p>Skills are stored in a <strong>canonical directory</strong> (<code>.agents/skills/</code>), and each platform directory links to it via <strong>relative symlinks</strong>.</p>
+<pre><code>.agents/skills/my-skill/          ← actual files (canonical)
+.codebuddy/skills/my-skill/       → symlink → ../../.agents/skills/my-skill/
+.gemini/skills/my-skill/          → symlink → ../../.agents/skills/my-skill/
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="global-vs-local-paths"><a class="header" href="#global-vs-local-paths">Global vs local paths</a></h3>
+<table><thead><tr><th>Mode</th><th>Canonical directory</th><th>Platform directory examples</th></tr></thead><tbody>
+<tr><td><code>-g</code> (global)</td><td><code>~/.agents/skills/</code></td><td><code>~/.codebuddy/skills/</code>, <code>~/.gemini/skills/</code></td></tr>
+<tr><td>Local (default)</td><td><code>./.agents/skills/</code></td><td><code>./.codebuddy/skills/</code>, <code>./.gemini/skills/</code></td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="symlink-rules"><a class="header" href="#symlink-rules">Symlink rules</a></h3>
+<ul>
+<li><strong>Relative paths</strong>: <code>relative(platform_skills_dir, canonical_skill_dir)</code> for portability.</li>
+<li><strong>Idempotent</strong>: existing link pointing to the same target → skipped.</li>
+<li><strong>Update</strong>: existing link pointing to a different target → deleted and recreated.</li>
+<li><strong>Auto-create parents</strong>: <code>mkdir -p</code> ensures platform skills subdirectories exist.</li>
+<li><strong>Cross-platform</strong>: Windows uses junctions, Unix uses symlinks.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="fallback-mechanism"><a class="header" href="#fallback-mechanism">Fallback mechanism</a></h3>
+<pre><code>Preferred: symlink
+  ↓ fails
+Fallback: copy (file duplication)
+</code></pre>
+<p>If symlink creation fails, the target directory is cleaned and <code>copy_dir_recursive</code> is used instead.</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="platform-directory-behavior"><a class="header" href="#platform-directory-behavior">Platform directory behavior</a></h3>
+<table><thead><tr><th>Scenario</th><th>When platform directory doesn’t exist</th></tr></thead><tbody>
+<tr><td><code>-a &lt;name&gt;</code> (specific platform)</td><td><strong>Created</strong> automatically, then linked</td></tr>
+<tr><td><code>-a '*'</code> (all platforms)</td><td><strong>Skipped</strong> — no directory created, no link</td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="lock-file"><a class="header" href="#lock-file">Lock File</a></h2>
+<p>The lock file tracks installed skills for reproducibility.</p>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="locations"><a class="header" href="#locations">Locations</a></h3>
+<table><thead><tr><th>Path</th><th>Scope</th></tr></thead><tbody>
+<tr><td><code>./.xskill-lock.json</code></td><td>Project-level</td></tr>
+<tr><td><code>~/.agents/.xskill-lock.json</code></td><td>Global</td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="format"><a class="header" href="#format">Format</a></h3>
+<pre><code class="language-json">{
+  &quot;version&quot;: 1,
+  &quot;skills&quot;: {
+    &quot;vue&quot;: {
+      &quot;source&quot;: &quot;antfu&quot;,
+      &quot;source_type&quot;: &quot;git&quot;,
+      &quot;source_url&quot;: &quot;https://github.com/antfu/skills.git&quot;,
+      &quot;skill_path&quot;: &quot;skills/vue/SKILL.md&quot;,
+      &quot;skill_folder_hash&quot;: &quot;abc123...&quot;,
+      &quot;installed_at&quot;: &quot;2026-07-15T18:16:42.852Z&quot;,
+      &quot;updated_at&quot;: &quot;2026-07-15T18:16:42.852Z&quot;
+    }
+  },
+  &quot;updated_at&quot;: &quot;2026-07-15T18:16:42.852Z&quot;
+}
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="entry-fields"><a class="header" href="#entry-fields">Entry Fields</a></h3>
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>source</code></td><td>Source name from configuration</td></tr>
+<tr><td><code>source_type</code></td><td>Source type (<code>git</code>)</td></tr>
+<tr><td><code>source_url</code></td><td>Full repository URL</td></tr>
+<tr><td><code>skill_path</code></td><td>Relative path to <code>SKILL.md</code> within the repo</td></tr>
+<tr><td><code>skill_folder_hash</code></td><td>Git tree hash of the skill folder for change detection</td></tr>
+<tr><td><code>installed_at</code></td><td>ISO 8601 timestamp of first installation (<code>YYYY-MM-DDTHH:MM:SS.sssZ</code>)</td></tr>
+<tr><td><code>updated_at</code></td><td>ISO 8601 timestamp of last update for this skill (<code>YYYY-MM-DDTHH:MM:SS.sssZ</code>)</td></tr>
+</tbody></table>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="top-level-fields"><a class="header" href="#top-level-fields">Top-level Fields</a></h3>
+<table><thead><tr><th>Field</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>version</code></td><td>Lock file format version (always <code>1</code>)</td></tr>
+<tr><td><code>updated_at</code></td><td>ISO 8601 timestamp of last lock file modification (any skill add/update/remove)</td></tr>
+</tbody></table>
+<p>The <code>update</code> command uses lock file records to re-fetch skills while preserving the original <code>installed_at</code> timestamp.</p>
+<p>The <code>restore</code> command reads from the project lock file and writes back to the same lock file scope (project-level by default, global with <code>-g</code>), updating <code>skill_folder_hash</code> and both <code>updated_at</code> fields while preserving <code>installed_at</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="migrating-from-xskillyaml"><a class="header" href="#migrating-from-xskillyaml">Migrating from <code>.xskill.yaml</code></a></h2>
+<p>If you have an existing <code>.xskill.yaml</code>, convert it to JSON and save as <code>~/.xskill/settings.json</code>:</p>
+<pre><code class="language-bash"># Using yq
+yq -o=json '.' .xskill.yaml &gt; ~/.xskill/settings.json
+</code></pre>
+<p>YAML keys map directly to JSON keys with no structural changes required.</p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="editor-integration"><a class="header" href="#editor-integration">Editor Integration</a></h2>
+<p><code>xskill config --init</code> automatically adds a <code>$schema</code> field to <code>settings.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;$schema&quot;: &quot;https://xskill.gcli.cn/xskill.schema.json&quot;,
+  ...
+}
+</code></pre>
+<p>Most JSON editors (VSCode, Neovim with jsonls, etc.) will automatically load the schema from this URL and provide validation and autocompletion.</p>
+<p>Two JSON Schemas are hosted at <code>xskill.gcli.cn</code>:</p>
+<ul>
+<li><code>xskill.schema.json</code> — for <code>~/.xskill/settings.json</code> (tool configuration)</li>
+<li><code>registry.schema.json</code> — for the registry index data (skills list from the registry API)</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="development"><a class="header" href="#development">Development</a></h2>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="building"><a class="header" href="#building">Building</a></h3>
+<pre><code class="language-bash">cargo build
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="testing"><a class="header" href="#testing">Testing</a></h3>
+<pre><code class="language-bash">cargo test
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h3 id="project-structure"><a class="header" href="#project-structure">Project Structure</a></h3>
+<pre><code>xskill/
+├── Cargo.toml
+├── README.md
+├── schemas/                # JSON Schema definitions
+│   ├── xskill.schema.json    # settings.json schema
+│   └── registry.schema.json  # registry index schema
+├── docs/                   # Documentation source (mdbook input)
+│   ├── SPEC.md             # Requirements specification
+├── book/                   # mdbook output (generated)
+│   ├── en/
+│   └── zh/
+├── crates/
+│   └── generate-book/      # mdbook content generator
+├── src/
+│   ├── main.rs             # CLI entry point (clap derive)
+│   ├── config.rs           # Configuration handling
+│   ├── git.rs              # Git operations (clone, sparse checkout)
+│   ├── lock.rs             # Lock file management
+│   ├── skill_meta.rs       # SKILL.md frontmatter parsing
+│   ├── cache.rs            # Cache data structures
+│   ├── utils.rs            # Utility functions
+│   └── commands/
+│       ├── add.rs          # Install skills
+│       ├── remove.rs       # Remove skills
+│       ├── update.rs       # Update from lock file
+│       ├── restore.rs      # Restore from lock file
+│       ├── list.rs         # List installed skills
+│       ├── find.rs         # Interactive TUI skill finder
+│       ├── query.rs        # Query remote/cache skills
+│       ├── sources.rs      # Manage sources (CRUD)
+│       ├── platforms.rs    # List platforms
+│       ├── rec.rs          # Manage recommended skills (list/add/remove)
+│       ├── cache.rs        # Cache management
+│       ├── config.rs       # Config management
+│       └── new.rs          # Create skill project
+└── openspec/               # Change tracking
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="license"><a class="header" href="#license">License</a></h2>
+<p><a href="https://github.com/jetsung/xskill/blob/main/LICENSE">Apache License 2.0</a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                        
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                            </nav>
+
+        </div>
+
+        
+        
+        
+                <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+        
+                <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+                        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+                
+    </body>
+</html>
