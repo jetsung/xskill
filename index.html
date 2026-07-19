@@ -79,6 +79,10 @@
     font-size: 15px;
     margin-top: 6px;
   }
+  .doc-links { font-size: 13px; margin-top: 8px; }
+  .doc-links a { color: var(--accent); text-decoration: none; }
+  .doc-links a:hover { text-decoration: underline; }
+  .doc-sep { margin: 0 6px; color: var(--border); }
 
   /* Stats bar */
   .stats {
@@ -335,6 +339,11 @@
       </a>
     </h1>
     <p>Agent skill index across platforms</p>
+    <p class="doc-links">
+      <a href="/man/en/">Docs (EN)</a>
+      <span class="doc-sep">·</span>
+      <a href="/man/zh/">文档 (中文)</a>
+    </p>
   </header>
 
   <div class="stats" id="stats"></div>
