@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xskill.gcli.cn/xskill.schema.json",
+  "title": "XSkill Configuration",
+  "description": "Configuration file for XSkill ( ~/.xskill/settings.json )",
+  "type": "object",
+  "properties": {
+    "platforms": {
+      "description": "Tool platform configurations. Keys are platform identifiers.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/Platform"
+      }
+    },
+    "sources": {
+      "description": "Skill source repositories (git or api).",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Source"
+      }
+    },
+    "recommended": {
+      "description": "Recommended skill sets grouped by source.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/RecommendedSource"
+      }
+    },
+    "cache": {
+      "description": "Cache settings for skills list caching.",
+      "$ref": "#/$defs/CacheConfig"
+    },
+    "registry": {
+      "description": "Registry settings for skill discovery.",
+      "$ref": "#/$defs/RegistryConfig"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "Platform": {
+      "description": "Configuration for a single tool platform.",
+      "type": "object",
+      "properties": {
+        "path": {
+          "description": "Tool configuration directory (relative, absolute, or ~/... path).",
+          "type": "string",
+          "minLength": 1
+        },
+        "skills": {
+          "description": "Skills subdirectory name relative to path. Empty string to skip skill installation.",
+          "type": "string",
+          "default": ""
+        },
+        "agents": {
+          "description": "Agents config file name relative to path. Empty string to skip agents installation.",
+          "type": "string",
+          "default": ""
+        },
+        "source": {
+          "description": "Agents source file name under the fixed .agents/ directory (symlink target). E.g. source=\"AGENTS.md\" means <path>/<agents> → .agents/AGENTS.md.",
+          "type": "string",
+          "default": "AGENTS.md"
+        }
+      },
+      "required": ["path"],
+      "additionalProperties": false
+    },
+    "Source": {
+      "description": "A skill source repository.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Unique source identifier (alphanumeric, hyphens, underscores). Optional — when empty or invalid, the url value is used as the name.",
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "default": ""
+        },
+        "type": {
+          "description": "Source type.",
+          "type": "string",
+          "enum": ["git", "api"],
+          "default": "git"
+        },
+        "url": {
+          "description": "Source repository URL.",
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["url"],
+      "additionalProperties": false
+    },
+    "RecommendedSource": {
+      "description": "A group of recommended skills from a specific source.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Source name referencing a Source entry, or custom label.",
+          "type": "string",
+          "default": ""
+        },
+        "url": {
+          "description": "Direct source URL (overrides name reference).",
+          "type": "string",
+          "format": "uri",
+          "default": ""
+        },
+        "skills": {
+          "description": "List of recommended skill names.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        }
+      },
+      "required": ["skills"],
+      "additionalProperties": false
+    },
+    "CacheConfig": {
+      "description": "Cache configuration for skills list caching.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enable or disable skills list caching. Default is false.",
+          "type": "boolean",
+          "default": false
+        },
+        "ttl": {
+          "description": "Cache time-to-live in seconds. Default is 600 (10 minutes).",
+          "type": "integer",
+          "minimum": 0,
+          "default": 600
+        }
+      },
+      "additionalProperties": false
+    },
+    "RegistryConfig": {
+      "description": "Registry configuration for skill discovery.",
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "description": "Enable or disable registry. Default is false.",
+          "type": "boolean",
+          "default": false
+        },
+        "url": {
+          "description": "Registry URL. Default is https://xskill.gcli.cn/skills.json.",
+          "type": "string",
+          "format": "uri",
+          "default": "https://xskill.gcli.cn/skills.json"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
