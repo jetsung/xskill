@@ -1,8 +1,10 @@
 {
-  "updated_at": "2026-07-19T08:01:07.893Z",
+  "$schema": "https://github.com/jetsung/xskill/raw/refs/heads/main/schemas/skills-index.schema.json",
+  "updated_at": "2026-07-19T11:58:07.463Z",
   "sources": [
     {
-      "source": "antfu",
+      "source": "skills11/skills",
+      "url": "https://gitcode.com/gh_mirrors/skills11/skills.git",
       "skills": [
         {
           "name": "antfu",
@@ -122,6 +124,7 @@
     },
     {
       "source": "anthropics",
+      "url": "https://gitcode.com/GitHub_Trending/skills3/skills.git",
       "skills": [
         {
           "name": "algorithmic-art",
@@ -228,7 +231,8 @@
       ]
     },
     {
-      "source": "agentskill",
+      "source": "agentskill/agent-skills",
+      "url": "https://gitcode.com/GitHub_Trending/agentskill/agent-skills.git",
       "skills": [
         {
           "name": "api-and-interface-design",
@@ -377,7 +381,8 @@
       ]
     },
     {
-      "source": "mattpocock",
+      "source": "skills13/skills",
+      "url": "https://gitcode.com/GitHub_Trending/skills13/skills.git",
       "skills": [
         {
           "name": "design-an-interface",
@@ -623,6 +628,7 @@
     },
     {
       "source": "github",
+      "url": "https://gitcode.com/GitHub_Trending/aw/awesome-copilot.git",
       "skills": [
         {
           "name": "acquire-codebase-knowledge",
