@@ -1,0 +1,13 @@
+pub mod add;
+pub mod cache;
+pub mod find;
+pub mod config;
+pub mod list;
+pub mod new;
+pub mod platforms;
+pub mod query;
+pub mod rec;
+pub mod remove;
+pub mod restore;
+pub mod sources;
+pub mod update;

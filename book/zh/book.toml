@@ -1,0 +1,13 @@
+[book]
+language = "en"
+src = "src"
+title = "XSkill's 用户指南"
+
+[build]
+build-dir = "build"
+
+[output.html]
+git-repository-url = "https://github.com/jetsung/xskill"
+site-url = "/man/zh/"
+
+[output.linkcheck]

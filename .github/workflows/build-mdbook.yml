@@ -1,0 +1,45 @@
+name: Build Book
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: '0.4.10'
+
+      - name: Install `mdbook-linkcheck`
+        run: cargo install --locked mdbook-linkcheck@0.7.7
+
+      - name: Build book
+        run: |
+          cargo run --package generate-book
+          mdbook build book/en
+          mdbook build book/zh
+
+      - name: Collect output
+        run: |
+          mkdir -p output/man/en output/man/zh
+          cp -r book/en/build/html/. output/man/en/
+          cp -r book/zh/build/html/. output/man/zh/
+
+      - name: Deploy to book branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+          publish_branch: mdbook
+          commit_message: "chore: update book [skip ci]"

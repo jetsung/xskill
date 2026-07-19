@@ -1,0 +1,9 @@
+[package]
+name = "generate-book"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+pulldown-cmark = "0.13.4"
+pulldown-cmark-to-cmark = "22.0.0"

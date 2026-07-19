@@ -19,3 +19,11 @@ Thumbs.db
 # xskill local skills directory (installed skills)
 /skills/
 /.xskill-lock.json
+
+/openspec/
+
+# mdbook
+/book/en/build
+/book/en/src
+/book/zh/build
+/book/zh/src

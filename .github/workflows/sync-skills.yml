@@ -1,0 +1,79 @@
+name: Sync Skills Index
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 每 6 小时同步一次
+    - cron: "0 */6 * * *"
+
+# ---------------------------------------------------------------
+# 技能源列表 —— 在此添加 / 删除 / 修改即可
+# ---------------------------------------------------------------
+env:
+  SOURCES: |
+    [
+      {
+        "name": "anthropics",
+        "url": "https://github.com/anthropics/skills"
+      },
+      {
+        "name": "github",
+        "url": "https://github.com/github/awesome-copilot"
+      },
+      {
+        "name": "antfu",
+        "url": "https://github.com/antfu/skills"
+      },
+      {
+        "name": "addyosmani",
+        "url": "https://github.com/addyosmani/agent-skills"
+      },
+      {
+        "name": "mattpocock",
+        "url": "https://github.com/mattpocock/skills"
+      }
+    ]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Collect skills from sources
+        env:
+          SOURCES: ${{ vars.SOURCES || env.SOURCES }}
+        run: python .github/scripts/collect_skills.py
+
+      - name: Fetch mdbook from mdbook branch
+        run: |
+          git fetch origin mdbook:mdbook || true
+          if git show mdbook:man >/dev/null 2>&1; then
+            mkdir -p output/man
+            git checkout mdbook -- man/
+            mv man output/
+          fi
+
+      - name: Collect output
+        run: |
+          cp schemas/*.json output/
+          cp index.html output/
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+          destination_dir: .
+          commit_message: "chore: update skills index [skip ci]"
+          cname: ${{ vars.PAGES_DOMAIN }}
