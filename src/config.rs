@@ -144,6 +144,7 @@ pub fn default_platforms() -> HashMap<String, Platform> {
         ("qoder", ".qoder", "skills", "AGENTS.md", true),
         ("qwen", ".qwen", "skills", "AGENTS.md", true),
         ("roo", ".roo", "skills", "AGENTS.md", true),
+        ("zcode", ".zcode", "skills", "AGENTS.md", true),
     ];
 
     let mut map = HashMap::new();
@@ -404,12 +405,21 @@ impl Platform {
         }
     }
 
-    /// 获取 skills 安装目录
+    /// 获取 skills 安装目录（相对于 resolve_path）
     pub fn skills_dir(&self) -> Option<PathBuf> {
         if self.skills.is_empty() {
             None
         } else {
             Some(self.resolve_path().join(&self.skills))
+        }
+    }
+
+    /// 获取 skills 安装目录（基于指定 base_dir，用于 global/project 切换）
+    pub fn skills_dir_with_base(&self, base_dir: &Path) -> Option<PathBuf> {
+        if self.skills.is_empty() {
+            None
+        } else {
+            Some(base_dir.join(&self.path).join(&self.skills))
         }
     }
 
@@ -609,11 +619,12 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 16);
+        assert_eq!(platforms.len(), 17);
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
         assert!(platforms.contains_key("gemini"));
         assert!(platforms.contains_key("jcode"));
+        assert!(platforms.contains_key("zcode"));
 
         let claude = &platforms["claude"];
         assert_eq!(claude.path, ".claude");
@@ -628,7 +639,7 @@ mod tests {
         assert_eq!(config.cache.ttl, 600);
         assert!(!config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 16);
+        assert_eq!(config.platforms.len(), 17);
     }
 
     #[test]

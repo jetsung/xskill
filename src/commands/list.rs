@@ -37,19 +37,31 @@ pub fn run(global: bool, agent: Option<&str>) -> Result<()> {
         validate_agent(&config, platform_name)?;
     }
     for pname in config.platform_names() {
-        let platform_skills = scan_platform_with_paths(&config, pname, global)?;
-        for (name, platform_path) in platform_skills {
-            let entry = skills.entry(name.clone()).or_insert_with(|| InstalledSkill {
-                display_path: platform_path.clone(),
-                in_canonical: false,
-                platforms: Vec::new(),
-            });
-            // 如果不在规范目录中，使用平台路径
-            if !entry.in_canonical {
-                entry.display_path = platform_path;
+        let platform = config.platforms.get(pname);
+        let is_agents_compat = platform.map(|p| p.agents_compat).unwrap_or(false);
+
+        if is_agents_compat {
+            // agents_compat 平台直接读取规范目录，视为已链接所有规范目录中的 skill
+            for entry in skills.values_mut() {
+                if entry.in_canonical && !entry.platforms.contains(&pname.to_string()) {
+                    entry.platforms.push(pname.to_string());
+                }
             }
-            if !entry.platforms.contains(&pname.to_string()) {
-                entry.platforms.push(pname.to_string());
+        } else {
+            let platform_skills = scan_platform_with_paths(&config, pname, global)?;
+            for (name, platform_path) in platform_skills {
+                let entry = skills.entry(name.clone()).or_insert_with(|| InstalledSkill {
+                    display_path: platform_path.clone(),
+                    in_canonical: false,
+                    platforms: Vec::new(),
+                });
+                // 如果不在规范目录中，使用平台路径
+                if !entry.in_canonical {
+                    entry.display_path = platform_path;
+                }
+                if !entry.platforms.contains(&pname.to_string()) {
+                    entry.platforms.push(pname.to_string());
+                }
             }
         }
     }

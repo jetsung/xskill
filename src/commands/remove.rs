@@ -42,7 +42,12 @@ pub fn run(skill: &str, global: bool, agent: Option<&str>) -> Result<()> {
             remove_from_platform(&config, skill, platform_name, global)?
         }
         RemoveTarget::AllPlatforms => {
-            remove_from_all_platforms(&config, skill, global)?
+            // 移除各平台 symlink
+            let n = remove_from_all_platforms(&config, skill, global)?;
+            // 移除规范目录
+            let canonical_dir = canonical_skills_dir(global).join(skill);
+            let dir_removed = remove_from_target(skill, &canonical_dir)?;
+            n + dir_removed
         }
     };
 
@@ -140,12 +145,22 @@ fn remove_from_platform(
     config: &Config,
     skill: &str,
     platform_name: &str,
-    _global: bool,
+    global: bool,
 ) -> Result<usize> {
     validate_agent(config, platform_name)?;
     let platform = config.get_platform(platform_name).unwrap();
 
-    let skills_dir = platform.skills_dir()
+    if platform.agents_compat {
+        println!("{}: {} ({})", "Skipped".dimmed(), platform_name, "agents_compat");
+        return Ok(0);
+    }
+
+    let base_dir = if global {
+        dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"))
+    } else {
+        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+    };
+    let skills_dir = platform.skills_dir_with_base(&base_dir)
         .ok_or_else(|| anyhow::anyhow!("Platform {} has no skills directory configured", platform_name))?;
 
     let link_path = skills_dir.join(skill);
@@ -178,6 +193,9 @@ fn remove_from_all_platforms(
             Some(p) => p,
             None => continue,
         };
+        if platform.agents_compat {
+            continue;
+        }
         let platform_path = base_dir.join(&platform.path);
         if !platform_path.exists() || platform.skills.is_empty() {
             continue;
@@ -200,12 +218,22 @@ fn remove_from_all_platforms(
 fn remove_all_from_platform(
     config: &Config,
     platform_name: &str,
-    _global: bool,
+    global: bool,
 ) -> Result<usize> {
     validate_agent(config, platform_name)?;
     let platform = config.get_platform(platform_name).unwrap();
 
-    if let Some(skills_dir) = platform.skills_dir() {
+    if platform.agents_compat {
+        println!("{}: {} ({})", "Skipped".dimmed(), platform_name, "agents_compat");
+        return Ok(0);
+    }
+
+    let base_dir = if global {
+        dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"))
+    } else {
+        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+    };
+    if let Some(skills_dir) = platform.skills_dir_with_base(&base_dir) {
         if skills_dir.exists() || skills_dir.is_symlink() {
             return remove_all_from_dir(&skills_dir);
         }
@@ -228,6 +256,9 @@ fn remove_platform_symlinks(config: &Config, skill: &str, global: bool) -> Resul
             Some(p) => p,
             None => continue,
         };
+        if platform.agents_compat {
+            continue;
+        }
         let platform_path = base_dir.join(&platform.path);
         if !platform_path.exists() || platform.skills.is_empty() {
             continue;
@@ -271,6 +302,9 @@ fn remove_all_platform_symlinks(config: &Config, global: bool) -> Result<usize> 
             Some(p) => p,
             None => continue,
         };
+        if platform.agents_compat {
+            continue;
+        }
         let platform_path = base_dir.join(&platform.path);
         if !platform_path.exists() || platform.skills.is_empty() {
             continue;
@@ -313,6 +347,9 @@ fn remove_all_from_all_platforms(config: &Config, global: bool) -> Result<usize>
             Some(p) => p,
             None => continue,
         };
+        if platform.agents_compat {
+            continue;
+        }
         let platform_path = base_dir.join(&platform.path);
         if !platform_path.exists() || platform.skills.is_empty() {
             continue;

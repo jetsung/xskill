@@ -132,8 +132,14 @@ fn symlink_to_platform(
     validate_agent(config, platform_name)?;
     let platform = config.get_platform(platform_name).unwrap();
 
-    let skills_dir = platform.skills_dir()
-        .ok_or_else(|| anyhow::anyhow!("Platform {} has no skills directory configured", platform_name))?;
+    if platform.agents_compat {
+        println!("{}: {} ({})", "Skipped".dimmed(), platform_name, "agents_compat");
+        return Ok(());
+    }
+
+    if platform.skills.is_empty() {
+        bail!("Platform {} has no skills directory configured", platform_name);
+    }
 
     // 平台目录不存在时自动创建
     let base_dir = if global {
@@ -147,7 +153,7 @@ fn symlink_to_platform(
     }
 
     let canonical_dir = canonical_skills_dir(global).join(dest_name);
-    let link_path = skills_dir.join(dest_name);
+    let link_path = platform_path.join(&platform.skills).join(dest_name);
 
     match create_relative_symlink(&canonical_dir, &link_path) {
         Ok(true) => {
@@ -197,6 +203,10 @@ fn symlink_to_all_platforms(
         }
 
         if platform.skills.is_empty() {
+            continue;
+        }
+
+        if platform.agents_compat {
             continue;
         }
 

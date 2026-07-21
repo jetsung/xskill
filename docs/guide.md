@@ -16,12 +16,41 @@ A skills management tool for discovering, installing, and managing reusable agen
 
 ## Installation
 
+### Quick install
+
+**Linux / macOS:**
+
+```bash
+curl -fsSL https://xskill.gcli.cn/install.sh | bash
+```
+
+The script auto-detects OS and architecture, downloads the appropriate pre-built binary from GitHub Releases, and installs it to `~/.local/bin` (or `/usr/local/bin` for root).
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://xskill.gcli.cn/install.ps1 | iex
+```
+
+Auto-detects architecture, downloads from GitHub Releases, and installs to `%USERPROFILE%\.local\bin` (or `%ProgramFiles%\xskill\bin` for admin). The script will prompt you to add it to PATH if needed.
+
+### From crates.io
+
+```bash
+cargo install xskill
+```
+
+### From Git
+
+```bash
+cargo install --git https://github.com/jetsung/xskill.git xskill
+```
+
 ### From source
 
 ```bash
 git clone https://github.com/jetsung/xskill.git
 cd xskill
-cargo build --release
 cargo install --path .
 ```
 
@@ -150,7 +179,7 @@ Options:
 
 ### `platforms` — List configured platforms
 
-List all configured AI coding platforms:
+List all configured AI coding platforms (sorted alphabetically):
 
 ```bash
 xskill platforms
@@ -378,7 +407,7 @@ Options:
 
 1. **Skill selection** — Substring search (exact mode) from cached skills. Display format: `name [source]` (registry entries show `name [registry] [source]`). Non-selected names use default color, selected names use blue. Source tags are always dark gray; `[registry]` tags turn green when selected. Search box at bottom, list arranged upward. Keyboard hints: `up/down navigate | enter select | esc cancel`. Match count shown as `current/total` (e.g., `2/2`).
 2. **Platform selection** — Multi-select target platforms. First item is `Default` (disabled, means no platform symlinks). Remaining items are all configured platforms. Press TAB to select/deselect, Enter to confirm. Selected rows use blue text with dark background highlight.
-3. **Install** — Installs the skill to the canonical directory (`.agents/skills/<name>` or `~/.agents/skills/<name>` with `-g`), then creates relative symlinks for each selected platform. Reports `Installed:`, `Symlinked:`, and any `Failed:` platforms.
+3. **Install** — Installs the skill to the canonical directory (`.agents/skills/<name>` or `~/.agents/skills/<name>` with `-g`), then creates relative symlinks for each selected platform. Reports `Installed:`, `Symlinked:`, and any `Failed:` platforms. Registry skills are cloned directly from their URL, independent of local `sources` configuration.
 
 Press Esc or Ctrl-C at any step to cancel.
 
@@ -628,7 +657,7 @@ Each platform entry configures how skills are installed for a specific AI coding
 | `skills` | No | — | Skills subdirectory name relative to `path`. Omit to skip skill installation |
 | `agents` | No | — | Agents config file name relative to `path`. Omit to skip agents installation |
 | `source` | No | `"AGENTS.md"` | Source file name under the fixed `.agents/` directory |
-| `agents_compat` | No | `false` | Whether this platform can reuse `.agents/` resources (project-level agents configuration) |
+| `agents_compat` | No | `false` | Whether this platform can reuse `.agents/` resources. When `true`, the platform reads directly from the canonical directory — add/remove/restore skip symlink operations (single platform: `Skipped` output; `-a '*'`: silent). find TUI lists and selects normally, silently skips symlink during install. list `-a` shows all canonical skills as linked. |
 
 #### Symlink behavior
 
@@ -671,10 +700,10 @@ Recommended skills are managed by the `rec` command for easy installation.
 
 | Field | Required | Default | Description |
 |-------|----------|---------|-------------|
-| `cache.enabled` | No | `false` | Enable local skills cache for `query` command |
+| `cache.enabled` | No | `false` | Enable local skills cache for `query` and `find` commands |
 | `cache.ttl` | No | `600` | Cache time-to-live in seconds (default: 10 minutes). Applies to both the main cache (`skills.json`) and URL cache (`source_<md5>.json`) |
 
-When enabled, `xskill cache update` fetches skill metadata from all sources and stores it locally. Subsequent `query` commands read from cache instead of cloning repositories.
+When enabled, `xskill cache update` fetches skill metadata from all sources and stores it locally. Subsequent `query` and `find` commands check `cache.ttl` for staleness: if the cache is fresh, it is used directly; if stale or empty with configured sources, sources are re-cloned and the cache is automatically refreshed.
 
 ### Registry
 
@@ -859,7 +888,7 @@ For `~/.xskill/settings.json`. Defines the full configuration structure.
 | `skills` | `string` | No | `""` | Skills subdirectory name relative to `path`. Empty string skips skill installation |
 | `agents` | `string` | No | `""` | Agents config file name relative to `path`. Empty string skips agents installation |
 | `source` | `string` | No | `"AGENTS.md"` | Source file name under the fixed `.agents/` directory. `<path>/<agents>` is symlinked to `.agents/<source>` |
-| `agents_compat` | `boolean` | No | `false` | Whether this platform can reuse `.agents/` resources (project-level agents configuration) |
+| `agents_compat` | `boolean` | No | `false` | Whether this platform can reuse `.agents/` resources. When `true`, reads directly from canonical directory — symlink operations are skipped |
 
 **Source** (`sources[]`):
 
@@ -984,7 +1013,6 @@ xskill/
 │       ├── cache.rs        # Cache management
 │       ├── config.rs       # Config management
 │       └── new.rs          # Create skill project
-└── openspec/               # Change tracking
 ```
 
 ## License

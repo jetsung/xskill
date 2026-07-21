@@ -14,6 +14,40 @@
 
 ## 安装
 
+### 快速安装
+
+**Linux / macOS：**
+
+```bash
+curl -fsSL https://xskill.gcli.cn/install.sh | bash
+```
+
+**Windows（PowerShell）：**
+
+```powershell
+irm https://xskill.gcli.cn/install.ps1 | iex
+```
+
+### 从 crates.io 安装
+
+```bash
+cargo install xskill
+```
+
+### 从 Git 安装
+
+```bash
+cargo install --git https://github.com/jetsung/xskill.git xskill
+```
+
+或从 AtomGit 安装（国内用户）：
+
+```bash
+cargo install --git https://atomgit.com/jetsung/xskill.git xskill
+```
+
+### 从源码安装
+
 ```bash
 git clone https://github.com/jetsung/xskill.git
 cd xskill

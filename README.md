@@ -14,6 +14,34 @@ A skills management tool for discovering, installing, and managing reusable agen
 
 ## Installation
 
+### Quick install
+
+**Linux / macOS:**
+
+```bash
+curl -fsSL https://xskill.gcli.cn/install.sh | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://xskill.gcli.cn/install.ps1 | iex
+```
+
+### From crates.io
+
+```bash
+cargo install xskill
+```
+
+### From Git
+
+```bash
+cargo install --git https://github.com/jetsung/xskill.git xskill
+```
+
+### From source
+
 ```bash
 git clone https://github.com/jetsung/xskill.git
 cd xskill

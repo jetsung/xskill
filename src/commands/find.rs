@@ -139,11 +139,18 @@ pub fn run(skill: Option<&str>, source: Option<&str>, global: bool) -> Result<()
     let skill_name = &selected_skill.skill.name;
 
     {
-        // Resolve source and clone once
-        let resolved = resolve_source(&config, source_name)?;
+        // Resolve source URL — registry skills use source_url directly
+        let source_url = if selected_skill.is_registry {
+            selected_skill
+                .source_url
+                .clone()
+                .unwrap_or_else(|| source_name.to_string())
+        } else {
+            resolve_source(&config, source_name)?.url
+        };
         let skill_path = skill_name.to_string();
         let (_tmp_dir, source_dir) =
-            git::install_skill_sparse(&resolved.url, &skill_path, skill_name)?;
+            git::install_skill_sparse(&source_url, &skill_path, skill_name)?;
 
         let mut failed: Vec<String> = Vec::new();
 
@@ -179,6 +186,13 @@ pub fn run(skill: Option<&str>, source: Option<&str>, global: bool) -> Result<()
         // 2. Create symlinks for selected platforms
         let mut linked: Vec<String> = Vec::new();
         for platform in &platforms {
+            // agents_compat 平台直接读取规范目录，静默跳过 symlink
+            if let Some(p) = config.platforms.get(platform.as_str()) {
+                if p.agents_compat {
+                    linked.push(platform.to_string());
+                    continue;
+                }
+            }
             let dest_dir = match resolve_platform_dest(&config, platform, skill_name, global) {
                 Some(dir) => dir,
                 None => {
@@ -215,7 +229,7 @@ pub fn run(skill: Option<&str>, source: Option<&str>, global: bool) -> Result<()
         }
 
         // Update lock file
-        update_lock_file(source_name, &resolved, &skill_path, skill_name, global)?;
+        update_lock_file(source_name, &source_url, &skill_path, skill_name, global)?;
 
         if !failed.is_empty() {
             println!();
@@ -343,7 +357,7 @@ fn resolve_platform_dest(
 /// Update the lock file after successful installation.
 fn update_lock_file(
     source: &str,
-    resolved: &crate::utils::ResolvedSource,
+    source_url: &str,
     _skill_path: &str,
     skill_name: &str,
     global: bool,
@@ -361,7 +375,7 @@ fn update_lock_file(
     };
 
     let skill_path_in_repo = format!("skills/{}/SKILL.md", skill_name);
-    let tmp_dir = git::clone_for_listing(&resolved.url)?;
+    let tmp_dir = git::clone_for_listing(source_url)?;
     let skill_folder_hash =
         git::get_skill_folder_hash(tmp_dir.path(), skill_name).unwrap_or_default();
 
@@ -377,7 +391,7 @@ fn update_lock_file(
     let entry = LockEntry {
         source: source.to_string(),
         source_type,
-        source_url: resolved.url.clone(),
+        source_url: source_url.to_string(),
         skill_path: skill_path_in_repo,
         skill_folder_hash,
         installed_at,

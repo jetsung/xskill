@@ -102,7 +102,11 @@ pub fn url_cache_filename(url: &str) -> String {
     let normalized = url.strip_suffix(".git").unwrap_or(url);
     let mut hasher = Md5::new();
     hasher.update(normalized.as_bytes());
-    let hash = format!("{:x}", hasher.finalize());
+    let hash = hasher.finalize().iter().fold(String::with_capacity(32), |mut acc, b| {
+        use std::fmt::Write;
+        write!(acc, "{:02x}", b).unwrap();
+        acc
+    });
     format!("source_{}.json", hash)
 }
 

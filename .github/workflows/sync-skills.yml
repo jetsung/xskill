@@ -45,16 +45,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.x"
+      # - name: Set up Python
+      #   uses: actions/setup-python@v6
+      #   with:
+      #     python-version: "3.x"
+
+      # - name: Collect skills from sources
+      #   env:
+      #     SOURCES: ${{ vars.SOURCES || env.SOURCES }}
+      #   run: python .github/scripts/collect_skills.py
+
+      - name: Set up XSkill
+        run: |
+          bash ./site/install.sh -p
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Collect skills from sources
         env:
           SOURCES: ${{ vars.SOURCES || env.SOURCES }}
-        run: python .github/scripts/collect_skills.py
-
+        run: |
+          # 添加源
+          echo "$SOURCES" | jq -c '.[]' | while read -r src; do
+            name=$(echo "$src" | jq -r '.name // empty')
+            url=$(echo "$src" | jq -r '.url')
+            if [ -n "$name" ]; then
+              xskill sources add --name "$name" --url "$url"
+            else
+              xskill sources add --url "$url"
+            fi
+          done
+          # 启用缓存
+          xskill config --set cache.enabled=true
+          # 生成缓存
+          xskill cache update
+          # 复制缓存到输出目录
+          mkdir -p output
+          cp ~/.xskill/cache/skills.json output/skills.json
       - name: Fetch mdbook from mdbook branch
         run: |
           git fetch origin mdbook:mdbook || true
@@ -67,7 +93,7 @@ jobs:
       - name: Collect output
         run: |
           cp schemas/*.json output/
-          cp index.html output/
+          cp -r site/* output/
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4

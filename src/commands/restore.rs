@@ -37,12 +37,21 @@ fn resolve_restore_target(global: bool, agent: Option<&str>) -> Result<Vec<PathB
     let config = Config::load()?;
     let mut targets = Vec::new();
 
+    let base_dir = if global {
+        dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"))
+    } else {
+        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+    };
+
     if let Some(agent_value) = agent {
         if agent_value == "*" {
             // All configured platforms
             for name in config.platform_names() {
                 if let Some(platform) = config.get_platform(name) {
-                    if let Some(skills_dir) = platform.skills_dir() {
+                    if platform.agents_compat {
+                        continue;
+                    }
+                    if let Some(skills_dir) = platform.skills_dir_with_base(&base_dir) {
                         targets.push(skills_dir);
                     }
                 }
@@ -51,7 +60,11 @@ fn resolve_restore_target(global: bool, agent: Option<&str>) -> Result<Vec<PathB
             // Specific platform
             validate_agent(&config, agent_value)?;
             let platform = config.get_platform(agent_value).unwrap();
-            let skills_dir = platform.skills_dir()
+            if platform.agents_compat {
+                // agents_compat 平台直接读取规范目录，无需 restore symlink
+                return Ok(targets);
+            }
+            let skills_dir = platform.skills_dir_with_base(&base_dir)
                 .ok_or_else(|| anyhow::anyhow!(
                     "Platform {} has no skills directory configured", agent_value
                 ))?;
