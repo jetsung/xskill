@@ -175,6 +175,25 @@ enum Commands {
         global: bool,
     },
 
+    /// Symlink existing skills to a platform
+    Link {
+        /// Skill name (use '*' to link all skills)
+        #[arg(short, long)]
+        skill: Option<String>,
+
+        /// Target platform ('*' for all platforms)
+        #[arg(short, long)]
+        agent: Option<String>,
+
+        /// Link from global directory (~/.agents/skills)
+        #[arg(short, long)]
+        global: bool,
+
+        /// Shorthand for --skill `'*'` --agent `'*'`
+        #[arg(short = 'A', long = "all")]
+        all: bool,
+    },
+
     /// Create a new skill project
     New {
         /// Skill name (used as directory name)
@@ -380,6 +399,16 @@ fn run() -> Result<()> {
         }
         Commands::Find { source, skill, global } => {
             commands::find::run(skill.as_deref(), source.as_deref(), global)
+        }
+        Commands::Link { skill, agent, global, all } => {
+            let (final_skill, final_agent) = if all {
+                ("*".to_string(), Some("*".to_string()))
+            } else {
+                let skill = skill.ok_or_else(|| anyhow::anyhow!("--skill option is required (or use --all)"))?;
+                (skill, agent)
+            };
+            let agent = final_agent.ok_or_else(|| anyhow::anyhow!("--agent option is required (or use --all)"))?;
+            commands::link::run(&final_skill, &agent, global)
         }
         Commands::New { name, description, template } => {
             commands::new::run(&name, &description, &template)

@@ -83,6 +83,9 @@ xskill find --skill git
 # 从指定源查找
 xskill find --from antfu
 
+# 将已有技能软链接到指定平台
+xskill link -s vue -a claude
+
 # 移除技能
 xskill remove -s vue
 ```
@@ -94,6 +97,7 @@ xskill remove -s vue
 | `sources` | 管理配置源（list/add/remove/edit） |
 | `platforms` | 列出配置平台 |
 | `add` | 安装技能 |
+| `link` | 将已有技能软链接到指定平台 |
 | `remove` | 移除技能 |
 | `update` | 从锁文件更新已安装技能 |
 | `restore` | 从项目锁文件恢复技能 |

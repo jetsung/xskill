@@ -9,6 +9,7 @@ use colored::Colorize;
 use ratatui::style::Color;
 use ratatui::text::{Line, Span};
 use skim::prelude::*;
+use std::collections::HashMap;
 use std::fs;
 use std::io::IsTerminal;
 use std::path::PathBuf;
@@ -25,6 +26,18 @@ struct FindItem {
     source: String,
     is_registry: bool,
     source_url: Option<String>,
+}
+
+impl FindItem {
+    /// Get the source name for lock file, falling back to URL if empty.
+    fn source_name(&self) -> &str {
+        if self.source.is_empty() {
+            // For registry with name collision, use URL as identifier
+            self.source_url.as_deref().unwrap_or("")
+        } else {
+            &self.source
+        }
+    }
 }
 
 impl SkimItem for FindItem {
@@ -74,6 +87,7 @@ struct SelectItem {
     display: String,
     value: String,
     disabled: bool,
+    label: Option<&'static str>,
 }
 
 impl SkimItem for SelectItem {
@@ -96,7 +110,20 @@ impl SkimItem for SelectItem {
         } else {
             base
         };
-        Line::from(vec![Span::styled(self.display.clone(), style)])
+        if let Some(label) = self.label {
+            // Render label in green, rest in default
+            Line::from(vec![
+                Span::styled(format!("{} ", label), base.fg(Color::Green)),
+                Span::styled(
+                    self.display.strip_prefix(&format!("{}: ", label))
+                        .unwrap_or(&self.display)
+                        .to_string(),
+                    base,
+                ),
+            ])
+        } else {
+            Line::from(vec![Span::styled(self.display.clone(), style)])
+        }
     }
 }
 
@@ -125,116 +152,152 @@ pub fn run(skill: Option<&str>, source: Option<&str>, global: bool) -> Result<()
         }
     }
 
-    let selected_skill = run_skill_tui(items, skill)?;
+    let selected_skills = run_skill_tui(items, skill)?;
 
     // ---- Step 2: Platform selection (multi-select) ----
     let platforms = run_platform_tui(&config)?;
 
-    // ---- Step 3: Install ----
-    let source_name = if selected_skill.source.is_empty() {
-        selected_skill.source_url.as_deref().unwrap_or("")
-    } else {
-        &selected_skill.source
-    };
-    let skill_name = &selected_skill.skill.name;
+    // ---- Step 3: Install (grouped by source URL) ----
+    install_skills(&config, &selected_skills, &platforms, global)?;
 
-    {
-        // Resolve source URL — registry skills use source_url directly
-        let source_url = if selected_skill.is_registry {
-            selected_skill
-                .source_url
-                .clone()
-                .unwrap_or_else(|| source_name.to_string())
+    Ok(())
+}
+
+/// Group selected skills by source URL, clone each repo once, install all skills from it.
+fn install_skills(
+    config: &Config,
+    selected: &[FindItem],
+    platforms: &[String],
+    global: bool,
+) -> Result<()> {
+    // Group by source URL
+    let mut groups: HashMap<String, Vec<&FindItem>> = HashMap::new();
+    for item in selected {
+        let source_name = if item.source.is_empty() {
+            item.source_url.as_deref().unwrap_or("")
         } else {
-            resolve_source(&config, source_name)?.url
+            &item.source
         };
-        let skill_path = skill_name.to_string();
-        let (_tmp_dir, source_dir) =
-            git::install_skill_sparse(&source_url, &skill_path, skill_name)?;
-
-        let mut failed: Vec<String> = Vec::new();
-
-        // 1. Always install to canonical .agents directory
-        let canonical_dir = if global {
-            dirs::home_dir()
-                .unwrap_or_default()
-                .join(".agents")
-                .join("skills")
+        let url = if item.is_registry {
+            item.source_url.clone().unwrap_or_else(|| source_name.to_string())
         } else {
-            std::env::current_dir()
-                .unwrap_or_default()
-                .join(".agents")
-                .join("skills")
-        }
-        .join(skill_name);
+            resolve_source(config, source_name)?.url
+        };
+        groups.entry(url).or_default().push(item);
+    }
 
-        if let Err(e) = fs::create_dir_all(&canonical_dir) {
-            bail!("Failed to create canonical directory: {}", e);
-        }
-        if canonical_dir.exists() {
-            let _ = fs::remove_dir_all(&canonical_dir);
-        }
-        if let Err(e) = git::copy_dir_recursive(&source_dir, &canonical_dir) {
-            bail!("Failed to install skill: {}", e);
-        }
-        println!(
-            "{}: {}",
-            "Installed".green(),
-            crate::utils::display_path(&canonical_dir)
-        );
+    let mut all_failed: Vec<String> = Vec::new();
 
-        // 2. Create symlinks for selected platforms
-        let mut linked: Vec<String> = Vec::new();
-        for platform in &platforms {
-            // agents_compat 平台直接读取规范目录，静默跳过 symlink
-            if let Some(p) = config.platforms.get(platform.as_str()) {
-                if p.agents_compat {
-                    linked.push(platform.to_string());
-                    continue;
-                }
-            }
-            let dest_dir = match resolve_platform_dest(&config, platform, skill_name, global) {
-                Some(dir) => dir,
-                None => {
-                    failed.push(format!("{} (platform not found)", platform));
-                    continue;
-                }
-            };
+    for (source_url, skills) in &groups {
+        // Resolve source name for lock file
+        let source_name = skills[0].source_name();
 
-            if let Err(e) = fs::create_dir_all(&dest_dir.parent().unwrap_or(&dest_dir)) {
-                failed.push(format!("{} ({})", platform, e));
+        // Clone once for this source
+        let tmp_dir = git::clone_for_listing(source_url)?;
+        let workdir = tmp_dir.path();
+
+        for item in skills {
+            let skill_name = &item.skill.name;
+            let (skill_path, dest_name) = extract_skill_path(&item.skill.path);
+
+            // Source dir from the clone — use CachedSkill.path directly
+            let source_dir = workdir.join(&item.skill.path).parent()
+                .map(|p| p.to_path_buf())
+                .unwrap_or_else(|| workdir.join("skills").join(&skill_path));
+            if !source_dir.exists() {
+                all_failed.push(format!("{} (not found in repo: {})", skill_name, item.skill.path));
                 continue;
             }
 
-            // Remove old dir/link if exists
-            if dest_dir.exists() || dest_dir.is_symlink() {
-                let _ = fs::remove_dir_all(&dest_dir);
+            // 1. Install to canonical .agents directory
+            let canonical_dir = if global {
+                dirs::home_dir()
+                    .unwrap_or_default()
+                    .join(".agents")
+                    .join("skills")
+            } else {
+                std::env::current_dir()
+                    .unwrap_or_default()
+                    .join(".agents")
+                    .join("skills")
             }
+            .join(&dest_name);
 
-            match crate::utils::create_relative_symlink(&canonical_dir, &dest_dir) {
-                Ok(true) => linked.push(platform.to_string()),
-                _ => {
-                    // Fallback to copy
-                    if let Err(e) = git::copy_dir_recursive(&source_dir, &dest_dir) {
-                        failed.push(format!("{} ({})", platform, e));
+            if let Err(e) = fs::create_dir_all(&canonical_dir) {
+                all_failed.push(format!("{} ({})", skill_name, e));
+                continue;
+            }
+            if canonical_dir.exists() {
+                let _ = fs::remove_dir_all(&canonical_dir);
+            }
+            if let Err(e) = git::copy_dir_recursive(&source_dir, &canonical_dir) {
+                all_failed.push(format!("{} ({})", skill_name, e));
+                continue;
+            }
+            eprintln!(
+                "{}: {}",
+                "Installed".green(),
+                crate::utils::display_path(&canonical_dir)
+            );
+
+            // 2. Create symlinks for selected platforms
+            let mut linked: Vec<String> = Vec::new();
+            for platform in platforms {
+                if let Some(p) = config.platforms.get(platform.as_str()) {
+                    if p.agents_compat {
+                        linked.push(platform.to_string());
                         continue;
                     }
-                    linked.push(format!("{} (copy)", platform));
+                }
+                let dest_dir = match resolve_platform_dest(config, platform, &dest_name, global) {
+                    Some(dir) => dir,
+                    None => {
+                        all_failed.push(format!("{}: {} (platform not found)", skill_name, platform));
+                        continue;
+                    }
+                };
+
+                if let Err(e) = fs::create_dir_all(&dest_dir.parent().unwrap_or(&dest_dir)) {
+                    all_failed.push(format!("{}: {} ({})", skill_name, platform, e));
+                    continue;
+                }
+
+                if dest_dir.exists() || dest_dir.is_symlink() {
+                    let _ = fs::remove_dir_all(&dest_dir);
+                }
+
+                match crate::utils::create_relative_symlink(&canonical_dir, &dest_dir) {
+                    Ok(true) => linked.push(platform.to_string()),
+                    _ => {
+                        if let Err(e) = git::copy_dir_recursive(&source_dir, &dest_dir) {
+                            all_failed.push(format!("{}: {} ({})", skill_name, platform, e));
+                            continue;
+                        }
+                        linked.push(format!("{} (copy)", platform));
+                    }
                 }
             }
-        }
 
-        if !linked.is_empty() {
-            println!("{}: {}", "Symlinked".green(), linked.join(", "));
-        }
+            if !linked.is_empty() {
+                eprintln!("{}: {}", "Symlinked".green(), linked.join(", "));
+            }
 
-        // Update lock file
-        update_lock_file(source_name, &source_url, &skill_path, skill_name, global)?;
+            // 3. Update lock file — use full path from CachedSkill.path
+            update_lock_file(
+                source_name,
+                source_url,
+                &item.skill.path,
+                skill_name,
+                global,
+            )?;
 
-        if !failed.is_empty() {
-            println!();
-            println!("{}: {}", "Failed".red(), failed.join(", "));
+            eprintln!();
         }
+    }
+
+    if !all_failed.is_empty() {
+        println!();
+        eprintln!("{}: {}", "Failed".red(), all_failed.join(", "));
     }
 
     Ok(())
@@ -253,15 +316,15 @@ fn load_skills(config: &Config, source: Option<&str>) -> Result<CacheData> {
 // TUI steps
 // ---------------------------------------------------------------------------
 
-/// Step 1: Fuzzy-find a skill. Returns the selected FindItem.
-fn run_skill_tui(items: Vec<FindItem>, initial_query: Option<&str>) -> Result<FindItem> {
+/// Step 1: Fuzzy-find skills (multi-select). Returns selected FindItems.
+fn run_skill_tui(items: Vec<FindItem>, initial_query: Option<&str>) -> Result<Vec<FindItem>> {
     let mut builder = SkimOptionsBuilder::default();
-    builder.multi(false);
+    builder.multi(true);
     builder.prompt("Search skills: ".to_string());
     builder.exact(true);
     builder.highlight_line(true);
     builder.color("current:bg:236,current_match:fg:151:bg:236".to_string());
-    builder.header(" \nup/down navigate | enter select | esc cancel\n ".to_string());
+    builder.header(" \nTAB: multi-select  |  enter confirm  |  esc cancel\n ".to_string());
 
     if let Some(query) = initial_query {
         builder.query(query.to_string());
@@ -274,35 +337,76 @@ fn run_skill_tui(items: Vec<FindItem>, initial_query: Option<&str>) -> Result<Fi
         bail!("Cancelled.");
     }
 
-    let matched = match output.current {
-        Some(item) => item,
-        None => bail!("No skill selected."),
-    };
+    // Prefer toggled items; fallback to cursor item if nothing toggled
+    let selected: Vec<FindItem> = output
+        .selected_items
+        .iter()
+        .filter_map(|item| item.downcast_item::<FindItem>().cloned())
+        .collect();
 
-    matched
+    if !selected.is_empty() {
+        return Ok(selected);
+    }
+
+    // No TAB selection — use cursor item
+    let matched = output
+        .current
+        .ok_or_else(|| anyhow::anyhow!("No skill selected."))?;
+    let item = matched
         .downcast_item::<FindItem>()
         .cloned()
-        .ok_or_else(|| anyhow::anyhow!("Failed to retrieve selected skill"))
+        .ok_or_else(|| anyhow::anyhow!("Failed to retrieve selected skill"))?;
+    Ok(vec![item])
 }
 
 
 /// Step 2: Select target platforms (multi-select).
 fn run_platform_tui(config: &Config) -> Result<Vec<String>> {
+    // Collect agents_compat platform names
+    let compat_names: Vec<String> = config
+        .platform_names()
+        .iter()
+        .filter(|name| {
+            config
+                .platforms
+                .get(**name)
+                .map_or(false, |p| p.agents_compat)
+        })
+        .map(|s| s.to_string())
+        .collect();
+
     let mut items = vec![SelectItem {
         display: "Default".to_string(),
         value: "-".to_string(),
         disabled: true,
+        label: None,
     }];
 
+    // Add non-compat platforms as selectable items
     for name in config.platform_names() {
+        if config
+            .platforms
+            .get(name)
+            .map_or(false, |p| p.agents_compat)
+        {
+            continue;
+        }
         items.push(SelectItem {
             display: name.to_string(),
             value: name.to_string(),
             disabled: false,
+            label: None,
         });
     }
 
-    let header = " \nTAB: select/deselect\n ";
+    let header = if compat_names.is_empty() {
+        " \nTAB: multi-select  |  enter confirm  |  esc cancel\n ".to_string()
+    } else {
+        format!(
+            " \nSELECTED: {}\nTAB: multi-select  |  enter confirm  |  esc cancel\n ",
+            compat_names.join(", ")
+        )
+    };
 
     let opts = SkimOptionsBuilder::default()
         .multi(true)
@@ -358,7 +462,7 @@ fn resolve_platform_dest(
 fn update_lock_file(
     source: &str,
     source_url: &str,
-    _skill_path: &str,
+    skill_path: &str,
     skill_name: &str,
     global: bool,
 ) -> Result<()> {
@@ -374,10 +478,28 @@ fn update_lock_file(
             .unwrap_or_else(|| "git".to_string())
     };
 
-    let skill_path_in_repo = format!("skills/{}/SKILL.md", skill_name);
+    // Normalize skill_path: ensure it starts with skills/ and ends with /SKILL.md
+    let skill_path_in_repo = {
+        let with_prefix = if skill_path.starts_with("skills/") {
+            skill_path.to_string()
+        } else {
+            format!("skills/{}", skill_path)
+        };
+        if with_prefix.ends_with("/SKILL.md") {
+            with_prefix
+        } else {
+            format!("{}/SKILL.md", with_prefix)
+        }
+    };
     let tmp_dir = git::clone_for_listing(source_url)?;
+    // Extract the sub-path under skills/ (without /SKILL.md) for hash lookup
+    let hash_key = skill_path_in_repo
+        .strip_prefix("skills/")
+        .unwrap_or(&skill_path_in_repo)
+        .strip_suffix("/SKILL.md")
+        .unwrap_or(&skill_path_in_repo);
     let skill_folder_hash =
-        git::get_skill_folder_hash(tmp_dir.path(), skill_name).unwrap_or_default();
+        git::get_skill_folder_hash(tmp_dir.path(), hash_key).unwrap_or_default();
 
     let now = chrono::Utc::now();
     let timestamp = now.format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string();
@@ -459,6 +581,23 @@ fn format_display(
     }
 }
 
+/// Extract (sparse_skill_path, leaf_name) from CachedSkill.path.
+/// e.g. "skills/engineering/grill/SKILL.md" → ("engineering/grill", "grill")
+/// e.g. "skills/vue/SKILL.md" → ("vue", "vue")
+fn extract_skill_path(full_path: &str) -> (String, String) {
+    let stripped = full_path
+        .strip_prefix("skills/")
+        .unwrap_or(full_path)
+        .strip_suffix("/SKILL.md")
+        .unwrap_or(full_path);
+    let dest_name = stripped
+        .split('/')
+        .last()
+        .unwrap_or(stripped)
+        .to_string();
+    (stripped.to_string(), dest_name)
+}
+
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
@@ -532,6 +671,27 @@ mod tests {
         };
         // Source name empty, no URL → fallback to "-"
         assert_eq!(format_display(&skill, "", true, None), "vue [registry] [-]");
+    }
+
+    #[test]
+    fn test_extract_skill_path_simple() {
+        let (path, name) = extract_skill_path("skills/vue/SKILL.md");
+        assert_eq!(path, "vue");
+        assert_eq!(name, "vue");
+    }
+
+    #[test]
+    fn test_extract_skill_path_nested() {
+        let (path, name) = extract_skill_path("skills/engineering/grill-with-docs/SKILL.md");
+        assert_eq!(path, "engineering/grill-with-docs");
+        assert_eq!(name, "grill-with-docs");
+    }
+
+    #[test]
+    fn test_extract_skill_path_deeply_nested() {
+        let (path, name) = extract_skill_path("skills/a/b/c/SKILL.md");
+        assert_eq!(path, "a/b/c");
+        assert_eq!(name, "c");
     }
 
     fn make_cache() -> CacheData {
@@ -802,6 +962,7 @@ mod tests {
             display: "Project [.agents/skills]".to_string(),
             value: "project".to_string(),
             disabled: false,
+            label: None,
         };
         assert_eq!(item.text(), "Project [.agents/skills]");
         assert_eq!(item.output(), "project");

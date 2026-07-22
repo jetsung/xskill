@@ -189,6 +189,7 @@ pub fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
 /// Sparse checkout clone, returns (TempDir, skill source dir path).
 /// The caller can copy from the returned path to multiple targets.
 /// The TempDir must be kept alive until copying is done.
+#[allow(dead_code)]
 pub fn install_skill_sparse(repo_url: &str, skill_path: &str, dest_name: &str) -> Result<(TempDir, PathBuf)> {
     let tmp_dir = TempDir::new()?;
     let tmp_path = tmp_dir.path().to_path_buf();
