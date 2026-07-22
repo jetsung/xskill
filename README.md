@@ -101,7 +101,7 @@ xskill remove -s vue
 | `restore` | Restore skills from project lock file |
 | `list` | List installed skills |
 | `query` | Query skills from a source |
-| `find` | Interactively find and install a skill (TUI) |
+| `find` | Interactively find and install skills (multi-select TUI) |
 | `rec` | Manage recommended skills (list/add/remove) |
 | `cache` | Manage skills cache |
 | `config` | Manage configuration |

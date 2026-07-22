@@ -248,7 +248,7 @@ jobs:
         if: steps.check-token.outputs.has_token == 'true'
         uses: vedantmgoyal9/winget-releaser@main
         with:
-          identifier: jetsung.xskill
+          identifier: Jetsung.XSkill
           installers-regex: 'xskill-v[\d.]+-(x86_64|aarch64)-pc-windows-msvc\.zip$'
           release-tag: ${{ github.ref_name }}
           fork-user: forkdo
