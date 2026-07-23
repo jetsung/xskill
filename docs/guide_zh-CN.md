@@ -34,6 +34,12 @@ irm https://xskill.gcli.cn/install.ps1 | iex
 
 自动检测架构，从 GitHub Releases 下载，安装到 `%USERPROFILE%\.local\bin`（管理员安装到 `%ProgramFiles%\xskill\bin`）。若安装路径不在 PATH 中，脚本会提示你添加。
 
+### 从 npm 安装
+
+```bash
+npm install -g @jetsung/xskill
+```
+
 ### 从 crates.io 安装
 
 ```bash

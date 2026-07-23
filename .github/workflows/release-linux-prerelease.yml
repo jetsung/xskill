@@ -78,3 +78,89 @@ jobs:
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    needs: [build-linux, create-release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Extract version from tag
+        id: tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download release artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.tag.outputs.TAG }}"
+          mkdir -p dist/npm
+
+          gh release download "$TAG" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern "xskill-v*.tar.xz" \
+            --dir dist/npm
+
+      - name: Prepare npm package
+        run: |
+          VERSION="${{ steps.tag.outputs.VERSION }}"
+          TAR_FILE=$(ls dist/npm/xskill-v${VERSION}-x86_64-unknown-linux-gnu.tar.xz)
+
+          # 创建目录并复制 README
+          mkdir -p npm-package/bin temp_extract
+          cp README.md npm-package/
+          tar -xJf "$TAR_FILE" -C temp_extract/
+          cp temp_extract/xskill npm-package/bin/
+          chmod +x npm-package/bin/xskill
+
+          # 创建 package.json
+          cat > npm-package/package.json << EOF
+          {
+            "name": "@jetsung/xskill",
+            "version": "${VERSION}",
+            "description": "Discover, install, manage reusable agent skill packs",
+            "license": "Apache-2.0",
+            "homepage": "https://xskill.gcli.cn",
+            "repository": {
+              "type": "git",
+              "url": "https://github.com/jetsung/xskill.git"
+            },
+            "bin": {
+              "xskill": "bin/xskill"
+            },
+            "files": ["bin/"]
+          }
+          EOF
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION="${{ steps.tag.outputs.VERSION }}"
+          TAG="${{ steps.tag.outputs.TAG }}"
+
+          # 从 tag 中提取 npm tag（如 preview、alpha、beta、rc）
+          if [[ "$TAG" == *-preview* ]]; then
+            NPM_TAG="preview"
+          elif [[ "$TAG" == *-alpha* ]]; then
+            NPM_TAG="alpha"
+          elif [[ "$TAG" == *-beta* ]]; then
+            NPM_TAG="beta"
+          elif [[ "$TAG" == *-rc* ]]; then
+            NPM_TAG="rc"
+          else
+            NPM_TAG="next"
+          fi
+
+          echo "Publishing @jetsung/xskill@${VERSION} --tag ${NPM_TAG}"
+          cd npm-package
+          npm publish --access public --tag "${NPM_TAG}"

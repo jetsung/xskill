@@ -199,3 +199,219 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  publish-npm:
+    needs: [extract-version, create-release]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download release artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ needs.extract-version.outputs.tag }}"
+          mkdir -p dist/npm
+
+          gh release download "$TAG" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern "xskill-v*.tar.xz" \
+            --dir dist/npm || true
+
+          gh release download "$TAG" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern "xskill-v*.zip" \
+            --dir dist/npm || true
+
+      - name: Prepare npm packages
+        run: |
+          VERSION="${{ needs.extract-version.outputs.version }}"
+
+          # 创建目录并复制 README
+          mkdir -p npm-package/bin temp_extract
+          cp README.md npm-package/
+
+          # Rust target -> npm platform
+          declare -A TARGET_TO_PLATFORM=(
+            ["x86_64-unknown-linux-gnu"]="linux-x64"
+            ["aarch64-unknown-linux-gnu"]="linux-arm64"
+            ["x86_64-unknown-linux-musl"]="linux-x64-musl"
+            ["aarch64-unknown-linux-musl"]="linux-arm64-musl"
+            ["loongarch64-unknown-linux-gnu"]="linux-loong64"
+            ["x86_64-apple-darwin"]="darwin-x64"
+            ["aarch64-apple-darwin"]="darwin-arm64"
+            ["x86_64-pc-windows-msvc"]="win32-x64"
+            ["aarch64-pc-windows-msvc"]="win32-arm64"
+          )
+
+          for target in "${!TARGET_TO_PLATFORM[@]}"; do
+            platform="${TARGET_TO_PLATFORM[$target]}"
+            PKG_DIR="npm-package/platforms/${platform}"
+            mkdir -p "${PKG_DIR}/bin"
+
+            # 解压二进制
+            mkdir -p temp_extract
+            if [[ "$target" == *windows* ]]; then
+              ZIP_FILE=$(ls dist/npm/xskill-v${VERSION}-${target}.zip 2>/dev/null)
+              if [ -n "$ZIP_FILE" ]; then
+                unzip -o "$ZIP_FILE" -d temp_extract/
+                cp temp_extract/xskill.exe "${PKG_DIR}/bin/"
+              fi
+            else
+              TAR_FILE=$(ls dist/npm/xskill-v${VERSION}-${target}.tar.xz 2>/dev/null)
+              if [ -n "$TAR_FILE" ]; then
+                tar -xJf "$TAR_FILE" -C temp_extract/
+                cp temp_extract/xskill "${PKG_DIR}/bin/"
+                chmod +x "${PKG_DIR}/bin/xskill"
+              fi
+            fi
+
+            # 创建平台包 package.json
+            cat > "${PKG_DIR}/package.json" << EOF
+          {
+            "name": "@jetsung/xskill-${platform}",
+            "version": "${VERSION}",
+            "description": "XSkill ${platform} binary",
+            "license": "Apache-2.0",
+            "bin": { "xskill": "bin/xskill" },
+            "files": ["bin/"]
+          }
+          EOF
+          done
+
+          # 创建根包
+          cat > npm-package/package.json << EOF
+          {
+            "name": "@jetsung/xskill",
+            "version": "${VERSION}",
+            "description": "Discover, install, manage reusable agent skill packs",
+            "license": "Apache-2.0",
+            "homepage": "https://xskill.gcli.cn",
+            "repository": {
+              "type": "git",
+              "url": "https://github.com/jetsung/xskill.git"
+            },
+            "bin": { "xskill": "bin/xskill" },
+            "optionalDependencies": {
+              "@jetsung/xskill-linux-x64": "${VERSION}",
+              "@jetsung/xskill-linux-arm64": "${VERSION}",
+              "@jetsung/xskill-linux-x64-musl": "${VERSION}",
+              "@jetsung/xskill-linux-arm64-musl": "${VERSION}",
+              "@jetsung/xskill-linux-loong64": "${VERSION}",
+              "@jetsung/xskill-darwin-x64": "${VERSION}",
+              "@jetsung/xskill-darwin-arm64": "${VERSION}",
+              "@jetsung/xskill-win32-x64": "${VERSION}",
+              "@jetsung/xskill-win32-arm64": "${VERSION}"
+            },
+            "files": ["bin/", "platforms/"]
+          }
+          EOF
+
+          mkdir -p npm-package/bin
+          cat > npm-package/bin/xskill << 'SCRIPT'
+          #!/usr/bin/env node
+          const { execFileSync } = require('child_process');
+          const path = require('path');
+          const os = process.platform;
+          const arch = process.arch;
+          const platformMap = {
+            'linux-x64': 'linux-x64',
+            'linux-arm64': 'linux-arm64',
+            'darwin-x64': 'darwin-x64',
+            'darwin-arm64': 'darwin-arm64',
+            'win32-x64': 'win32-x64',
+            'win32-arm64': 'win32-arm64',
+          };
+          const platform = platformMap[`${os}-${arch}`];
+          if (!platform) {
+            console.error(`Unsupported platform: ${os}-${arch}`);
+            process.exit(1);
+          }
+          const binPath = path.join(__dirname, '..', 'platforms', platform, 'bin', process.platform === 'win32' ? 'xskill.exe' : 'xskill');
+          try {
+            execFileSync(binPath, process.argv.slice(2), { stdio: 'inherit' });
+          } catch (e) {
+            process.exit(e.status || 1);
+          }
+          SCRIPT
+          chmod +x npm-package/bin/xskill
+
+      - name: Publish platform packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION="${{ needs.extract-version.outputs.version }}"
+
+          for platform in linux-x64 linux-arm64 linux-x64-musl linux-arm64-musl linux-loong64 darwin-x64 darwin-arm64 win32-x64 win32-arm64; do
+            PKG_DIR="npm-package/platforms/${platform}"
+            if [ -d "${PKG_DIR}" ] && [ -f "${PKG_DIR}/package.json" ]; then
+              echo "Publishing @jetsung/xskill-${platform}@${VERSION}"
+              cd "${PKG_DIR}"
+              npm publish --access public
+              cd "${GITHUB_WORKSPACE}"
+            fi
+          done
+
+          echo "Publishing @jetsung/xskill@${VERSION}"
+          cd npm-package
+          npm publish --access public
+
+  publish-crates:
+    needs: [extract-version, create-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check CARGO_REGISTRY_TOKEN
+        id: check-token
+        env:
+          TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "has_token=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_token=false" >> $GITHUB_OUTPUT
+            echo "::warning::CARGO_REGISTRY_TOKEN is not set, skipping crates.io publish"
+          fi
+
+      - uses: actions/checkout@v7
+        if: steps.check-token.outputs.has_token == 'true'
+        with:
+          ref: ${{ needs.extract-version.outputs.tag }}
+
+      - uses: dtolnay/rust-toolchain@stable
+        if: steps.check-token.outputs.has_token == 'true'
+
+      - name: Publish to crates.io
+        if: steps.check-token.outputs.has_token == 'true'
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish -p xskill
+
+  publish-winget:
+    needs: [extract-version, create-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check WINGET_TOKEN
+        id: check-token
+        env:
+          TOKEN: ${{ secrets.WINGET_TOKEN }}
+        run: |
+          if [ -n "$TOKEN" ]; then
+            echo "has_token=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_token=false" >> $GITHUB_OUTPUT
+            echo "::warning::WINGET_TOKEN is not set, skipping WinGet publish"
+          fi
+
+      - name: Submit manifest to WinGet
+        if: steps.check-token.outputs.has_token == 'true'
+        uses: vedantmgoyal9/winget-releaser@main
+        with:
+          identifier: Jetsung.XSkill
+          installers-regex: 'xskill-v[\d.]+-(x86_64|aarch64)-pc-windows-msvc\.zip$'
+          release-tag: ${{ needs.extract-version.outputs.tag }}
+          fork-user: forkdo
+          token: ${{ secrets.WINGET_TOKEN }}

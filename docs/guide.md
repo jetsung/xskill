@@ -34,6 +34,12 @@ irm https://xskill.gcli.cn/install.ps1 | iex
 
 Auto-detects architecture, downloads from GitHub Releases, and installs to `%USERPROFILE%\.local\bin` (or `%ProgramFiles%\xskill\bin` for admin). The script will prompt you to add it to PATH if needed.
 
+### From npm
+
+```bash
+npm install -g @jetsung/xskill
+```
+
 ### From crates.io
 
 ```bash

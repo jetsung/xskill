@@ -29,6 +29,12 @@ curl -fsSL https://xskill.gcli.cn/install.sh | bash
 irm https://xskill.gcli.cn/install.ps1 | iex
 ```
 
+### 从 npm 安装
+
+```bash
+npm install -g @jetsung/xskill
+```
+
 ### 从 crates.io 安装
 
 ```bash
