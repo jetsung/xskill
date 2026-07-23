@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-23T16:50:07.919Z",
+  "updated_at": "2026-07-23T19:01:08.101Z",
   "sources": [
     {
       "source": "jetsung",
@@ -198,6 +198,12 @@
           "version": ""
         },
         {
+          "name": "competitor-ad-intelligence",
+          "path": "skills/competitor-ad-intelligence",
+          "description": "Use this skill when the user asks to analyze, tear down, or reverse-engineer a competitor's paid ads. Trigger for prompts like \"what ads is [competitor] running\", \"tear down their ad strategy\", \"competitor ad analysis\", \"find ad angles we haven't tried\", or \"reverse-engineer their paid funnel\". Do not trigger for organic/SEO competitor research or website positioning analysis.",
+          "version": "1.0"
+        },
+        {
           "name": "arch-linux-triage",
           "path": "skills/arch-linux-triage",
           "description": "Triage and resolve Arch Linux issues with pacman, systemd, and rolling-release best practices.",
@@ -267,6 +273,12 @@
           "name": "playwright-explore-website",
           "path": "skills/playwright-explore-website",
           "description": "Website exploration for testing using Playwright MCP",
+          "version": ""
+        },
+        {
+          "name": "webmcpify",
+          "path": "skills/webmcpify",
+          "description": "Make a web app agent-ready — propose a WebMCP tool manifest, integrate, verify in a real browser, heal; unrelated code stays untouched. Use for \"webmcpify\", \"add WebMCP\", or \"expose app actions to AI agents\".",
           "version": ""
         },
         {
@@ -1302,6 +1314,12 @@
           "version": ""
         },
         {
+          "name": "agent-skill-stack",
+          "path": "skills/agent-skill-stack",
+          "description": "Find, evaluate, and assemble the smallest compatible set of AI Agent Skills for an end-to-end natural-language goal. Use when a user wants Skills for a multi-step workflow, asks which Skills fit a project, needs an installed-Skill audit or conflict check, has low Skill recall, wants indirect helpers such as humanizers or compliance checks, or wants a project-specific Skill Stack with controlled installation. Search local Skills, registries, GitHub, and OpenCLI; compare adoption, verified fit, safety, and overlap. Do not use for locating one known or common Skill; use the generic find-skills workflow.",
+          "version": ""
+        },
+        {
           "name": "structured-autonomy-generate",
           "path": "skills/structured-autonomy-generate",
           "description": "Structured Autonomy Implementation Generator Prompt",
@@ -2208,6 +2226,12 @@
           "version": ""
         },
         {
+          "name": "ad-campaign-analyzer",
+          "path": "skills/ad-campaign-analyzer",
+          "description": "Use this skill when the user shares ad campaign performance data and asks what to cut, scale, or test. Trigger for prompts like \"analyze my ad campaigns\", \"where am I wasting ad spend\", \"reallocate my ad budget\", \"which ads are actually working\", or \"ROAS analysis\". Do not trigger for campaign planning or creative generation without performance data.",
+          "version": "1.0"
+        },
+        {
           "name": "arize-instrumentation",
           "path": "skills/arize-instrumentation",
           "description": "Adds Arize AX tracing to an LLM application for the first time. Follows a two-phase agent-assisted flow to analyze the codebase then implement instrumentation after user confirmation. Use when the user wants to instrument their app, add tracing from scratch, set up LLM observability, integrate OpenTelemetry or openinference, or get started with Arize tracing.",
@@ -2223,6 +2247,12 @@
           "name": "create-technical-spike",
           "path": "skills/create-technical-spike",
           "description": "Create time-boxed technical spike documents for researching and resolving critical development decisions before implementation.",
+          "version": ""
+        },
+        {
+          "name": "latchshot-page-capture",
+          "path": "skills/latchshot-page-capture",
+          "description": "Use this skill when a user needs a screenshot, website thumbnail, full-page capture, or PDF of a public HTTP(S) webpage saved as a local artifact through Latchshot, including report, QA, archive, and social-preview workflows. Do not use it for private or authenticated pages, raw HTML, scraping or extraction, arbitrary browser actions, CAPTCHA or anti-bot bypass, or local-file capture.",
           "version": ""
         },
         {
