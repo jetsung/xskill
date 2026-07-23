@@ -263,6 +263,63 @@ xskill add -f antfu -s '*'
 xskill add -f antfu -A
 ```
 
+### `link` — 软链接已有技能到平台
+
+将规范目录中已存在的 skill 软链接到指定平台目录。与 `add` 不同，`link` 不会从远程源下载或安装任何 skill，仅操作本地已有的 skill。
+
+```bash
+xskill link [OPTIONS] --skill <SKILL> --agent <AGENT>
+```
+
+选项：
+- `-s, --skill <SKILL>` — 技能名称（使用 `'*'` 表示所有技能）
+- `-a, --agent <AGENT>` — 目标平台（使用 `'*'` 表示所有平台）
+- `-g, --global` — 操作全局 `~/.agents/skills/` 目录
+- `-A, --all` — `--skill '*' --agent '*'` 的简写
+
+#### 链接行为
+
+| 标志 | 行为 |
+|------|------|
+| `-s s1 -a codebuddy` | 将 `.agents/skills/s1` 软链接到 `.codebuddy/skills/s1`（自动创建平台目录） |
+| `-s s1 -a codebuddy -g` | 将 `~/.agents/skills/s1` 软链接到 `~/.codebuddy/skills/s1` |
+| `-s s1 -a '*'` | 将 s1 链接到各已存在平台目录 |
+| `-s '*' -a claude` | 将所有已有 skill 链接到 claude 平台 |
+| `-s '*' -a '*'` | 将所有已有 skill 链接到各已存在平台目录 |
+| `-A` | 等同于 `-s '*' -a '*'` |
+
+#### 关键规则
+
+- `link` **不需要** `-f` 参数（不涉及远程源）。
+- **不更新锁文件**：skill 已由 `add` 命令安装并写入锁文件，`link` 仅创建 symlink。
+- 规范目录中的 skill 必须已存在（包含 `SKILL.md`），否则报错。
+- `-s '*'` 时扫描规范目录中所有包含 `SKILL.md` 的子目录。
+- 软链接使用相对路径，规则与 `add` 命令一致。
+- symlink 创建失败时回退为文件复制。
+
+#### agents_compat 兼容
+
+`agents_compat: true` 的平台会被跳过（直接读取规范目录）。单平台指定时输出 `Skipped: <name> (agents_compat)`（暗灰色）；`-a '*'` 时静默跳过并汇总输出。
+
+#### 示例
+
+```bash
+# 将单个 skill 链接到特定平台
+xskill link -s vue -a claude
+
+# 将所有已有 skill 链接到某个平台
+xskill link -s '*' -a claude
+
+# 将 skill 链接到所有平台
+xskill link -s vue -a '*'
+
+# 链接所有 skill 到所有平台
+xskill link -A
+
+# 全局模式
+xskill link -s vue -a claude -g
+```
+
 ### `remove` — 移除技能
 
 移除已安装的技能并更新锁文件。
@@ -398,7 +455,7 @@ xskill query [OPTIONS]
 
 ### `find` — 交互式查找并安装技能
 
-启动多步交互式 TUI，依次查找技能、选择安装范围和目标平台后安装。
+启动多步交互式 TUI，支持多选批量安装技能。同源技能仅 clone 一次仓库，避免重复拉取。
 
 ```bash
 xskill find [OPTIONS]
@@ -411,9 +468,9 @@ xskill find [OPTIONS]
 
 #### 工作流程
 
-1. **选择技能** — 从缓存中子串搜索（exact 模式）。显示格式：`name [source]`（注册中心条目显示 `name [registry] [source]`）。非选中行技能名称使用默认色，选中行使用蓝色。source 标签始终暗灰色；`[registry]` 标签选中时变为绿色。搜索框在底部，列表向上排列。快捷键提示：`up/down navigate | enter select | esc cancel`。匹配计数格式为 `当前/总数`（如 `2/2`）。
-2. **选择目标平台** — TUI 多选。首项为 `Default`（不可选中，表示不创建平台符号链接）。后续为配置中所有平台。按 TAB 选择/取消选择，Enter 确认。选中行使用蓝色文字和深色背景高亮。
-3. **安装** — 将技能安装到规范目录（`.agents/skills/<name>` 或 `-g` 时 `~/.agents/skills/<name>`），然后为每个选中的平台创建相对符号链接。输出 `Installed:`、`Symlinked:` 和失败的平台（如有）。注册中心的技能直接使用 URL 克隆，不依赖本地 `sources` 配置。
+1. **选择技能** — 多选子串搜索（exact 模式）。显示格式：`name [source]`（注册中心条目显示 `name [registry] [source]`）。非选中行技能名称使用默认色，选中行使用蓝色。source 标签始终暗灰色；`[registry]` 标签选中时变为绿色。搜索框在底部，列表向上排列。快捷键提示：`TAB: multi-select | enter confirm | esc cancel`。按 TAB 多选技能，Enter 确认。未 TAB 选中时直接 Enter，使用光标所在项。
+2. **选择目标平台** — TUI 多选。首项为 `Default`（不可选中，表示不创建平台符号链接）。`agents_compat` 平台不在可选列表中，以 `SELECTED: <platform1>, <platform2>, ...` 形式显示在 header 中。后续为非兼容的配置平台。按 TAB 选择/取消选择，Enter 确认。选中行使用蓝色文字和深色背景高亮。
+3. **安装** — 按 source URL 分组，每组仅 clone 一次仓库。从 `CachedSkill.path` 提取正确安装路径（支持嵌套路径，如 `skills/engineering/grill/SKILL.md`）。安装到规范目录（`.agents/skills/<name>` 或 `-g` 时 `~/.agents/skills/<name>`），然后为每个选中的平台创建相对符号链接。输出 `Installed:`、`Symlinked:` 和失败的平台（如有）。各技能输出之间以空行分隔。注册中心的技能直接使用 URL 克隆，不依赖本地 `sources` 配置。
 
 任意步骤按 Esc 或 Ctrl-C 取消。
 
@@ -663,7 +720,7 @@ xskill new --name <name> [--description <desc>] [--template <template>]
 | `skills` | 否 | — | 技能子目录名（相对于 `path`），省略则跳过技能安装 |
 | `agents` | 否 | — | 代理配置文件名（相对于 `path`），省略则跳过代理安装 |
 | `source` | 否 | `"AGENTS.md"` | 固定 `.agents/` 目录下的源文件名 |
-| `agents_compat` | 否 | `false` | 是否兼容 `.agents/` 资源。为 `true` 时直接读取规范目录 — add/remove/restore 跳过 symlink（单平台输出 `Skipped`，`-a '*'` 静默）。find TUI 正常列出，安装时静默跳过 symlink。list `-a` 显示所有规范目录 skill。 |
+| `agents_compat` | 否 | `false` | 是否兼容 `.agents/` 资源。为 `true` 时直接读取规范目录 — add/remove/link/restore 跳过 symlink（单平台输出 `Skipped`，`-a '*'` 静默）。find TUI 正常列出，安装时静默跳过 symlink。list `-a` 显示所有规范目录 skill。 |
 
 #### 符号链接行为
 
@@ -1007,6 +1064,7 @@ xskill/
 │   ├── utils.rs            # 工具函数
 │   └── commands/
 │       ├── add.rs          # 安装技能
+│       ├── link.rs         # 软链接已有技能到平台
 │       ├── remove.rs       # 移除技能
 │       ├── update.rs       # 从锁文件更新
 │       ├── restore.rs      # 从锁文件恢复

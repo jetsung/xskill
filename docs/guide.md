@@ -257,6 +257,63 @@ xskill add -f antfu -s '*'
 xskill add -f antfu -A
 ```
 
+### `link` — Symlink existing skills to a platform
+
+Symlink skills that already exist in the canonical directory to a specified platform directory. Unlike `add`, `link` does not download or install any skills from remote sources — it only operates on locally existing skills.
+
+```bash
+xskill link [OPTIONS] --skill <SKILL> --agent <AGENT>
+```
+
+Options:
+- `-s, --skill <SKILL>` — Skill name (use `'*'` for all skills)
+- `-a, --agent <AGENT>` — Target platform (use `'*'` for all platforms)
+- `-g, --global` — Operate on global `~/.agents/skills/` directory
+- `-A, --all` — Shorthand for `--skill '*' --agent '*'`
+
+#### Link behavior
+
+| Flag | Behavior |
+|------|----------|
+| `-s s1 -a codebuddy` | Symlink `.agents/skills/s1` to `.codebuddy/skills/s1` (auto-creates platform dir) |
+| `-s s1 -a codebuddy -g` | Symlink `~/.agents/skills/s1` to `~/.codebuddy/skills/s1` |
+| `-s s1 -a '*'` | Link s1 to all existing platform directories |
+| `-s '*' -a claude` | Link all existing skills to claude platform |
+| `-s '*' -a '*'` | Link all existing skills to all existing platforms |
+| `-A` | Same as `-s '*' -a '*'` |
+
+#### Key rules
+
+- `link` does **not** require a `-f` parameter (no remote source involved).
+- **No lock file update**: skills were already installed and recorded by `add`; `link` only creates symlinks.
+- Skills must already exist in the canonical directory (with `SKILL.md`), otherwise an error is shown.
+- `-s '*'` scans all subdirectories containing `SKILL.md` in the canonical directory.
+- Symlinks use relative paths, following the same rules as `add`.
+- Falls back to file copy if symlink creation fails.
+
+#### agents_compat
+
+Platforms with `agents_compat: true` are skipped (they read the canonical directory directly). Single platform: `Skipped: <name> (agents_compat)` (dimmed); `-a '*'`: silently skipped with summary.
+
+#### Examples
+
+```bash
+# Link a single skill to a specific platform
+xskill link -s vue -a claude
+
+# Link all existing skills to a platform
+xskill link -s '*' -a claude
+
+# Link a skill to all platforms
+xskill link -s vue -a '*'
+
+# Link everything to everything
+xskill link -A
+
+# Global mode
+xskill link -s vue -a claude -g
+```
+
 ### `remove` — Remove a skill
 
 Remove an installed skill and update the lock file.
@@ -390,9 +447,9 @@ Output style: labels (`Source`, `Registry`, `Name`, `Description`, `Version`, `P
 
 When no skills are found and configured sources exist with `cache.enabled` true, a hint is displayed: `Hint: run 'xskill cache update' to refresh skills cache` (cyan).
 
-### `find` — Interactively find and install a skill
+### `find` — Interactively find and install skills
 
-Launch a multi-step interactive TUI to search, configure, and install skills.
+Launch a multi-step interactive TUI to search, configure, and install skills. Supports multi-select for batch installation, with source grouping to clone each repo only once.
 
 ```bash
 xskill find [OPTIONS]
@@ -405,9 +462,9 @@ Options:
 
 #### How it works
 
-1. **Skill selection** — Substring search (exact mode) from cached skills. Display format: `name [source]` (registry entries show `name [registry] [source]`). Non-selected names use default color, selected names use blue. Source tags are always dark gray; `[registry]` tags turn green when selected. Search box at bottom, list arranged upward. Keyboard hints: `up/down navigate | enter select | esc cancel`. Match count shown as `current/total` (e.g., `2/2`).
-2. **Platform selection** — Multi-select target platforms. First item is `Default` (disabled, means no platform symlinks). Remaining items are all configured platforms. Press TAB to select/deselect, Enter to confirm. Selected rows use blue text with dark background highlight.
-3. **Install** — Installs the skill to the canonical directory (`.agents/skills/<name>` or `~/.agents/skills/<name>` with `-g`), then creates relative symlinks for each selected platform. Reports `Installed:`, `Symlinked:`, and any `Failed:` platforms. Registry skills are cloned directly from their URL, independent of local `sources` configuration.
+1. **Skill selection** — Multi-select substring search (exact mode) from cached skills. Display format: `name [source]` (registry entries show `name [registry] [source]`). Non-selected names use default color, selected names use blue. Source tags are always dark gray; `[registry]` tags turn green when selected. Search box at bottom, list arranged upward. Keyboard hints: `TAB: multi-select | enter confirm | esc cancel`. Press TAB to toggle multiple skills, Enter to confirm. If nothing is toggled, the cursor item is used.
+2. **Platform selection** — Multi-select target platforms. First item is `Default` (disabled, means no platform symlinks). `agents_compat` platforms are excluded from the list and shown as `SELECTED: <platform1>, <platform2>, ...` in the header. Remaining items are non-compat configured platforms. Press TAB to select/deselect, Enter to confirm. Selected rows use blue text with dark background highlight.
+3. **Install** — Skills are grouped by source URL; each repo is cloned once. For each skill, the correct path is extracted from `CachedSkill.path` (supports nested paths like `skills/engineering/grill/SKILL.md`). The skill is installed to the canonical directory (`.agents/skills/<name>` or `~/.agents/skills/<name>` with `-g`), then relative symlinks are created for each selected platform. Reports `Installed:`, `Symlinked:`, and any `Failed:` platforms. Each skill's output is separated by a blank line. Registry skills are cloned directly from their URL, independent of local `sources` configuration.
 
 Press Esc or Ctrl-C at any step to cancel.
 
@@ -657,7 +714,7 @@ Each platform entry configures how skills are installed for a specific AI coding
 | `skills` | No | — | Skills subdirectory name relative to `path`. Omit to skip skill installation |
 | `agents` | No | — | Agents config file name relative to `path`. Omit to skip agents installation |
 | `source` | No | `"AGENTS.md"` | Source file name under the fixed `.agents/` directory |
-| `agents_compat` | No | `false` | Whether this platform can reuse `.agents/` resources. When `true`, the platform reads directly from the canonical directory — add/remove/restore skip symlink operations (single platform: `Skipped` output; `-a '*'`: silent). find TUI lists and selects normally, silently skips symlink during install. list `-a` shows all canonical skills as linked. |
+| `agents_compat` | No | `false` | Whether this platform can reuse `.agents/` resources. When `true`, the platform reads directly from the canonical directory — add/remove/link/restore skip symlink operations (single platform: `Skipped` output; `-a '*'`: silent). find TUI lists and selects normally, silently skips symlink during install. list `-a` shows all canonical skills as linked. |
 
 #### Symlink behavior
 
@@ -1001,6 +1058,7 @@ xskill/
 │   ├── utils.rs            # Utility functions
 │   └── commands/
 │       ├── add.rs          # Install skills
+│       ├── link.rs         # Symlink existing skills to platforms
 │       ├── remove.rs       # Remove skills
 │       ├── update.rs       # Update from lock file
 │       ├── restore.rs      # Restore from lock file

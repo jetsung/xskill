@@ -11,6 +11,7 @@
 - **锁文件追踪** — 通过 `.xskill-lock.json` 实现可复现安装
 - **批量操作** — 使用 `--all` 标志安装/移除所有技能
 - **缓存支持** — 可选本地缓存，支持离线技能查询
+- **交互式 TUI** — 通过 `find` 命令多选批量安装技能
 
 ## 安装
 
@@ -74,7 +75,7 @@ xskill add -f my-skills -s vue -g
 # 列出已安装技能
 xskill list
 
-# 交互式查找并安装技能（需要缓存）
+# 交互式查找并安装技能（多选，需要缓存）
 xskill find
 
 # 带预填充过滤条件的查找
@@ -82,6 +83,12 @@ xskill find --skill git
 
 # 从指定源查找
 xskill find --from antfu
+
+# 全局安装
+xskill find -g
+
+# 将已有技能软链接到指定平台
+xskill link -s vue -a claude
 
 # 移除技能
 xskill remove -s vue
@@ -94,12 +101,13 @@ xskill remove -s vue
 | `sources` | 管理配置源（list/add/remove/edit） |
 | `platforms` | 列出配置平台 |
 | `add` | 安装技能 |
+| `link` | 将已有技能软链接到指定平台 |
 | `remove` | 移除技能 |
 | `update` | 从锁文件更新已安装技能 |
 | `restore` | 从项目锁文件恢复技能 |
 | `list` | 列出已安装技能 |
 | `query` | 从源查询技能 |
-| `find` | 交互式查找并安装技能（TUI） |
+| `find` | 交互式查找并安装技能（多选 TUI） |
 | `rec` | 管理推荐技能（list/add/remove） |
 | `cache` | 管理技能缓存 |
 | `config` | 管理配置 |

@@ -57,7 +57,7 @@ jobs:
 
       - name: Set up XSkill
         run: |
-          bash ./site/install.sh -p
+          bash ./site/install.sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Collect skills from sources

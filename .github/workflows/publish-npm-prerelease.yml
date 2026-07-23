@@ -1,0 +1,122 @@
+name: Publish npm (Prerelease)
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish-npm:
+    # 仅在 prerelease 版本时触发（由 release-linux-prerelease.yml 创建）
+    if: ${{ github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract version from tag
+        id: tag
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          VERSION="${TAG#v}"
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download release artifacts
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.tag.outputs.TAG }}"
+          mkdir -p dist/npm
+
+          gh release download "$TAG" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --pattern "xskill-v*.tar.xz" \
+            --dir dist/npm
+
+      - name: Prepare npm package
+        run: |
+          VERSION="${{ steps.tag.outputs.VERSION }}"
+          TAR_FILE=$(ls dist/npm/xskill-v${VERSION}-x86_64-unknown-linux-gnu.tar.xz)
+
+          # 解压二进制
+          mkdir -p npm-package/platforms/linux-x64
+          tar -xJf "$TAR_FILE" -C temp_extract/
+          cp temp_extract/xskill npm-package/platforms/linux-x64/
+          chmod +x npm-package/platforms/linux-x64/xskill
+
+          # 创建平台包
+          cat > npm-package/platforms/linux-x64/package.json << EOF
+          {
+            "name": "@jetsung/xskill-linux-x64",
+            "version": "${VERSION}",
+            "description": "XSkill linux-x64 binary",
+            "license": "MIT",
+            "files": ["xskill"]
+          }
+          EOF
+
+          # 创建根包
+          cat > npm-package/package.json << EOF
+          {
+            "name": "@jetsung/xskill",
+            "version": "${VERSION}",
+            "description": "Discover, install, manage reusable agent skill packs",
+            "license": "MIT",
+            "bin": {
+              "xskill": "bin/xskill"
+            },
+            "optionalDependencies": {
+              "@jetsung/xskill-linux-x64": "${VERSION}"
+            },
+            "files": ["bin/", "platforms/"]
+          }
+          EOF
+
+          mkdir -p npm-package/bin
+          cat > npm-package/bin/xskill << 'SCRIPT'
+          #!/usr/bin/env node
+          const { execFileSync } = require('child_process');
+          const path = require('path');
+          const os = process.platform;
+          const arch = process.arch;
+          const platformMap = {
+            'linux-x64': 'linux-x64',
+            'linux-arm64': 'linux-arm64',
+            'darwin-x64': 'darwin-x64',
+            'darwin-arm64': 'darwin-arm64',
+            'win32-x64': 'win32-x64',
+            'win32-arm64': 'win32-arm64',
+          };
+          const platform = platformMap[`${os}-${arch}`];
+          if (!platform) {
+            console.error(`Unsupported platform: ${os}-${arch}`);
+            process.exit(1);
+          }
+          const binPath = path.join(__dirname, '..', 'platforms', platform, process.platform === 'win32' ? 'xskill.exe' : 'xskill');
+          try {
+            execFileSync(binPath, process.argv.slice(2), { stdio: 'inherit' });
+          } catch (e) {
+            process.exit(e.status || 1);
+          }
+          SCRIPT
+          chmod +x npm-package/bin/xskill
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION="${{ steps.tag.outputs.VERSION }}"
+
+          echo "Publishing @jetsung/xskill-linux-x64@${VERSION}"
+          cd npm-package/platforms/linux-x64
+          npm publish --access public
+          cd "${GITHUB_WORKSPACE}"
+
+          echo "Publishing @jetsung/xskill@${VERSION}"
+          cd npm-package
+          npm publish --access public

@@ -11,6 +11,7 @@ A skills management tool for discovering, installing, and managing reusable agen
 - **Lock file tracking** — Reproducible installs with `.xskill-lock.json`
 - **Batch operations** — Install/remove all skills with `--all` flag
 - **Cache support** — Optional local cache for offline skill queries
+- **Interactive TUI** — Multi-select skill finder with `find` command
 
 ## Installation
 
@@ -68,7 +69,7 @@ xskill add -f my-skills -s vue -g
 # List installed skills
 xskill list
 
-# Interactively find and install a skill (requires cache)
+# Interactively find and install skills (multi-select, requires cache)
 xskill find
 
 # Find with a pre-filled filter
@@ -76,6 +77,12 @@ xskill find --skill git
 
 # Find from a specific source
 xskill find --from antfu
+
+# Find and install globally
+xskill find -g
+
+# Link existing skills to a platform
+xskill link -s vue -a claude
 
 # Remove a skill
 xskill remove -s vue
@@ -88,12 +95,13 @@ xskill remove -s vue
 | `sources` | Manage configured sources (list/add/remove/edit) |
 | `platforms` | List configured platforms |
 | `add` | Install a skill |
+| `link` | Symlink existing skills to a platform |
 | `remove` | Remove a skill |
 | `update` | Update installed skills from lock file |
 | `restore` | Restore skills from project lock file |
 | `list` | List installed skills |
 | `query` | Query skills from a source |
-| `find` | Interactively find and install a skill (TUI) |
+| `find` | Interactively find and install skills (multi-select TUI) |
 | `rec` | Manage recommended skills (list/add/remove) |
 | `cache` | Manage skills cache |
 | `config` | Manage configuration |
