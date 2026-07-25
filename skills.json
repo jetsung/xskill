@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-25T13:21:21.194Z",
+  "updated_at": "2026-07-25T18:54:59.269Z",
   "sources": [
     {
       "source": "jetsung",
@@ -3173,6 +3173,96 @@
       "source": "claude-office-skills",
       "url": "https://github.com/claude-office-skills/skills",
       "skills": []
+    },
+    {
+      "source": "superpowers",
+      "url": "https://github.com/obra/superpowers",
+      "skills": [
+        {
+          "name": "finishing-a-development-branch",
+          "path": "skills/finishing-a-development-branch",
+          "description": "Use when implementation is complete, all tests pass, and you need to decide how to integrate the work",
+          "version": ""
+        },
+        {
+          "name": "systematic-debugging",
+          "path": "skills/systematic-debugging",
+          "description": "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes",
+          "version": ""
+        },
+        {
+          "name": "brainstorming",
+          "path": "skills/brainstorming",
+          "description": "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation.",
+          "version": ""
+        },
+        {
+          "name": "dispatching-parallel-agents",
+          "path": "skills/dispatching-parallel-agents",
+          "description": "Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies",
+          "version": ""
+        },
+        {
+          "name": "receiving-code-review",
+          "path": "skills/receiving-code-review",
+          "description": "Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation",
+          "version": ""
+        },
+        {
+          "name": "verification-before-completion",
+          "path": "skills/verification-before-completion",
+          "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
+          "version": ""
+        },
+        {
+          "name": "requesting-code-review",
+          "path": "skills/requesting-code-review",
+          "description": "Use when completing tasks, implementing major features, or before merging to verify work meets requirements",
+          "version": ""
+        },
+        {
+          "name": "test-driven-development",
+          "path": "skills/test-driven-development",
+          "description": "Use when implementing any feature or bugfix, before writing implementation code",
+          "version": ""
+        },
+        {
+          "name": "writing-skills",
+          "path": "skills/writing-skills",
+          "description": "Use when creating new skills, editing existing skills, or verifying skills work before deployment",
+          "version": ""
+        },
+        {
+          "name": "using-superpowers",
+          "path": "skills/using-superpowers",
+          "description": "Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions",
+          "version": ""
+        },
+        {
+          "name": "using-git-worktrees",
+          "path": "skills/using-git-worktrees",
+          "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback",
+          "version": ""
+        },
+        {
+          "name": "writing-plans",
+          "path": "skills/writing-plans",
+          "description": "Use when you have a spec or requirements for a multi-step task, before touching code",
+          "version": ""
+        },
+        {
+          "name": "executing-plans",
+          "path": "skills/executing-plans",
+          "description": "Use when you have a written implementation plan to execute in a separate session with review checkpoints",
+          "version": ""
+        },
+        {
+          "name": "subagent-driven-development",
+          "path": "skills/subagent-driven-development",
+          "description": "Use when executing implementation plans with independent tasks in the current session",
+          "version": ""
+        }
+      ]
     }
   ]
 }
