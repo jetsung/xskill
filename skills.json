@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-27T02:03:55.383Z",
+  "updated_at": "2026-07-27T09:33:47.602Z",
   "sources": [
     {
       "source": "jetsung",
@@ -1419,6 +1419,12 @@
           "name": "create-spring-boot-java-project",
           "path": "skills/create-spring-boot-java-project",
           "description": "Create Spring Boot Java Project Skeleton",
+          "version": ""
+        },
+        {
+          "name": "gitmoji",
+          "path": "skills/gitmoji",
+          "description": "Generates commit messages following the gitmoji convention (https://gitmoji.dev) — picks the right emoji for the intent of the change and writes a well-formed message. Use when asked to \"write a gitmoji commit\", \"add an emoji to my commit message\", \"which gitmoji should I use\", \"gitmoji this change\", or when a project uses gitmoji-style commit messages. Works from a git diff, staged changes, or a plain description of the change. Generates the message only — does not run git commands.",
           "version": ""
         },
         {
