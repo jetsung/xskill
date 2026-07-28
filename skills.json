@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-27T19:14:29.358Z",
+  "updated_at": "2026-07-28T01:45:51.202Z",
   "sources": [
     {
       "source": "jetsung",
@@ -1329,6 +1329,12 @@
           "name": "desk-journal",
           "path": "skills/desk-journal",
           "description": "Write, append, or read desk journal entries. The journal is persistent memory — what survives session boundaries. A good entry has: what was done, current state, next step.",
+          "version": ""
+        },
+        {
+          "name": "azure-well-architected-review",
+          "path": "skills/azure-well-architected-review",
+          "description": "Perform an Azure Well-Architected Framework review of the current workload IaC and architecture, generating findings and GitHub issues for improvements.",
           "version": ""
         },
         {
