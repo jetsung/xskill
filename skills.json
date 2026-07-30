@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-30T01:30:19.358Z",
+  "updated_at": "2026-07-30T08:09:24.026Z",
   "sources": [
     {
       "source": "jetsung",
@@ -968,7 +968,7 @@
         {
           "name": "x-twitter-scraper",
           "path": "skills/x-twitter-scraper",
-          "description": "Build GitHub Copilot workflows with Xquik X API SDKs, REST endpoints, MCP tools, TweetClaw OpenClaw plugin installs, signed webhooks, tweet search, user lookup, follower exports, media actions, and agent automation.",
+          "description": "Build GitHub Copilot workflows with Xquik X API SDKs, REST endpoints, hosted Apify Actor runs, MCP tools, TweetClaw OpenClaw plugin installs, signed webhooks, tweet search, user lookup, follower exports, media actions, and agent automation.",
           "version": ""
         },
         {
@@ -1058,7 +1058,7 @@
         {
           "name": "ai-team-orchestration",
           "path": "skills/ai-team-orchestration",
-          "description": "Bootstrap and run a multi-agent AI development team. Use when: starting a new software project with AI agents, setting up parallel dev/QA teams, creating sprint plans, writing brainstorm prompts with distinct agent voices, recovering a project workflow, or planning sprints.",
+          "description": "Bootstrap and run a lightweight multi-agent development team. Use when starting or adopting a project, planning work, coordinating implementation and optional QA, brainstorming with distinct perspectives, or preserving context across sessions.",
           "version": ""
         },
         {
@@ -1365,6 +1365,12 @@
           "name": "acreadiness-assess",
           "path": "skills/acreadiness-assess",
           "description": "Run the AgentRC readiness assessment on the current repository and produce a static HTML dashboard at reports/index.html. Wraps `npx github:microsoft/agentrc readiness` and hands off rendering to the @ai-readiness-reporter custom agent. Supports policies (--policy) for org-specific scoring. Use when asked to assess, audit, or score the AI readiness of a repo.",
+          "version": ""
+        },
+        {
+          "name": "azure-container-registry-cli",
+          "path": "skills/azure-container-registry-cli",
+          "description": "Manage Azure Container Registry via the az acr CLI including registries, images, cloud builds, ACR Tasks, authentication, tokens, geo-replication, and networking. Use when working with ACR, az acr commands, pushing/importing/purging container images in Azure, or when the user mentions Azure Container Registry.",
           "version": ""
         },
         {
