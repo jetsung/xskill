@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-29T18:59:28.141Z",
+  "updated_at": "2026-07-30T01:30:19.358Z",
   "sources": [
     {
       "source": "jetsung",
@@ -1491,6 +1491,12 @@
           "name": "codebase-memory-mcp",
           "path": "skills/codebase-memory-mcp",
           "description": "Use when a configured codebase-memory-mcp server can assist with graph-backed code discovery, architecture orientation, symbol lookup, callers and callees, dependency or data-flow tracing, impact analysis, unfamiliar modules, or an explicit Codebase Memory request.",
+          "version": ""
+        },
+        {
+          "name": "bug-reproduction-brief",
+          "path": "skills/bug-reproduction-brief",
+          "description": "Turn a vague, intermittent, or environment-specific bug report into a minimal evidence-backed reproduction before proposing a fix.",
           "version": ""
         },
         {
