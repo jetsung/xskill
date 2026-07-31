@@ -162,12 +162,12 @@
     align-items: center;
     justify-content: space-between;
     padding: 12px 16px;
-    background: var(--bg-secondary);
+    background: #e2eaf3;
     cursor: pointer;
     user-select: none;
     border-bottom: 1px solid var(--border);
   }
-  .source-header:hover { background: var(--accent-light); }
+  .source-header:hover { background: #d7e1ed; }
   .source-left {
     display: flex;
     align-items: center;
@@ -264,6 +264,22 @@
     flex-shrink: 0;
   }
   .copy-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
+  .view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color .15s, border-color .15s, background .15s;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  .view-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
   .copy-btn.copied { color: #1a7f37; border-color: #1a7f37; }
   .copy-toast {
     position: fixed;
@@ -364,7 +380,7 @@
 
 <script>
 (function () {
-  const DATA_URL = "skills.json";
+  const DATA_URL = "./skills.json";
 
   const $ = (s) => document.querySelector(s);
   const escHtml = (s) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -372,6 +388,10 @@
   const chevronSvg = `<svg class="chevron" viewBox="0 0 16 16" fill="currentColor"><path d="M12.78 5.22a.749.749 0 0 1 0 1.06l-4.25 4.25a.749.749 0 0 1-1.06 0L3.22 6.28a.749.749 0 1 1 1.06-1.06L8 8.939l3.72-3.719a.749.749 0 0 1 1.06 0Z"/></svg>`;
 
   let allData = null;
+
+  const GITHUB_HOSTS = ["github.com", "gitlab.com", "framagit.org", "gitcode.com", "atomgit.com"];
+  const GITEA_HOSTS = ["git.asfd.cn", "gitea.com", "codeberg.org"];
+  const giteaHostCache = new Map();
 
   function formatDate(iso) {
     try {
@@ -406,6 +426,7 @@
     for (const g of groups) {
       totalShown += g.skills.length;
       const srcLabel = g.source || g.url || "";
+      const filePrefix = getFilePrefix(g.url);
       const cls = query ? "" : " collapsed";
       html += `<div class="source-group${cls}" data-source="${escHtml(srcLabel)}">
         <div class="source-header" onclick="this.parentElement.classList.toggle('collapsed')">
@@ -426,11 +447,16 @@
         const descTitle = descRaw ? ` title="${escHtml(descRaw)}"` : "";
         const ver = sk.version ? `<span class="skill-version">v${escHtml(sk.version)}</span>` : "";
         const cmd = `xskill add --from ${g.url} --skill ${sk.name}`;
+        const repoUrl = (g.url || "").replace(/\.git$/, "").replace(/\/+$/, "");
+        const skillPath = sk.path.endsWith("/SKILL.md") ? sk.path : sk.path.replace(/\/+$/, "") + "/SKILL.md";
         html += `<li class="skill-item">
           <span class="skill-name">${nameHtml}</span>
           <span class="skill-desc"${descTitle}>${descHtml}</span>
           <span class="skill-actions">
             ${ver}
+            <a class="view-btn" href="${escHtml(repoUrl)}${filePrefix}${escHtml(skillPath)}" target="_blank" rel="noopener" title="View SKILL.md" onclick="event.stopPropagation()">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"/></svg>
+            </a>
             <button class="copy-btn" title="Copy install command" data-cmd="${escHtml(cmd)}">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>
             </button>
@@ -454,6 +480,45 @@
     const match = text.slice(idx, idx + q.length);
     const after = text.slice(idx + q.length);
     return `${before}<mark style="background:var(--highlight);color:inherit;padding:0 1px;border-radius:2px">${match}</mark>${after}`;
+  }
+
+  function getHost(url) {
+    try { return new URL(url).hostname; } catch { return ""; }
+  }
+
+  function isGiteaHost(host) {
+    return GITEA_HOSTS.some(h => host === h || host.endsWith("." + h));
+  }
+
+  function getFilePrefix(url) {
+    const host = getHost(url);
+    if (!host || GITHUB_HOSTS.some(h => host === h || host.endsWith("." + h))) return "/blob/main/";
+    if (isGiteaHost(host)) return "/src/branch/main/";
+    if (giteaHostCache.get(host) === true) return "/src/branch/main/";
+    return "/blob/main/";
+  }
+
+  // Detect Gitea/Forgejo hosts via /api/v1/version
+  async function detectGiteaHosts(sources) {
+    const hosts = new Set();
+    for (const s of sources) {
+      const host = getHost(s.url);
+      if (host && !GITHUB_HOSTS.some(h => host === h) && !isGiteaHost(host)) {
+        hosts.add(host);
+      }
+    }
+    await Promise.allSettled([...hosts].map(async (host) => {
+      if (giteaHostCache.has(host)) return;
+      try {
+        const resp = await fetch(`https://${host}/api/v1/version`, { signal: AbortSignal.timeout(3000) });
+        if (resp.ok) {
+          const data = await resp.json();
+          giteaHostCache.set(host, typeof data.version === "string");
+        } else {
+          giteaHostCache.set(host, false);
+        }
+      } catch { giteaHostCache.set(host, false); }
+    }));
   }
 
   function filterData(query) {
@@ -521,6 +586,11 @@
 
       renderStats(allData);
       renderGroups(allData.sources, "");
+
+      // Detect unknown Gitea/Forgejo hosts, then re-render
+      detectGiteaHosts(allData.sources).then(() => {
+        renderGroups(allData.sources, "");
+      });
 
       let timer;
       $("#search").addEventListener("input", (e) => {

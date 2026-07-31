@@ -34,6 +34,11 @@
           "type": "string",
           "format": "uri"
         },
+        "commit_hash": {
+          "description": "Latest commit hash (SHA) of the source repository at sync time.",
+          "type": "string",
+          "default": ""
+        },
         "skills": {
           "description": "Skills available from this source.",
           "type": "array",
