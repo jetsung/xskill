@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-31T01:57:40.751Z",
+  "updated_at": "2026-07-31T04:17:22.596Z",
   "sources": [
     {
       "source": "jetsung",
@@ -3284,6 +3284,2352 @@
           "name": "subagent-driven-development",
           "path": "skills/subagent-driven-development",
           "description": "Use when executing implementation plans with independent tasks in the current session",
+          "version": ""
+        }
+      ]
+    },
+    {
+      "source": "frontendchecklist",
+      "url": "https://github.com/thedaviddias/Front-End-Checklist",
+      "skills": [
+        {
+          "name": "blocked-links",
+          "path": "skills/blocked-links",
+          "description": "Use when reviewing HTML source and JavaScript for links or resource URLs pointing to domains listed in common adblocker filter lists.",
+          "version": ""
+        },
+        {
+          "name": "autoplay-media",
+          "path": "skills/autoplay-media",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Avoid autoplaying media. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "has-selector",
+          "path": "skills/has-selector",
+          "description": "Use when reviewing stylesheets or components that use JavaScript to toggle classes on parent elements based on child state, form input values, or content presence — :has() may replace the JavaScript entirely.",
+          "version": ""
+        },
+        {
+          "name": "author-info",
+          "path": "skills/author-info",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Implement comprehensive author markup. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "viewport",
+          "path": "skills/viewport",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Set the responsive viewport meta tag. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "canonical-chain",
+          "path": "skills/canonical-chain",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Avoid redirect chains on canonical URLs. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "mime-type",
+          "path": "skills/mime-type",
+          "description": "Use when auditing server configuration or diagnosing broken resources. Applies to any web server serving HTML, CSS, JS, images, fonts, or other static assets.",
+          "version": ""
+        },
+        {
+          "name": "avif-format",
+          "path": "skills/avif-format",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Use AVIF format for modern browsers. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "pdf-size",
+          "path": "skills/pdf-size",
+          "description": "Use when auditing a site that publishes downloadable PDFs (reports, white papers, legal documents, manuals). Applies to any site where PDFs are linked as indexable content resources.",
+          "version": ""
+        },
+        {
+          "name": "parameters",
+          "path": "skills/parameters",
+          "description": "Use when auditing URL structure or configuring search engine handling of filtered, sorted, or tracked URLs. Applies to e-commerce sites, filtered content directories, and any site appending tracking or session parameters.",
+          "version": ""
+        },
+        {
+          "name": "indexability",
+          "path": "skills/indexability",
+          "description": "Use when auditing a site for accidental noindex directives, investigating why important pages are not appearing in Google Search, or reviewing CMS settings that control indexing at the page or category level.",
+          "version": ""
+        },
+        {
+          "name": "citations",
+          "path": "skills/citations",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Cite authoritative external sources. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "form-https",
+          "path": "skills/form-https",
+          "description": "Use when reviewing HTML forms, fetch/XHR calls, and form action attributes to ensure data is submitted exclusively over HTTPS.",
+          "version": ""
+        },
+        {
+          "name": "x-frame-options",
+          "path": "skills/x-frame-options",
+          "description": "Use when reviewing HTTP response headers for clickjacking protection on any web application with authenticated user actions.",
+          "version": ""
+        },
+        {
+          "name": "modern-format",
+          "path": "skills/modern-format",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Use modern image formats (WebP, AVIF). Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "canonical-header",
+          "path": "skills/canonical-header",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Sync HTML canonical tags and Link headers. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "animated-content",
+          "path": "skills/animated-content",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Convert animated GIFs to video. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "code-splitting",
+          "path": "skills/code-splitting",
+          "description": "Use when reviewing large SPA bundles, new dependency additions, or routes that feel slow to hydrate. Focus on code that is not required for the initial view and can move behind route transitions, user interaction, or viewport-based loading.",
+          "version": ""
+        },
+        {
+          "name": "scheduler-yield",
+          "path": "skills/scheduler-yield",
+          "description": "Use when reviewing JavaScript that performs synchronous loops over large datasets, recursive tree traversals, or bulk DOM updates that may exceed 50 ms on mid-range devices.",
+          "version": ""
+        },
+        {
+          "name": "svg-inline",
+          "path": "skills/svg-inline",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Manage inline SVG size and complexity. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "ai-content",
+          "path": "skills/ai-content",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Audit and refine AI-generated content. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "link-text",
+          "path": "skills/link-text",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use descriptive link text. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "nosnippet",
+          "path": "skills/nosnippet",
+          "description": "Use when auditing robots meta tags. Applies to any important landing page, article, or product page that should appear with a description in search results.",
+          "version": ""
+        },
+        {
+          "name": "title-unique",
+          "path": "skills/title-unique",
+          "description": "Use when applies to all HTML pages. Use when auditing a site crawl report or investigating why multiple pages compete for the same keyword in search results.",
+          "version": ""
+        },
+        {
+          "name": "javascript-linter",
+          "path": "skills/javascript-linter",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Lint JavaScript code. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "referrer-policy",
+          "path": "skills/referrer-policy",
+          "description": "Use when reviewing HTTP response headers for privacy hardening on any website that handles authentication, session state, or sensitive URL parameters.",
+          "version": ""
+        },
+        {
+          "name": "http-to-https",
+          "path": "skills/http-to-https",
+          "description": "Use when checking whether a web server is configured to redirect all HTTP traffic to HTTPS.",
+          "version": ""
+        },
+        {
+          "name": "error-images",
+          "path": "skills/error-images",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Handle image loading errors gracefully. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "web-storage",
+          "path": "skills/web-storage",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Use Web Storage API safely. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "http-requests",
+          "path": "skills/http-requests",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Minimize HTTP requests. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "html-size",
+          "path": "skills/html-size",
+          "description": "Use when auditing page weight for crawl efficiency, investigating why certain page content is not appearing in Google's index, or reviewing server-rendered pages that embed large JSON payloads in HTML.",
+          "version": ""
+        },
+        {
+          "name": "https",
+          "path": "skills/https",
+          "description": "Use when auditing whether a website or web application serves content exclusively over HTTPS with a valid certificate.",
+          "version": ""
+        },
+        {
+          "name": "nofollow-internal",
+          "path": "skills/nofollow-internal",
+          "description": "Use when auditing internal link structure or reviewing link attributes. Applies to any site using rel=nofollow on links pointing to pages within the same domain.",
+          "version": ""
+        },
+        {
+          "name": "dom-size",
+          "path": "skills/dom-size",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Reduce DOM size and complexity. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "x-content-type",
+          "path": "skills/x-content-type",
+          "description": "Use when auditing HTTP response headers on any web server or CDN for security hardening.",
+          "version": ""
+        },
+        {
+          "name": "css-minification",
+          "path": "skills/css-minification",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Minify all CSS files. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "input-image-alt",
+          "path": "skills/input-image-alt",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide alt text for image buttons. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "decorative-elements",
+          "path": "skills/decorative-elements",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Hide decorative elements from assistive technology. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant. If an image is clearly decorative, default to no finding unless the snippet shows an actual issue such as broken semantics, focusability, or visible layout instability.",
+          "version": ""
+        },
+        {
+          "name": "source-maps",
+          "path": "skills/source-maps",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Provide source maps for production debugging. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "form-labels",
+          "path": "skills/form-labels",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Associate labels with form controls. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "article-links",
+          "path": "skills/article-links",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Optimize article link density. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "video-accessibility",
+          "path": "skills/video-accessibility",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Make videos accessible with captions. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "aria-required-attr",
+          "path": "skills/aria-required-attr",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Include required ARIA attributes for roles. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "definition-list",
+          "path": "skills/definition-list",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use correct definition list structure. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "focus-management",
+          "path": "skills/focus-management",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Manage focus during dynamic interactions. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "html-resource-hints",
+          "path": "skills/html-resource-hints",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Add resource hints (preload, prefetch, dns-prefetch). Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "cross-origin-security",
+          "path": "skills/cross-origin-security",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Handle cross-origin requests securely. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "geo-meta",
+          "path": "skills/geo-meta",
+          "description": "Use when auditing locally-focused or regionally-targeted pages for geo targeting signals, particularly on sites targeting audiences through Bing or regional search engines. Note that these meta tags have no documented effect on Google's ranking.",
+          "version": ""
+        },
+        {
+          "name": "css-containment",
+          "path": "skills/css-containment",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Use CSS containment to limit repaint scope. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "view-transitions",
+          "path": "skills/view-transitions",
+          "description": "Use when adding page transition animations, image expand/contract effects, shared-element transitions, or improving navigation UX in a single-page or multi-page application.",
+          "version": ""
+        },
+        {
+          "name": "editorial-policy",
+          "path": "skills/editorial-policy",
+          "description": "Use when auditing a blog, news site, or YMYL content site for trust signals, drafting editorial policy page content, or evaluating whether a site meets Google's quality rater trustworthiness criteria.",
+          "version": ""
+        },
+        {
+          "name": "og-url-match",
+          "path": "skills/og-url-match",
+          "description": "Use when auditing Open Graph tags or investigating why social share counts appear low. Applies to any page with both canonical-url and og:url tags.",
+          "version": ""
+        },
+        {
+          "name": "right-to-erasure",
+          "path": "skills/right-to-erasure",
+          "description": "Use when auditing account settings pages, privacy dashboards, or API routes to verify that a complete data deletion path exists for users.",
+          "version": ""
+        },
+        {
+          "name": "dom-performance",
+          "path": "skills/dom-performance",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Minimize costly DOM read/write operations. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug. In React, repeated requestAnimationFrame-driven state updates across multiple mounted components are a valid performance smell when visible in the source.",
+          "version": ""
+        },
+        {
+          "name": "modern-array-methods",
+          "path": "skills/modern-array-methods",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Use modern array and object methods. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "progressive-jpeg",
+          "path": "skills/progressive-jpeg",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Use progressive JPEG encoding. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "browser-required",
+          "path": "skills/browser-required",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Perform browser-based performance audits. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "aria-tooltip-name",
+          "path": "skills/aria-tooltip-name",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide accessible names for tooltips. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "accessible-tables",
+          "path": "skills/accessible-tables",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use semantic table markup for screen readers. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "redirect-chains",
+          "path": "skills/redirect-chains",
+          "description": "Use when auditing internal link structure after a URL migration, domain change, or site rebuild. Applies to any site that has had redirects in place for more than a month.",
+          "version": ""
+        },
+        {
+          "name": "sitemap-valid",
+          "path": "skills/sitemap-valid",
+          "description": "Use when applies to any site with a manually or programmatically generated XML sitemap. Use when debugging sitemap submission errors in Google Search Console.",
+          "version": ""
+        },
+        {
+          "name": "tel-mailto",
+          "path": "skills/tel-mailto",
+          "description": "Use when applies to contact pages, business listing pages, headers/footers, and any page displaying a phone number or email address. Use when auditing contact UX or schema-marked LocalBusiness pages.",
+          "version": ""
+        },
+        {
+          "name": "consistent-help",
+          "path": "skills/consistent-help",
+          "description": "Use when reviewing support UI across multi-page flows such as checkout, onboarding, account recovery, or support journeys. Compare multiple pages in the same variation instead of reviewing a single page alone.",
+          "version": ""
+        },
+        {
+          "name": "aria-required-parent",
+          "path": "skills/aria-required-parent",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Ensure ARIA roles are contained by required parent roles. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "unique-id",
+          "path": "skills/unique-id",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Ensure all IDs are unique. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "responsive-images",
+          "path": "skills/responsive-images",
+          "description": "Use when reviewing article images, cards, galleries, or any component rendered at multiple sizes across breakpoints. Check both the markup and the CSS layout because an incorrect `sizes` attribute can negate a perfectly good `srcset`.",
+          "version": ""
+        },
+        {
+          "name": "aria-hidden-body",
+          "path": "skills/aria-hidden-body",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Do not use aria-hidden on the document body. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "dlitem",
+          "path": "skills/dlitem",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Wrap definition items in a definition list. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "charset",
+          "path": "skills/charset",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Declare UTF-8 character encoding. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "affiliate-disclosure",
+          "path": "skills/affiliate-disclosure",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Provide clear affiliate disclosures. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "aria-meter-name",
+          "path": "skills/aria-meter-name",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide accessible names for meter elements. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "logical-properties",
+          "path": "skills/logical-properties",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Use CSS logical properties for i18n and RTL support. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "pagination",
+          "path": "skills/pagination",
+          "description": "Use when auditing paginated content (blog archives, product category pages, search results). Applies to any site with lists or grids of content split across multiple pages.",
+          "version": ""
+        },
+        {
+          "name": "responsive-units",
+          "path": "skills/responsive-units",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Use relative units for responsive layouts. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "orphan-pages",
+          "path": "skills/orphan-pages",
+          "description": "Use when auditing site architecture or investigating why specific pages have low organic traffic despite good content. Applies to any site with more than ~20 pages.",
+          "version": ""
+        },
+        {
+          "name": "memory-leaks",
+          "path": "skills/memory-leaks",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Prevent common memory leak patterns. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "accessible-authentication",
+          "path": "skills/accessible-authentication",
+          "description": "Use when reviewing sign-in, sign-up, MFA, CAPTCHA, recovery, and re-auth flows. Evaluate the full authentication path, including error handling and backup methods, not just the primary login form.",
+          "version": ""
+        },
+        {
+          "name": "image-compression",
+          "path": "skills/image-compression",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Compress images without quality loss. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "tabs-accessibility",
+          "path": "skills/tabs-accessibility",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Make tabs keyboard navigable. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "plain-language",
+          "path": "skills/plain-language",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Write in plain language. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "word-count",
+          "path": "skills/word-count",
+          "description": "Use when applies to key landing pages, blog posts, product pages, and any page targeting competitive queries. Use when diagnosing poor rankings or after a Google Helpful Content update.",
+          "version": ""
+        },
+        {
+          "name": "image-file-size",
+          "path": "skills/image-file-size",
+          "description": "Use when auditing the image pipeline, static assets in `public/`, CMS-managed media, or image CDN transforms. Separate file-size problems from dimension mismatches so you can tell whether the issue is compression, format choice, or responsive delivery.",
+          "version": ""
+        },
+        {
+          "name": "clean-up-comments",
+          "path": "skills/clean-up-comments",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Remove comments and debug code in production. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "lazy-loading",
+          "path": "skills/lazy-loading",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Implement lazy loading for offscreen content. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes. Absence of `loading='lazy'` is not enough by itself when fold position is unknown.",
+          "version": ""
+        },
+        {
+          "name": "td-headers-attr",
+          "path": "skills/td-headers-attr",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Link table cells to headers using IDs. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "duplicate-id-active",
+          "path": "skills/duplicate-id-active",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use unique IDs for active elements. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "css-order",
+          "path": "skills/css-order",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Order CSS files correctly. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "html5-semantic-elements",
+          "path": "skills/html5-semantic-elements",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Use semantic HTML elements. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "hyphens",
+          "path": "skills/hyphens",
+          "description": "Use when auditing URL structures for word separator format, generating slugs from titles, or planning a URL migration from underscores or spaces to hyphens with appropriate redirects.",
+          "version": ""
+        },
+        {
+          "name": "broken-images",
+          "path": "skills/broken-images",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Fix broken images. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "fetchpriority-attribute",
+          "path": "skills/fetchpriority-attribute",
+          "description": "Use when optimising Largest Contentful Paint (LCP), reducing render-blocking resource contention, or fine-tuning resource loading order in the critical rendering path.",
+          "version": ""
+        },
+        {
+          "name": "json-ld-valid",
+          "path": "skills/json-ld-valid",
+          "description": "Use when generating or auditing any `<script type='application/ld+json'>` blocks, implementing structured data for articles, products, FAQs, breadcrumbs, or local businesses, or investigating why rich results are not appearing in Google Search Console.",
+          "version": ""
+        },
+        {
+          "name": "table-headers",
+          "path": "skills/table-headers",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Define proper table headers. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "privacy-policy",
+          "path": "skills/privacy-policy",
+          "description": "Use when reviewing whether a website has a visible, accessible privacy policy link, particularly in the footer navigation.",
+          "version": ""
+        },
+        {
+          "name": "content-security-policy",
+          "path": "skills/content-security-policy",
+          "description": "Use when reviewing headers, forms, cookies, or third-party integrations related to Implement a content security policy. Validate the effective browser and HTTP behavior in a production-like environment.",
+          "version": ""
+        },
+        {
+          "name": "external-links",
+          "path": "skills/external-links",
+          "description": "Use when auditing content pages for citation quality, suggesting authoritative sources to link for factual claims, or reviewing whether a page's external link attributes (nofollow, noopener) are correctly set.",
+          "version": ""
+        },
+        {
+          "name": "slug-keywords",
+          "path": "skills/slug-keywords",
+          "description": "Use when applies to blog posts, product pages, and any content page with editable URL slugs. Use when building a URL strategy for a new site or auditing existing URLs for keyword inclusion.",
+          "version": ""
+        },
+        {
+          "name": "webfont-format",
+          "path": "skills/webfont-format",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Optimize web font formats. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "llm-parsability",
+          "path": "skills/llm-parsability",
+          "description": "Use when auditing content pages for AI discoverability. Applies to any informational page intended to appear in AI-generated answers, search snippets, or knowledge base extraction.",
+          "version": ""
+        },
+        {
+          "name": "broken-external-links",
+          "path": "skills/broken-external-links",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Fix or remove broken external links. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "aria-valid-attr",
+          "path": "skills/aria-valid-attr",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Ensure ARIA attributes are valid. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "list-structure",
+          "path": "skills/list-structure",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use correct list structure. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "css-file-size",
+          "path": "skills/css-file-size",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Optimize CSS file size. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "modal-accessibility",
+          "path": "skills/modal-accessibility",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Make modal dialogs keyboard accessible. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "css-critical",
+          "path": "skills/css-critical",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Inline critical CSS for faster rendering. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "focus-order",
+          "path": "skills/focus-order",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Ensure logical focus order. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "parallax-effects",
+          "path": "skills/parallax-effects",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide alternatives to parallax effects. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "mobile-testing",
+          "path": "skills/mobile-testing",
+          "description": "Use when reviewing CI coverage, automated checks, or test strategy related to Test on real mobile devices and viewports. Focus on whether the rule is continuously verified, not just documented.",
+          "version": ""
+        },
+        {
+          "name": "permissions-policy",
+          "path": "skills/permissions-policy",
+          "description": "Use when reviewing HTTP response headers for defense-in-depth security hardening on any web application.",
+          "version": ""
+        },
+        {
+          "name": "navigation-landmark",
+          "path": "skills/navigation-landmark",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Use navigation landmark regions. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "og-tags",
+          "path": "skills/og-tags",
+          "description": "Use when auditing a web page's social sharing metadata. Applies to any page users might share on social networks or messaging apps.",
+          "version": ""
+        },
+        {
+          "name": "third-party-scripts",
+          "path": "skills/third-party-scripts",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Optimize third-party script loading. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "h1",
+          "path": "skills/h1",
+          "description": "Use when auditing a page's heading structure, generating H1 text for landing pages or blog posts, or reviewing a CMS template that may produce empty or missing H1 elements.",
+          "version": ""
+        },
+        {
+          "name": "screen-reader-testing",
+          "path": "skills/screen-reader-testing",
+          "description": "Use when performing accessibility audits of web pages, components, or full user flows. Applies to all web content accessed via assistive technology. Particularly important for custom JavaScript widgets, single-page applications, dynamically updated content, modal dialogs, and forms with validation.",
+          "version": ""
+        },
+        {
+          "name": "color-oklch",
+          "path": "skills/color-oklch",
+          "description": "Use when building a design token system, creating accessible colour palettes, generating colour ramps programmatically, or migrating a design system to support wide-gamut displays.",
+          "version": ""
+        },
+        {
+          "name": "css-at-property",
+          "path": "skills/css-at-property",
+          "description": "Use when implementing animated gradients, complex CSS transitions that involve custom property values, or building a typed design token system where custom property misuse should produce visible errors.",
+          "version": ""
+        },
+        {
+          "name": "ymyl-detection",
+          "path": "skills/ymyl-detection",
+          "description": "Use when applies to any site in health, medicine, finance, law, safety, news, or similar fields. Use when auditing content quality for sites in YMYL categories or investigating why high-quality-seeming content underperforms.",
+          "version": ""
+        },
+        {
+          "name": "text-resizing",
+          "path": "skills/text-resizing",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Support text resizing to 200%. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "all-noindex-pages",
+          "path": "skills/all-noindex-pages",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Audit all noindex pages. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "focus-styles",
+          "path": "skills/focus-styles",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Provide visible custom focus indicators. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "empty-links",
+          "path": "skills/empty-links",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Fix empty and broken links. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "structured-data",
+          "path": "skills/structured-data",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Add structured data markup. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "form-captcha",
+          "path": "skills/form-captcha",
+          "description": "Use when reviewing public HTML forms (no authentication required to reach them) for bot and abuse protection mechanisms.",
+          "version": ""
+        },
+        {
+          "name": "listitem",
+          "path": "skills/listitem",
+          "description": "Use when applies to HTML documents with `<li>` elements. Also applies to custom ARIA lists where `role='listitem'` must be owned by `role='list'`. Common violations occur in templating systems where list markup is split across components or in CSS resets where developers use `<li>` for layout without proper list parents.",
+          "version": ""
+        },
+        {
+          "name": "breadcrumb-navigation",
+          "path": "skills/breadcrumb-navigation",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Implement accessible breadcrumb navigation. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "frame-title",
+          "path": "skills/frame-title",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide titles for iframes and frames. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "flexbox-patterns",
+          "path": "skills/flexbox-patterns",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Apply Flexbox best practices. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "new-tab",
+          "path": "skills/new-tab",
+          "description": "Use when reviewing HTML or JSX for anchor elements with target='_blank' to verify rel='noopener noreferrer' is present.",
+          "version": ""
+        },
+        {
+          "name": "product",
+          "path": "skills/product",
+          "description": "Use when auditing e-commerce product pages or implementing structured data for a shop. Applies to any page selling or describing a specific product.",
+          "version": ""
+        },
+        {
+          "name": "critical-request-chains",
+          "path": "skills/critical-request-chains",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Minimize critical request chains. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "meta-description",
+          "path": "skills/meta-description",
+          "description": "Use when auditing page metadata or generating descriptions for new pages. Applies to every page that should receive organic search traffic.",
+          "version": ""
+        },
+        {
+          "name": "video-captions",
+          "path": "skills/video-captions",
+          "description": "Use when applies to all `<video>` elements and third-party video embeds (YouTube, Vimeo) where the page owner controls the content. Prerecorded videos require `.vtt` caption files via `<track>`. For videos embedded via `<iframe>`, check that the video platform captions are enabled. Audio-only content requires transcripts instead (SC 1.2.1). Video-only content (no audio) requires a text alternative or audio description instead (SC 1.2.3).",
+          "version": ""
+        },
+        {
+          "name": "stop-words",
+          "path": "skills/stop-words",
+          "description": "Use when applies primarily when creating new content pages. Low priority for existing indexed pages where redirect risk outweighs gain. Use when building a slug naming convention.",
+          "version": ""
+        },
+        {
+          "name": "subresource-integrity",
+          "path": "skills/subresource-integrity",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Add Subresource Integrity to external scripts. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "preconnect",
+          "path": "skills/preconnect",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Use preconnect for critical third-party origins. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "color-contrast",
+          "path": "skills/color-contrast",
+          "description": "Use when applies to all visible text and text images, UI component borders (input fields, buttons), focus indicators, icons that convey meaning, and graphical objects required to understand content. Does not apply to inactive/disabled UI components or purely decorative elements.",
+          "version": ""
+        },
+        {
+          "name": "image-cdn",
+          "path": "skills/image-cdn",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Serve images from a CDN. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "table-duplicate-name",
+          "path": "skills/table-duplicate-name",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Ensure tables have unique accessible names. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "organization",
+          "path": "skills/organization",
+          "description": "Use when auditing structured data on a business or brand website homepage. Applies to organisations, companies, non-profits, and publishers that want accurate Knowledge Panel information in Google Search.",
+          "version": ""
+        },
+        {
+          "name": "currency-formatting",
+          "path": "skills/currency-formatting",
+          "description": "Use when reviewing utility functions, component props, or template strings that format numbers, prices, or dates to check whether Intl APIs are used correctly.",
+          "version": ""
+        },
+        {
+          "name": "text-expansion",
+          "path": "skills/text-expansion",
+          "description": "Use when reviewing CSS for fixed dimensions, truncation, or overflow rules on elements that render translatable strings.",
+          "version": ""
+        },
+        {
+          "name": "zoom-reflow",
+          "path": "skills/zoom-reflow",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Support content reflow at 400% zoom. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "aria-toggle-field-name",
+          "path": "skills/aria-toggle-field-name",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide accessible names for toggle fields. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "back-forward-cache",
+          "path": "skills/back-forward-cache",
+          "description": "Use when reviewing navigation performance, browser lifecycle events, or resume-from-memory behavior. Check the actual browser lifecycle and restore path, not only static code patterns.",
+          "version": ""
+        },
+        {
+          "name": "aria-deprecated-role",
+          "path": "skills/aria-deprecated-role",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Avoid using deprecated ARIA roles. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "service-area",
+          "path": "skills/service-area",
+          "description": "Use when applies to service businesses (plumbers, lawyers, consultants) serving multiple regions. Use when planning local SEO strategy for businesses without brick-and-mortar locations in every city.",
+          "version": ""
+        },
+        {
+          "name": "accessible-tooltips",
+          "path": "skills/accessible-tooltips",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Create accessible tooltips. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "integration-testing",
+          "path": "skills/integration-testing",
+          "description": "Use when reviewing CI coverage, automated checks, or test strategy related to Write integration tests for key workflows. Focus on whether the rule is continuously verified, not just documented.",
+          "version": ""
+        },
+        {
+          "name": "favicons",
+          "path": "skills/favicons",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Implement favicons for all devices. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "legacy-js",
+          "path": "skills/legacy-js",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Avoid serving legacy JavaScript to modern browsers. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "heading-order",
+          "path": "skills/heading-order",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Maintain logical heading order. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "speculation-rules",
+          "path": "skills/speculation-rules",
+          "description": "Use when optimising multi-page navigation performance, reducing INP on page transitions, or implementing progressive enhancement for fast page loads.",
+          "version": ""
+        },
+        {
+          "name": "embedded-or-inline-css",
+          "path": "skills/embedded-or-inline-css",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Avoid embedded and inline CSS. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "cross-browser-testing",
+          "path": "skills/cross-browser-testing",
+          "description": "Use when reviewing CI coverage, automated checks, or test strategy related to Test across all major browsers. Focus on whether the rule is continuously verified, not just documented.",
+          "version": ""
+        },
+        {
+          "name": "aria-valid-attr-value",
+          "path": "skills/aria-valid-attr-value",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use valid values for ARIA attributes. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "video",
+          "path": "skills/video",
+          "description": "Use when applies to any page embedding or hosting video content (YouTube, Vimeo, self-hosted). Use when adding video content to a site or auditing structured data coverage.",
+          "version": ""
+        },
+        {
+          "name": "list-virtualization",
+          "path": "skills/list-virtualization",
+          "description": "Use when reviewing dashboards, admin tables, search results, or feeds with many repeated items. Confirm the bottleneck is DOM or rendering cost before introducing virtualization because small lists usually do not need the added complexity.",
+          "version": ""
+        },
+        {
+          "name": "immutable-patterns",
+          "path": "skills/immutable-patterns",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Prefer immutable data patterns. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "webp-format",
+          "path": "skills/webp-format",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Use WebP format with fallbacks. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "compression",
+          "path": "skills/compression",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Enable text-based compression. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "frontend-checklist-global",
+          "path": "skills/frontend-checklist-global",
+          "description": "Use when auditing or improving any frontend codebase against the full Front-End Checklist rule corpus through one entry point.",
+          "version": ""
+        },
+        {
+          "name": "tabindex",
+          "path": "skills/tabindex",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use appropriate tabindex values. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "trailing-slash",
+          "path": "skills/trailing-slash",
+          "description": "Use when applies to all static and dynamic websites. Use when auditing a site for duplicate content, setting up a new site, or after migrating platforms that changed URL conventions.",
+          "version": ""
+        },
+        {
+          "name": "draggable-accessibility",
+          "path": "skills/draggable-accessibility",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Make drag and drop accessible. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "reading-level",
+          "path": "skills/reading-level",
+          "description": "Use when reviewing content pages for user experience and SEO. Applies to blog posts, landing pages, how-to guides, and any long-form content intended for a broad audience.",
+          "version": ""
+        },
+        {
+          "name": "redirect-chain",
+          "path": "skills/redirect-chain",
+          "description": "Use when auditing site redirects after URL migrations, domain changes, or CMS upgrades. Applies to any site that has had multiple rounds of structural changes over time.",
+          "version": ""
+        },
+        {
+          "name": "dead-end-pages",
+          "path": "skills/dead-end-pages",
+          "description": "Use when auditing a site's internal link graph for dead-end pages, suggesting related-content links to add to thin or standalone pages, or reviewing CMS templates that produce link-free content pages.",
+          "version": ""
+        },
+        {
+          "name": "css-non-blocking",
+          "path": "skills/css-non-blocking",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Load CSS without blocking render. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "horizontal-scroll",
+          "path": "skills/horizontal-scroll",
+          "description": "Use when applies to all CSS layout rules. Check `width`, `min-width`, fixed pixel values on containers, `overflow`, `white-space`, and `word-break` properties. Use when auditing responsive design or WCAG 2.1 Level AA compliance. Test at 320px viewport width and at 400% browser zoom.",
+          "version": ""
+        },
+        {
+          "name": "http2",
+          "path": "skills/http2",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Enable HTTP/2 or HTTP/3. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "subgrid",
+          "path": "skills/subgrid",
+          "description": "Use when reviewing card grid layouts with misaligned content areas, or any nested grid where child items need to align with sibling cards' corresponding sections without JavaScript intervention.",
+          "version": ""
+        },
+        {
+          "name": "event-delegation",
+          "path": "skills/event-delegation",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Use event delegation for dynamic content. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "th-has-data-cells",
+          "path": "skills/th-has-data-cells",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Ensure table headers associate with data cells. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "debounce-throttle",
+          "path": "skills/debounce-throttle",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Debounce and throttle event handlers. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "animation-performance",
+          "path": "skills/animation-performance",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Use transform and opacity for animations. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "lazy-above-fold",
+          "path": "skills/lazy-above-fold",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Disable lazy loading for above-the-fold content. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "meta-refresh",
+          "path": "skills/meta-refresh",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Avoid meta refresh redirects. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "js-libraries",
+          "path": "skills/js-libraries",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Use secure and up-to-date JS libraries. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "defer-async",
+          "path": "skills/defer-async",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Load scripts with defer, async, or type=module. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "session-timeout-recovery",
+          "path": "skills/session-timeout-recovery",
+          "description": "Use when reviewing authenticated user flows or long forms. Check both client and server behavior: warning timing, dialog accessibility, autosave frequency, timeout extension, and post-login state restoration.",
+          "version": ""
+        },
+        {
+          "name": "font-size",
+          "path": "skills/font-size",
+          "description": "Use when applies to all CSS `font-size` declarations, particularly those using `px` units for body text, UI labels, and navigation. Use when auditing mobile responsiveness and accessibility compliance. Check for `font-size` in media queries targeting small screens.",
+          "version": ""
+        },
+        {
+          "name": "skip-link",
+          "path": "skills/skip-link",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Implement 'Skip to Content' links. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "responsive-size",
+          "path": "skills/responsive-size",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Serve images at the correct display size. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "unused-css",
+          "path": "skills/unused-css",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Remove unused CSS rules. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "freshness",
+          "path": "skills/freshness",
+          "description": "Use when auditing content pages for freshness signals, setting up HTTP Last-Modified headers in a web server config, or ensuring Article JSON-LD dateModified is updated when CMS content changes.",
+          "version": ""
+        },
+        {
+          "name": "picture-element",
+          "path": "skills/picture-element",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Use <picture> with an <img> fallback. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "offscreen-lazy",
+          "path": "skills/offscreen-lazy",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Lazy load offscreen images. Check encoded size, rendered size, loading strategy, and above-the-fold impact together. Missing `loading='lazy'` is only a valid finding when you can reasonably tell the image is offscreen or non-critical.",
+          "version": ""
+        },
+        {
+          "name": "aria-progressbar-name",
+          "path": "skills/aria-progressbar-name",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide accessible names for progress bars. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "javascript-minification",
+          "path": "skills/javascript-minification",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Minify all JavaScript files. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "stack-trace-exposure",
+          "path": "skills/stack-trace-exposure",
+          "description": "Use when reviewing error handling middleware, API route handlers, or server responses for security-sensitive information disclosure.",
+          "version": ""
+        },
+        {
+          "name": "largest-contentful-paint",
+          "path": "skills/largest-contentful-paint",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Optimize largest contentful paint. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "pluralization",
+          "path": "skills/pluralization",
+          "description": "Use when reviewing string concatenation involving counts, translation key lookups, or i18n library configurations to check whether plural forms are handled correctly for all target locales.",
+          "version": ""
+        },
+        {
+          "name": "image-optimization",
+          "path": "skills/image-optimization",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Optimize all images for web. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "physical-address",
+          "path": "skills/physical-address",
+          "description": "Use when auditing local business websites, e-commerce sites, or any site where a physical presence affects trust or local search visibility.",
+          "version": ""
+        },
+        {
+          "name": "test-coverage",
+          "path": "skills/test-coverage",
+          "description": "Use when reviewing CI coverage, automated checks, or test strategy related to Maintain test coverage thresholds. Focus on whether the rule is continuously verified, not just documented.",
+          "version": ""
+        },
+        {
+          "name": "cumulative-layout-shift",
+          "path": "skills/cumulative-layout-shift",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Minimize cumulative layout shift. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "carousel-accessibility",
+          "path": "skills/carousel-accessibility",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Make carousels accessible. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "canonical-url",
+          "path": "skills/canonical-url",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Set canonical URLs for all pages. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "duplicate-description",
+          "path": "skills/duplicate-description",
+          "description": "Use when auditing a site's meta tag uniqueness, generating page-specific meta descriptions, or reviewing CMS templates that inject the same description globally.",
+          "version": ""
+        },
+        {
+          "name": "resource-hints",
+          "path": "skills/resource-hints",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Use resource hints for faster loading. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "touch-targets",
+          "path": "skills/touch-targets",
+          "description": "Use when applies to all interactive elements on touchscreen interfaces: buttons, links, checkboxes, radio buttons, form inputs, icon buttons, and menu items. Check CSS for min-width, min-height, width, height, and padding on interactive elements. Particularly important for icon-only buttons (close, delete, share) which are often made too small.",
+          "version": ""
+        },
+        {
+          "name": "orientation",
+          "path": "skills/orientation",
+          "description": "Use when reviewing mobile-first layouts, tablet experiences, fullscreen flows, forms, dashboards, or media interfaces. Check rendered behavior in both portrait and landscape and separate genuine layout constraints from unnecessary orientation assumptions.",
+          "version": ""
+        },
+        {
+          "name": "label-content-name-mismatch",
+          "path": "skills/label-content-name-mismatch",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Align visible labels with accessible names. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "e2e-testing",
+          "path": "skills/e2e-testing",
+          "description": "Use when reviewing CI coverage, automated checks, or test strategy related to Implement end-to-end testing. Focus on whether the rule is continuously verified, not just documented.",
+          "version": ""
+        },
+        {
+          "name": "const-let",
+          "path": "skills/const-let",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Prefer const and let over var. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "search-input",
+          "path": "skills/search-input",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Make search inputs accessible. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "service-worker",
+          "path": "skills/service-worker",
+          "description": "Use when auditing repeat-visit performance, adding offline support, or evaluating PWA readiness for a web application.",
+          "version": ""
+        },
+        {
+          "name": "length",
+          "path": "skills/length",
+          "description": "Use when generating URL slugs from article titles, auditing URL structures for unnecessary depth or length, or reviewing URL patterns in a CMS or router configuration.",
+          "version": ""
+        },
+        {
+          "name": "sitemap-domain",
+          "path": "skills/sitemap-domain",
+          "description": "Use when applies to sites that have recently migrated from HTTP to HTTPS, changed domain name, or have www/non-www redirect configurations. Use when sitemap submission reports low coverage.",
+          "version": ""
+        },
+        {
+          "name": "lang-attribute",
+          "path": "skills/lang-attribute",
+          "description": "Use when applies to all HTML documents. Check the `<html>` opening tag for a `lang` attribute with a non-empty, valid BCP 47 language code. Also check for `lang` attribute changes on individual elements when the document contains content in multiple languages (inline quotes, foreign terms, multilingual sections). The `lang` attribute is inherited — child elements inherit the language from their nearest ancestor with `lang`.",
+          "version": ""
+        },
+        {
+          "name": "about-page",
+          "path": "skills/about-page",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Create a dedicated About page. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "faq",
+          "path": "skills/faq",
+          "description": "Use when adding FAQ sections to landing pages or blog posts, generating FAQPage JSON-LD from existing Q&A content, or validating that structured data on pages with FAQ sections is syntactically and semantically correct.",
+          "version": ""
+        },
+        {
+          "name": "author-byline",
+          "path": "skills/author-byline",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Display clear author bylines. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "audio-descriptions",
+          "path": "skills/audio-descriptions",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide audio descriptions for video. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "cascade-layers",
+          "path": "skills/cascade-layers",
+          "description": "Use when reviewing a CSS architecture for specificity issues, setting up a design system, or migrating a large codebase from utility-first to a layered architecture.",
+          "version": ""
+        },
+        {
+          "name": "link-checker",
+          "path": "skills/link-checker",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Check for broken links. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "specificity-management",
+          "path": "skills/specificity-management",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Keep CSS specificity low and flat. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "js-file-size",
+          "path": "skills/js-file-size",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Optimize JavaScript bundle size. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "aria-allowed-attr",
+          "path": "skills/aria-allowed-attr",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use only allowed ARIA attributes for each role. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "critical-images",
+          "path": "skills/critical-images",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Prioritize loading critical images. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "404-page",
+          "path": "skills/404-page",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Create a custom 404 error page. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "interaction-to-next-paint",
+          "path": "skills/interaction-to-next-paint",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Optimize interaction to next paint. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "avoid-eval",
+          "path": "skills/avoid-eval",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Never use eval() or unsafe dynamic code execution. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "autofocus-avoidance",
+          "path": "skills/autofocus-avoidance",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Avoid autofocus on form fields. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "import-on-visibility",
+          "path": "skills/import-on-visibility",
+          "description": "Use when reviewing long pages, dashboards, or content feeds with expensive offscreen modules. Balance early enough loading for smooth scrolling against keeping the initial route light.",
+          "version": ""
+        },
+        {
+          "name": "website-search",
+          "path": "skills/website-search",
+          "description": "Use when applies to sites with internal site search functionality. Use when optimizing branded search result appearance or adding structured data for the first time.",
+          "version": ""
+        },
+        {
+          "name": "review",
+          "path": "skills/review",
+          "description": "Use when applies to product pages, local business pages, recipes, apps, books, and any page that aggregates user reviews. Use when auditing rich result eligibility for e-commerce or review sites.",
+          "version": ""
+        },
+        {
+          "name": "hsts",
+          "path": "skills/hsts",
+          "description": "Use when reviewing HTTP response headers on any site that serves content over HTTPS.",
+          "version": ""
+        },
+        {
+          "name": "performance-resource-hints",
+          "path": "skills/performance-resource-hints",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Use resource hints for faster loading. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "file-upload-accessibility",
+          "path": "skills/file-upload-accessibility",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Make file uploads accessible. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "custom-element-accessibility",
+          "path": "skills/custom-element-accessibility",
+          "description": "Use when reviewing custom element class definitions or Web Component source code to check for missing ARIA reflection, keyboard handling, and form association.",
+          "version": ""
+        },
+        {
+          "name": "reduced-motion",
+          "path": "skills/reduced-motion",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Respect reduced motion preferences. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "doctype",
+          "path": "skills/doctype",
+          "description": "Use when applies to all HTML documents. Always check the very first line of the raw HTML source (view-source: or DevTools > Network > Response). In SSR frameworks, check the root HTML template (e.g., _document.tsx in Next.js, index.html in Vite/Vue, application.html.erb in Rails). The doctype is not a tag — it is a declaration and does not need a closing tag.",
+          "version": ""
+        },
+        {
+          "name": "accordion-accessibility",
+          "path": "skills/accordion-accessibility",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Make accordions keyboard navigable. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "session-cookie-flags",
+          "path": "skills/session-cookie-flags",
+          "description": "Use when reviewing server-side session management, setting up authentication middleware, or auditing cookie configuration in HTTP response headers.",
+          "version": ""
+        },
+        {
+          "name": "aria-text",
+          "path": "skills/aria-text",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Avoid focusable descendants in role='text' elements. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "json-safety",
+          "path": "skills/json-safety",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Parse JSON safely with error handling. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "landmark-regions",
+          "path": "skills/landmark-regions",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use landmark regions correctly. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "es-modules",
+          "path": "skills/es-modules",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Use ES modules (import/export). Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "author-expertise",
+          "path": "skills/author-expertise",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Highlight author credentials and expertise. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "browser-caching",
+          "path": "skills/browser-caching",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Enable browser caching. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "first-contentful-paint",
+          "path": "skills/first-contentful-paint",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Optimize first contentful paint. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "object-alt",
+          "path": "skills/object-alt",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide alternative text for objects. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "flashing-content",
+          "path": "skills/flashing-content",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Prevent seizure-triggering flashing content. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "share-buttons",
+          "path": "skills/share-buttons",
+          "description": "Use when applies to blog posts, news articles, tutorials, and other long-form content. Less relevant for product pages, service pages, or home pages. Use when optimizing content distribution.",
+          "version": ""
+        },
+        {
+          "name": "naming-conventions",
+          "path": "skills/naming-conventions",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Use consistent CSS naming conventions. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "filename-quality",
+          "path": "skills/filename-quality",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Use descriptive image filenames. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "direction-attribute",
+          "path": "skills/direction-attribute",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Set text direction for RTL languages. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "unit-tests",
+          "path": "skills/unit-tests",
+          "description": "Use when reviewing CI coverage, automated checks, or test strategy related to Write unit tests. Focus on whether the rule is continuously verified, not just documented.",
+          "version": ""
+        },
+        {
+          "name": "svg-optimization",
+          "path": "skills/svg-optimization",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Optimize SVG files. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "robots-meta",
+          "path": "skills/robots-meta",
+          "description": "Use when applies to all HTML pages. Use when auditing pages that have disappeared from search results or when checking staging vs. production meta tag parity.",
+          "version": ""
+        },
+        {
+          "name": "webpagetest",
+          "path": "skills/webpagetest",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Analyze performance with WebPageTest. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "focus-not-obscured",
+          "path": "skills/focus-not-obscured",
+          "description": "Use when reviewing sticky navigation, consent banners, chat widgets, skip links, or any fixed-position UI. Validate the actual tab order and viewport behavior at realistic zoom levels.",
+          "version": ""
+        },
+        {
+          "name": "page-weight",
+          "path": "skills/page-weight",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Keep page weight under 1500KB. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "visual-regression",
+          "path": "skills/visual-regression",
+          "description": "Use when reviewing CI coverage, automated checks, or test strategy related to Use visual regression testing. Focus on whether the rule is continuously verified, not just documented.",
+          "version": ""
+        },
+        {
+          "name": "empty-heading",
+          "path": "skills/empty-heading",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Ensure headings contain text. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "type-only-imports",
+          "path": "skills/type-only-imports",
+          "description": "Use when auditing import statements in TypeScript files, setting up a new TypeScript project, or investigating unexpected bundle inclusions from type-only dependencies.",
+          "version": ""
+        },
+        {
+          "name": "alt-text",
+          "path": "skills/alt-text",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Provide meaningful alt text for images. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "token-storage-security",
+          "path": "skills/token-storage-security",
+          "description": "Use when reviewing authentication implementation, setting up a new auth system, or evaluating whether the current token storage approach exposes the application to XSS-based token theft.",
+          "version": ""
+        },
+        {
+          "name": "select-name",
+          "path": "skills/select-name",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide accessible names for select elements. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "mutation-testing",
+          "path": "skills/mutation-testing",
+          "description": "Use when evaluating test quality on modules containing business logic, calculation utilities, or state machines to determine whether the tests provide genuine defect detection.",
+          "version": ""
+        },
+        {
+          "name": "aria-labels",
+          "path": "skills/aria-labels",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide accessible names for all interactive elements. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "performance-budget",
+          "path": "skills/performance-budget",
+          "description": "Use when reviewing CI configuration, bundle analysis workflows, or pull requests that add dependencies and assets. Distinguish bundle-size budgets from runtime budgets such as Lighthouse or Core Web Vitals so teams can enforce both.",
+          "version": ""
+        },
+        {
+          "name": "third-party-cookies",
+          "path": "skills/third-party-cookies",
+          "description": "Use when reviewing a website for privacy compliance, third-party resource loading, or cookie consent implementation.",
+          "version": ""
+        },
+        {
+          "name": "lowercase",
+          "path": "skills/lowercase",
+          "description": "Use when auditing URL structure or configuring a new site's routing. Applies to any server or framework that allows case-insensitive file systems (Linux servers are case-sensitive by default).",
+          "version": ""
+        },
+        {
+          "name": "ttfb",
+          "path": "skills/ttfb",
+          "description": "Use when auditing slow first responses on SSR pages, APIs, or cacheable HTML. Distinguish origin compute time from network latency and CDN cache misses before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "pagination-accessibility",
+          "path": "skills/pagination-accessibility",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Make pagination accessible. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "schema-noindex-conflict",
+          "path": "skills/schema-noindex-conflict",
+          "description": "Use when applies to any site that uses structured data for rich results. Use when investigating why valid schema markup does not produce rich results in Google Search.",
+          "version": ""
+        },
+        {
+          "name": "optimized",
+          "path": "skills/optimized",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Optimise images for faster loading. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "noindex-in-sitemap",
+          "path": "skills/noindex-in-sitemap",
+          "description": "Use when auditing an XML sitemap or diagnosing indexing issues. Applies to any site where noindex meta tags or X-Robots-Tag headers may be applied to URLs also listed in the sitemap.",
+          "version": ""
+        },
+        {
+          "name": "sensory-instructions",
+          "path": "skills/sensory-instructions",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Avoid sensory-only instructions. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "import-on-interaction",
+          "path": "skills/import-on-interaction",
+          "description": "Use when reviewing slow initial loads caused by optional features. Prioritize code that is expensive to download or execute and not required for the first viewport, first input, or core task completion.",
+          "version": ""
+        },
+        {
+          "name": "aria-roles",
+          "path": "skills/aria-roles",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use valid ARIA role values. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "meta-title",
+          "path": "skills/meta-title",
+          "description": "Use when auditing page metadata or generating SEO-optimized titles. Applies to every HTML page that should appear in search results.",
+          "version": ""
+        },
+        {
+          "name": "heading-hierarchy",
+          "path": "skills/heading-hierarchy",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use logical heading hierarchy. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "og-image-size",
+          "path": "skills/og-image-size",
+          "description": "Use when auditing Open Graph tags or generating og:image assets. Applies to any page that may be shared on social networks or messaging platforms.",
+          "version": ""
+        },
+        {
+          "name": "text-in-images",
+          "path": "skills/text-in-images",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Avoid images of text. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "error-handling",
+          "path": "skills/error-handling",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Implement proper error handling. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "typescript-strict-mode",
+          "path": "skills/typescript-strict-mode",
+          "description": "Use when setting up a new TypeScript project, auditing an existing tsconfig.json, or reviewing code where null-reference errors or implicit any types are present.",
+          "version": ""
+        },
+        {
+          "name": "quality",
+          "path": "skills/quality",
+          "description": "Use when evaluating content pages for SEO quality. Applies to blog posts, product descriptions, landing pages, or any page expected to receive organic search traffic.",
+          "version": ""
+        },
+        {
+          "name": "css-print",
+          "path": "skills/css-print",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Include a print stylesheet. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "retina-display",
+          "path": "skills/retina-display",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Support high-DPI retina displays. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "no-unchecked-indexed-access",
+          "path": "skills/no-unchecked-indexed-access",
+          "description": "Use when auditing tsconfig.json for missing safety flags, reviewing code that uses array index access in data processing pipelines, or investigating runtime undefined errors that TypeScript did not catch.",
+          "version": ""
+        },
+        {
+          "name": "consent-mode",
+          "path": "skills/consent-mode",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Implement Google Consent Mode v2. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "element-hiding",
+          "path": "skills/element-hiding",
+          "description": "Use when reviewing a website for layout and functionality issues caused by adblocker filter rules targeting common ad-related class names and IDs.",
+          "version": ""
+        },
+        {
+          "name": "accesskeys",
+          "path": "skills/accesskeys",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Ensure accesskey values are unique. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "viewport-zoom",
+          "path": "skills/viewport-zoom",
+          "description": "Use when applies to any `<meta name='viewport'>` element in HTML documents. Check the `content` attribute for `user-scalable=no`, `user-scalable=0`, `maximum-scale=1`, or `maximum-scale` values less than 2. This is a common mistake in mobile-first templates and CSS frameworks.",
+          "version": ""
+        },
+        {
+          "name": "video-thumbnail",
+          "path": "skills/video-thumbnail",
+          "description": "Use when applies to all `<video>` elements in HTML. The `poster` attribute specifies the URL of an image to show as a placeholder before the video is loaded or played. This is distinct from captions or audio descriptions, which are accessibility requirements. The poster is primarily a UX and performance enhancement, though the lack of a poster can indirectly create a CLS (Cumulative Layout Shift) issue if video dimensions are not declared.",
+          "version": ""
+        },
+        {
+          "name": "aria-live-regions",
+          "path": "skills/aria-live-regions",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Announce dynamic content with ARIA live regions. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "indexability-conflicts",
+          "path": "skills/indexability-conflicts",
+          "description": "Use when auditing a site for indexability issues, investigating why pages appear in Google's index that should be excluded (or vice versa), or reviewing robots.txt and meta robots configurations for consistency.",
+          "version": ""
+        },
+        {
+          "name": "dark-mode-css",
+          "path": "skills/dark-mode-css",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Support dark mode with prefers-color-scheme. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "password-field-security",
+          "path": "skills/password-field-security",
+          "description": "Use when reviewing headers, forms, cookies, or third-party integrations related to Secure password input fields. Validate the effective browser and HTTP behavior in a production-like environment.",
+          "version": ""
+        },
+        {
+          "name": "social-profiles",
+          "path": "skills/social-profiles",
+          "description": "Use when applies to business websites, personal brand sites, and publisher sites. Use when setting up Organization schema or auditing E-E-A-T signals for sites in competitive or YMYL categories.",
+          "version": ""
+        },
+        {
+          "name": "input-types",
+          "path": "skills/input-types",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Use semantic input type attributes. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "noscript-tag",
+          "path": "skills/noscript-tag",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Provide noscript fallback content. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "css-grid",
+          "path": "skills/css-grid",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Use CSS Grid for two-dimensional layouts. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "javascript-inline",
+          "path": "skills/javascript-inline",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Avoid inline JavaScript. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "reset-css",
+          "path": "skills/reset-css",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Use a CSS reset or normalize stylesheet. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "duplicate-js",
+          "path": "skills/duplicate-js",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Remove duplicate JavaScript libraries. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "anchor-text",
+          "path": "skills/anchor-text",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Use descriptive anchor text. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "cdn",
+          "path": "skills/cdn",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Use a content delivery network. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "terms-of-service",
+          "path": "skills/terms-of-service",
+          "description": "Use when reviewing whether a website or web application has a visible Terms of Service link accessible from every page.",
+          "version": ""
+        },
+        {
+          "name": "aria-input-field-name",
+          "path": "skills/aria-input-field-name",
+          "description": "Use when applies to all `<input>` (except type=hidden), `<textarea>`, `<select>`, and custom form widgets using role=textbox, role=combobox, role=spinbutton, role=searchbox, or role=listbox.",
+          "version": ""
+        },
+        {
+          "name": "gtm-present",
+          "path": "skills/gtm-present",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Optimize Google Tag Manager implementation. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "accessibility-testing",
+          "path": "skills/accessibility-testing",
+          "description": "Use when reviewing component libraries, page flows, or CI pipelines that need repeatable accessibility checks. Automated testing is strongest at catching structural and attribute-level issues; it does not replace keyboard, screen reader, and manual UX testing.",
+          "version": ""
+        },
+        {
+          "name": "trust-signals",
+          "path": "skills/trust-signals",
+          "description": "Use when applies especially to e-commerce checkouts, contact/lead forms, pricing pages, and YMYL (Your Money or Your Life) content. Use when auditing E-E-A-T or conversion optimization.",
+          "version": ""
+        },
+        {
+          "name": "keyword-stuffing",
+          "path": "skills/keyword-stuffing",
+          "description": "Use when auditing content pages for over-optimisation, reviewing AI-generated content that may repeat target phrases excessively, or checking meta tags and alt text for unnatural keyword accumulation.",
+          "version": ""
+        },
+        {
+          "name": "sitemap-coverage",
+          "path": "skills/sitemap-coverage",
+          "description": "Use when applies to content sites, e-commerce stores, and any site where timely indexing of new pages matters. Use when investigating why new pages take a long time to appear in search results.",
+          "version": ""
+        },
+        {
+          "name": "redundant-entry",
+          "path": "skills/redundant-entry",
+          "description": "Use when reviewing any process that spans multiple screens, steps, or modal stages. Follow the real user journey and compare fields across steps instead of reviewing screens in isolation.",
+          "version": ""
+        },
+        {
+          "name": "dimensions",
+          "path": "skills/dimensions",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Set explicit width and height on images. Check encoded size, rendered size, loading strategy, and above-the-fold impact together. Separate real CLS risks from tiny decorative SVGs or ornament-only assets that are unlikely to move surrounding content.",
+          "version": ""
+        },
+        {
+          "name": "dependency-audit",
+          "path": "skills/dependency-audit",
+          "description": "Use when reviewing a project's security posture, setting up CI pipelines, or responding to a reported vulnerability in a dependency.",
+          "version": ""
+        },
+        {
+          "name": "form-field-multiple-labels",
+          "path": "skills/form-field-multiple-labels",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use a single label for each form field. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "llms-txt",
+          "path": "skills/llms-txt",
+          "description": "Use when auditing public documentation portals, API references, help centers, SDK docs, or large knowledge bases. Check the final file served at `/llms.txt` and verify that the linked pages are stable, high-value, and accessible without relying on a JavaScript-only interface.",
+          "version": ""
+        },
+        {
+          "name": "web-app-manifest",
+          "path": "skills/web-app-manifest",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Link a Web App Manifest for installability. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "console-cleanup",
+          "path": "skills/console-cleanup",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Remove console statements in production. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "robots-txt",
+          "path": "skills/robots-txt",
+          "description": "Use when applies to any public website. Use when auditing technical SEO foundations or diagnosing crawl coverage gaps.",
+          "version": ""
+        },
+        {
+          "name": "mixed-content",
+          "path": "skills/mixed-content",
+          "description": "Use when reviewing an HTTPS page for resources (scripts, images, stylesheets, iframes) that are loaded over plain HTTP.",
+          "version": ""
+        },
+        {
+          "name": "favicon",
+          "path": "skills/favicon",
+          "description": "Use when checking whether a site has a correctly configured favicon, auditing `<link rel='icon'>` tags in the `<head>`, or setting up favicon infrastructure for a new project.",
+          "version": ""
+        },
+        {
+          "name": "find-npm-packages",
+          "path": "skills/find-npm-packages",
+          "description": "Use when you need to find the 2-3 most popular and well-maintained npm packages relevant to a frontend checklist rule, validate they meet quality thresholds, and add them to the rule's frontmatter.",
+          "version": "1.0.0"
+        },
+        {
+          "name": "mock-best-practices",
+          "path": "skills/mock-best-practices",
+          "description": "Use when reviewing CI coverage, automated checks, or test strategy related to Follow mocking best practices. Focus on whether the rule is continuously verified, not just documented.",
+          "version": ""
+        },
+        {
+          "name": "breadcrumb",
+          "path": "skills/breadcrumb",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Implement valid BreadcrumbList schema. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "no-explicit-any",
+          "path": "skills/no-explicit-any",
+          "description": "Use when reviewing TypeScript files for type safety regressions, during code review of functions that handle external data, or when the codebase has ESLint warnings for @typescript-eslint/no-explicit-any.",
+          "version": ""
+        },
+        {
+          "name": "duplicate-id-aria",
+          "path": "skills/duplicate-id-aria",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use unique IDs for ARIA references. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "special-chars",
+          "path": "skills/special-chars",
+          "description": "Use when applies to any site with user-generated slugs, CMS-generated URLs, or content in non-English languages. Use when auditing URLs for crawl errors or canonicalization issues.",
+          "version": ""
+        },
+        {
+          "name": "aria-hidden-focus",
+          "path": "skills/aria-hidden-focus",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Remove focusable elements from aria-hidden containers. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "figure-figcaption",
+          "path": "skills/figure-figcaption",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Use <figure> and <figcaption> for image captions. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "internal-links",
+          "path": "skills/internal-links",
+          "description": "Use when auditing a site's internal link structure, identifying pages that need more incoming links, generating contextual linking opportunities between related content, or reviewing a CMS template's internal linking patterns.",
+          "version": ""
+        },
+        {
+          "name": "render-blocking",
+          "path": "skills/render-blocking",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Eliminate render-blocking resources. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "contact-page",
+          "path": "skills/contact-page",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Create a comprehensive Contact page. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "loading-indicators",
+          "path": "skills/loading-indicators",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Show loading indicators. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "button-name",
+          "path": "skills/button-name",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide accessible names for buttons. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "disclaimers",
+          "path": "skills/disclaimers",
+          "description": "Use when auditing YMYL content pages for trust signals, generating disclaimer copy for medical or financial content, or reviewing affiliate disclosure requirements under FTC or ASA guidelines.",
+          "version": ""
+        },
+        {
+          "name": "https-downgrade",
+          "path": "skills/https-downgrade",
+          "description": "Use when auditing a site's internal and external links for protocol consistency, migrating a site from HTTP to HTTPS, or reviewing hardcoded URLs in a codebase that may use `http://` instead of `https://`.",
+          "version": ""
+        },
+        {
+          "name": "translation-strings",
+          "path": "skills/translation-strings",
+          "description": "Use when reviewing a codebase for internationalisation readiness, setting up an i18n library, or preparing strings for a new locale.",
+          "version": ""
+        },
+        {
+          "name": "scrolljacking",
+          "path": "skills/scrolljacking",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Avoid scrolljacking and custom scroll behavior. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "streaming-html",
+          "path": "skills/streaming-html",
+          "description": "Use when reviewing server-side rendering setup, Next.js App Router pages, or Node.js HTTP handlers to verify that HTML is streamed incrementally rather than buffered until completion.",
+          "version": ""
+        },
+        {
+          "name": "runtime-validation",
+          "path": "skills/runtime-validation",
+          "description": "Use when reviewing code that calls fetch(), reads from localStorage, accesses process.env, or processes form submissions without explicitly validating the incoming data shape.",
+          "version": ""
+        },
+        {
+          "name": "keyboard-navigation",
+          "path": "skills/keyboard-navigation",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Enable keyboard navigation for all elements. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "accessible-notifications",
+          "path": "skills/accessible-notifications",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Make notifications accessible. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "locale-images",
+          "path": "skills/locale-images",
+          "description": "Use when reviewing image assets, icon libraries, or components that render illustrations to identify culture-specific content that may need locale overrides or replacement with neutral alternatives.",
+          "version": ""
+        },
+        {
+          "name": "paste-inputs",
+          "path": "skills/paste-inputs",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Allow pasting into form inputs. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "broken-links",
+          "path": "skills/broken-links",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Resolve internal broken links. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "content-without-css",
+          "path": "skills/content-without-css",
+          "description": "Use when reviewing rendered HTML, layout components, or design-system patterns that may depend on presentation for meaning. Check the DOM order, semantic structure, form relationships, and whether CSS generated content carries essential information.",
+          "version": ""
+        },
+        {
+          "name": "sitemap-4xx",
+          "path": "skills/sitemap-4xx",
+          "description": "Use when applies to any site with a dynamically generated or manually maintained XML sitemap. Use when investigating crawl errors or after a site migration that removed pages.",
+          "version": ""
+        },
+        {
+          "name": "identical-links-same-purpose",
+          "path": "skills/identical-links-same-purpose",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Ensure identical links have consistent destinations. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "contract-testing",
+          "path": "skills/contract-testing",
+          "description": "Use when setting up integration testing for a frontend-backend API boundary, evaluating whether two services are safe to deploy independently, or replacing slow end-to-end tests with contract tests.",
+          "version": ""
+        },
+        {
+          "name": "aria-required-children",
+          "path": "skills/aria-required-children",
+          "description": "Use when applies to custom ARIA widgets using composite roles: tablist, list, listbox, menu, menubar, tree, treegrid, grid, rowgroup, row, radiogroup. Use when reviewing components built with div/span elements that replace native HTML list, select, or nav elements.",
+          "version": ""
+        },
+        {
+          "name": "broken-html",
+          "path": "skills/broken-html",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Fix malformed HTML structure. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "cookie-consent",
+          "path": "skills/cookie-consent",
+          "description": "Use when reviewing a website for GDPR/CCPA compliance, specifically whether cookie consent is obtained before non-essential cookies are set.",
+          "version": ""
+        },
+        {
+          "name": "sitemap",
+          "path": "skills/sitemap",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Create and submit an XML sitemap. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "weak-internal-links",
+          "path": "skills/weak-internal-links",
+          "description": "Use when applies to any site with more than 20 pages. Use when auditing site architecture, investigating why certain pages underperform in search, or after a site migration.",
+          "version": ""
+        },
+        {
+          "name": "container-queries",
+          "path": "skills/container-queries",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Use container queries for component-level responsiveness. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "srcset",
+          "path": "skills/srcset",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Use srcset for responsive images. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "hreflang",
+          "path": "skills/hreflang",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Add hreflang tags for multilingual sites. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "landmark-one-main",
+          "path": "skills/landmark-one-main",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use exactly one main landmark. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "anchor-smooth-scroll",
+          "path": "skills/anchor-smooth-scroll",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide instant anchor scroll option. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "offline-fallback",
+          "path": "skills/offline-fallback",
+          "description": "Use when adding PWA capabilities, implementing a service worker, or improving the experience for users on unreliable network connections.",
+          "version": ""
+        },
+        {
+          "name": "image-redundant-alt",
+          "path": "skills/image-redundant-alt",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Avoid redundant image alternative text. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "page-load-time",
+          "path": "skills/page-load-time",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Keep page load time under 3 seconds. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "styles-lint",
+          "path": "skills/styles-lint",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Lint CSS and SCSS files. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "link-in-text-block",
+          "path": "skills/link-in-text-block",
+          "description": "Use when applies to hyperlinks (`<a>` elements) that appear inline within paragraphs or text blocks. Does not apply to navigation menus, button-style links, or standalone links that are visually isolated from body text. Use when reviewing CSS that removes text-decoration from inline body copy links.",
+          "version": ""
+        },
+        {
+          "name": "robots-meta-conflict",
+          "path": "skills/robots-meta-conflict",
+          "description": "Use when applies to sites that use both robots.txt disallow rules and meta robots noindex tags. Use when investigating why deindexed pages still appear in search results.",
+          "version": ""
+        },
+        {
+          "name": "cross-origin-isolation",
+          "path": "skills/cross-origin-isolation",
+          "description": "Use when reviewing security-sensitive web apps, SharedArrayBuffer usage, worker-heavy apps, editors, or measurement features that require cross-origin isolation. Check both headers and real browser behavior.",
+          "version": ""
+        },
+        {
+          "name": "font-loading",
+          "path": "skills/font-loading",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Optimize web font loading. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "aria-dialog-name",
+          "path": "skills/aria-dialog-name",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Ensure dialogs have an accessible name. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "w3c-compliant",
+          "path": "skills/w3c-compliant",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Validate HTML against W3C standards. Validate the final browser-facing markup, not just the source framework abstraction.",
+          "version": ""
+        },
+        {
+          "name": "improve-rule",
+          "path": "skills/improve-rule",
+          "description": "Use when reviewing or improving a Front-End Checklist rule MDX file to raise its quality score, fix stub prompts, add missing fields, or enrich content with real code examples.",
+          "version": ""
+        },
+        {
+          "name": "invalid-links",
+          "path": "skills/invalid-links",
+          "description": "Use when auditing a page's link elements for crawlability, reviewing JavaScript-heavy SPAs where navigation may not use `<a href>` tags, or checking that dynamically generated links have valid href values.",
+          "version": ""
+        },
+        {
+          "name": "nap-consistency",
+          "path": "skills/nap-consistency",
+          "description": "Use when auditing a local business website for local SEO. Applies to any business that has a physical address and wants to appear in local search results or Google Maps.",
+          "version": ""
+        },
+        {
+          "name": "form-validation",
+          "path": "skills/form-validation",
+          "description": "Use when reviewing templates, rendered HTML, or shared components related to Validate forms accessibly. Validate the final browser-facing markup, not just the source framework abstraction. Distinguish between browser-posted forms and client-handled React forms so you do not over-report missing `method` or `action` as accessibility defects.",
+          "version": ""
+        },
+        {
+          "name": "pwa-installability",
+          "path": "skills/pwa-installability",
+          "description": "Use when auditing PWA readiness, adding an install prompt, or preparing a web app for submission to Microsoft Store or Google Play via PWA Builder.",
+          "version": ""
+        },
+        {
+          "name": "article",
+          "path": "skills/article",
+          "description": "Use when auditing metadata, crawlability, structured data, or indexability related to Implement valid Article structured data. Verify the rendered HTML and HTTP response rather than relying only on source files.",
+          "version": ""
+        },
+        {
+          "name": "skip-navigation",
+          "path": "skills/skip-navigation",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Include a skip navigation link. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "content-dates",
+          "path": "skills/content-dates",
+          "description": "Use when auditing article or blog pages for date markup, generating Article JSON-LD with datePublished/dateModified, or checking whether a CMS template surfaces dates correctly.",
+          "version": ""
+        },
+        {
+          "name": "leaked-secrets",
+          "path": "skills/leaked-secrets",
+          "description": "Use when reviewing client-side JavaScript, HTML source, or git history for exposed credentials, API keys, or tokens.",
+          "version": ""
+        },
+        {
+          "name": "sprite-generation",
+          "path": "skills/sprite-generation",
+          "description": "Use when reviewing image assets, markup, and CDN or build transforms related to Use image sprites where appropriate. Check encoded size, rendered size, loading strategy, and above-the-fold impact together.",
+          "version": ""
+        },
+        {
+          "name": "meta-in-body",
+          "path": "skills/meta-in-body",
+          "description": "Use when auditing HTML document structure. Applies to any page where meta tags (noindex, canonical-url, description, viewport, OG tags) may have been injected into the body by CMS plugins, widgets, or JavaScript rendering.",
+          "version": ""
+        },
+        {
+          "name": "error-monitoring",
+          "path": "skills/error-monitoring",
+          "description": "Use when setting up a new project's production observability stack, reviewing incident response readiness, or investigating why errors are going undetected.",
+          "version": ""
+        },
+        {
+          "name": "local-business",
+          "path": "skills/local-business",
+          "description": "Use when auditing a local business website's structured data. Applies to any business that serves customers at a physical location or specific geographic area.",
+          "version": ""
+        },
+        {
+          "name": "html-xml-lang-mismatch",
+          "path": "skills/html-xml-lang-mismatch",
+          "description": "Use when applies to XHTML documents and polyglot HTML documents that must parse correctly as both HTML5 and XML. For modern HTML5-only documents, only `lang` is needed and `xml:lang` is not required. Check when auditing documents served as application/xhtml+xml or documents that include both attributes.",
+          "version": ""
+        },
+        {
+          "name": "js-redirects",
+          "path": "skills/js-redirects",
+          "description": "Use when auditing slow page loads, heavy assets, or rendering delays related to Avoid JavaScript-based redirects. Verify the actual bottleneck in DevTools, Lighthouse, or field data before recommending changes.",
+          "version": ""
+        },
+        {
+          "name": "semantic-lists",
+          "path": "skills/semantic-lists",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use semantic list elements. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "aria-command-name",
+          "path": "skills/aria-command-name",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Provide accessible names for ARIA command elements. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "twitter-cards",
+          "path": "skills/twitter-cards",
+          "description": "Use when applies to any page intended to be shared on X (Twitter). Use when auditing social sharing previews or adding social meta tags to a new site.",
+          "version": ""
+        },
+        {
+          "name": "data-minimisation",
+          "path": "skills/data-minimisation",
+          "description": "Use when reviewing form components, API payloads, or client-side storage to identify fields that are collected but not consumed by a stated feature.",
+          "version": ""
+        },
+        {
+          "name": "interstitials",
+          "path": "skills/interstitials",
+          "description": "Use when applies to CSS and JavaScript implementations of modals, overlays, pop-ups, cookie banners, newsletter sign-up dialogs, and promotional overlays. Check for `position: fixed`, `position: absolute` with large z-index, backdrop overlays, and JavaScript that shows modals on page load or shortly after. Consider both SEO impact (Google) and accessibility (WCAG focus management).",
+          "version": ""
+        },
+        {
+          "name": "inclusive-language",
+          "path": "skills/inclusive-language",
+          "description": "Use when reviewing rendered HTML, interactive components, or design-system patterns related to Use inclusive language. Check native semantics first, then inspect keyboard behavior, focus flow, accessible names, and screen-reader output where relevant.",
+          "version": ""
+        },
+        {
+          "name": "css-custom-properties",
+          "path": "skills/css-custom-properties",
+          "description": "Use when reviewing stylesheets, component styles, and responsive behavior related to Use CSS custom properties for design tokens. Check the rendered layout across breakpoints and interaction states before proposing a fix.",
+          "version": ""
+        },
+        {
+          "name": "type-coercion",
+          "path": "skills/type-coercion",
+          "description": "Use when reviewing scripts, client components, bundles, or runtime behavior related to Avoid implicit type coercion. Inspect both source code and the browser execution path so fixes target the real bottleneck or bug.",
+          "version": ""
+        },
+        {
+          "name": "aria-treeitem-name",
+          "path": "skills/aria-treeitem-name",
+          "description": "Use when applies to custom tree widgets built with role='tree', role='treeitem', and role='group'. Common in file explorers, nested navigation menus, org charts, and any UI where items can be expanded or collapsed to reveal children.",
           "version": ""
         }
       ]
