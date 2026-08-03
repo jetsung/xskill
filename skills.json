@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-03T09:29:10.445Z",
+  "updated_at": "2026-08-03T14:18:09.198Z",
   "sources": [
     {
       "source": "jetsung",
@@ -2859,6 +2859,258 @@
           "name": "interview-me",
           "path": "skills/interview-me",
           "description": "Extracts what the user actually wants instead of what they think they should want. Achieves this through one-question-at-a-time interview until ~95% confidence about the underlying intent. Use when an ask is underspecified (\"build me X\" without \"for whom\" or \"why now\"), when the user explicitly invokes (\"interview me\", \"grill me\", \"are we sure?\", \"stress-test my thinking\"), or when you catch yourself silently filling in ambiguous requirements before any plan, spec, or code exists.",
+          "version": ""
+        }
+      ]
+    },
+    {
+      "source": "mattpocock",
+      "url": "https://github.com/mattpocock/skills",
+      "skills": [
+        {
+          "name": "handoff",
+          "path": "skills/productivity/handoff",
+          "description": "Compact the current conversation into a handoff document for another agent to pick up.",
+          "version": ""
+        },
+        {
+          "name": "grilling",
+          "path": "skills/productivity/grilling",
+          "description": "Grill the user relentlessly about a plan, decision, or idea. Use when the user wants to stress-test their thinking, or uses any 'grill' trigger phrases.",
+          "version": ""
+        },
+        {
+          "name": "teach",
+          "path": "skills/productivity/teach",
+          "description": "Teach the user a new skill or concept, within this workspace.",
+          "version": ""
+        },
+        {
+          "name": "writing-great-skills",
+          "path": "skills/productivity/writing-great-skills",
+          "description": "Reference for writing and editing skills well — the vocabulary and principles that make a skill predictable.",
+          "version": ""
+        },
+        {
+          "name": "grill-me",
+          "path": "skills/productivity/grill-me",
+          "description": "A relentless interview to sharpen a plan or design.",
+          "version": ""
+        },
+        {
+          "name": "to-tickets",
+          "path": "skills/engineering/to-tickets",
+          "description": "Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker — edges as text in one file per ticket locally, or native blocking links on a real tracker.",
+          "version": ""
+        },
+        {
+          "name": "improve-codebase-architecture",
+          "path": "skills/engineering/improve-codebase-architecture",
+          "description": "Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.",
+          "version": ""
+        },
+        {
+          "name": "diagnosing-bugs",
+          "path": "skills/engineering/diagnosing-bugs",
+          "description": "Diagnosis loop for hard bugs and performance regressions. Use when the user says \"diagnose\"/\"debug this\", or reports something broken/throwing/failing/slow.",
+          "version": ""
+        },
+        {
+          "name": "implement",
+          "path": "skills/engineering/implement",
+          "description": "Implement a piece of work based on a spec or set of tickets.",
+          "version": ""
+        },
+        {
+          "name": "resolving-merge-conflicts",
+          "path": "skills/engineering/resolving-merge-conflicts",
+          "description": "Use when you need to resolve an in-progress git merge/rebase conflict.",
+          "version": ""
+        },
+        {
+          "name": "prototype",
+          "path": "skills/engineering/prototype",
+          "description": "Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.",
+          "version": ""
+        },
+        {
+          "name": "domain-modeling",
+          "path": "skills/engineering/domain-modeling",
+          "description": "Build and sharpen a project's domain model. Use when the user wants to pin down domain terminology or a ubiquitous language, record an architectural decision, or when another skill needs to maintain the domain model.",
+          "version": ""
+        },
+        {
+          "name": "tdd",
+          "path": "skills/engineering/tdd",
+          "description": "Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions \"red-green-refactor\", or wants integration tests.",
+          "version": ""
+        },
+        {
+          "name": "codebase-design",
+          "path": "skills/engineering/codebase-design",
+          "description": "Shared vocabulary for designing deep modules. Use when the user wants to design or improve a module's interface, find deepening opportunities, decide where a seam goes, make code more testable or AI-navigable, or when another skill needs the deep-module vocabulary.",
+          "version": ""
+        },
+        {
+          "name": "triage",
+          "path": "skills/engineering/triage",
+          "description": "Move issues and external PRs through a state machine of triage roles — categorise, verify, grill if needed, and write agent-ready briefs.",
+          "version": ""
+        },
+        {
+          "name": "research",
+          "path": "skills/engineering/research",
+          "description": "Investigate a question against high-trust primary sources and capture the findings as a Markdown file in the repo. Use when the user wants a topic researched, docs or API facts gathered, or reading legwork delegated to a background agent.",
+          "version": ""
+        },
+        {
+          "name": "wayfinder",
+          "path": "skills/engineering/wayfinder",
+          "description": "Plan a huge chunk of work — more than one agent session can hold — as a shared map of decision tickets on your issue tracker, and resolve them one at a time until the way to the destination is clear.",
+          "version": ""
+        },
+        {
+          "name": "code-review",
+          "path": "skills/engineering/code-review",
+          "description": "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/PRD asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\".",
+          "version": ""
+        },
+        {
+          "name": "ask-matt",
+          "path": "skills/engineering/ask-matt",
+          "description": "Ask which skill or flow fits your situation. A router over the skills in this repo.",
+          "version": ""
+        },
+        {
+          "name": "setup-matt-pocock-skills",
+          "path": "skills/engineering/setup-matt-pocock-skills",
+          "description": "Configure this repo for the engineering skills — set up its issue tracker, triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills.",
+          "version": ""
+        },
+        {
+          "name": "to-spec",
+          "path": "skills/engineering/to-spec",
+          "description": "Turn the current conversation into a spec and publish it to the project issue tracker — no interview, just synthesis of what you've already discussed.",
+          "version": ""
+        },
+        {
+          "name": "grill-with-docs",
+          "path": "skills/engineering/grill-with-docs",
+          "description": "A relentless interview to sharpen a plan or design, which also creates docs (ADR's and glossary) as we go.",
+          "version": ""
+        },
+        {
+          "name": "writing-fragments",
+          "path": "skills/in-progress/writing-fragments",
+          "description": "Writing, explore — mine raw fragments, no structure yet.",
+          "version": ""
+        },
+        {
+          "name": "writing-beats",
+          "path": "skills/in-progress/writing-beats",
+          "description": "Writing, exploit — assemble raw material into a journey of beats, grounding each term before a beat leans on it.",
+          "version": ""
+        },
+        {
+          "name": "setup-ts-deep-modules",
+          "path": "skills/in-progress/setup-ts-deep-modules",
+          "description": "Wire dependency-cruiser into a TypeScript repo so each package is a deep module — implementation hidden in subfolders, reachable only through its entry-point files. User-invoked.",
+          "version": ""
+        },
+        {
+          "name": "loop-me",
+          "path": "skills/in-progress/loop-me",
+          "description": "Grill me about specs for the workflows I want to build, within this workspace.",
+          "version": ""
+        },
+        {
+          "name": "wizard",
+          "path": "skills/in-progress/wizard",
+          "description": "Generate an interactive bash wizard that walks a human through a manual procedure — third-party setup, a one-off migration, an A→B state transition — opening URLs, capturing values, confirming each step, and writing .env files and GitHub Actions secrets.",
+          "version": ""
+        },
+        {
+          "name": "claude-handoff",
+          "path": "skills/in-progress/claude-handoff",
+          "description": "Hand the current conversation off to a fresh background agent that picks up the work immediately.",
+          "version": ""
+        },
+        {
+          "name": "writing-shape",
+          "path": "skills/in-progress/writing-shape",
+          "description": "Writing, exploit — shape raw material into an article, paragraph by paragraph.",
+          "version": ""
+        },
+        {
+          "name": "batch-grill-me",
+          "path": "skills/in-progress/batch-grill-me",
+          "description": "A relentless interview that asks every frontier question at once, round by round.",
+          "version": ""
+        },
+        {
+          "name": "to-questionnaire",
+          "path": "skills/in-progress/to-questionnaire",
+          "description": "Turn a decision you can't fully answer into a questionnaire for someone else to fill in.",
+          "version": ""
+        },
+        {
+          "name": "obsidian-vault",
+          "path": "skills/personal/obsidian-vault",
+          "description": "Search, create, and manage notes in the Obsidian vault with wikilinks and index notes. Use when user wants to find, create, or organize notes in Obsidian.",
+          "version": ""
+        },
+        {
+          "name": "edit-article",
+          "path": "skills/personal/edit-article",
+          "description": "Edit and improve articles by restructuring sections, improving clarity, and tightening prose. Use when user wants to edit, revise, or improve an article draft.",
+          "version": ""
+        },
+        {
+          "name": "git-guardrails-claude-code",
+          "path": "skills/misc/git-guardrails-claude-code",
+          "description": "Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.) before they execute. Use when user wants to prevent destructive git operations, add git safety hooks, or block git push/reset in Claude Code.",
+          "version": ""
+        },
+        {
+          "name": "migrate-to-shoehorn",
+          "path": "skills/misc/migrate-to-shoehorn",
+          "description": "Migrate test files from `as` type assertions to @total-typescript/shoehorn. Use when user mentions shoehorn, wants to replace `as` in tests, or needs partial test data.",
+          "version": ""
+        },
+        {
+          "name": "scaffold-exercises",
+          "path": "skills/misc/scaffold-exercises",
+          "description": "Create exercise directory structures with sections, problems, solutions, and explainers that pass linting. Use when user wants to scaffold exercises, create exercise stubs, or set up a new course section.",
+          "version": ""
+        },
+        {
+          "name": "setup-pre-commit",
+          "path": "skills/misc/setup-pre-commit",
+          "description": "Set up Husky pre-commit hooks with lint-staged (Prettier), type checking, and tests in the current repo. Use when user wants to add pre-commit hooks, set up Husky, configure lint-staged, or add commit-time formatting/typechecking/testing.",
+          "version": ""
+        },
+        {
+          "name": "qa",
+          "path": "skills/deprecated/qa",
+          "description": "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
+          "version": ""
+        },
+        {
+          "name": "design-an-interface",
+          "path": "skills/deprecated/design-an-interface",
+          "description": "Generate multiple radically different interface designs for a module using parallel sub-agents. Use when user wants to design an API, explore interface options, compare module shapes, or mentions \"design it twice\".",
+          "version": ""
+        },
+        {
+          "name": "request-refactor-plan",
+          "path": "skills/deprecated/request-refactor-plan",
+          "description": "Create a detailed refactor plan with tiny commits via user interview, then file it as a GitHub issue. Use when user wants to plan a refactor, create a refactoring RFC, or break a refactor into safe incremental steps.",
+          "version": ""
+        },
+        {
+          "name": "ubiquitous-language",
+          "path": "skills/deprecated/ubiquitous-language",
+          "description": "Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities and proposing canonical terms. Saves to UBIQUITOUS_LANGUAGE.md. Use when user wants to define domain terms, build a glossary, harden terminology, create a ubiquitous language, or mentions \"domain model\" or \"DDD\".",
           "version": ""
         }
       ]
