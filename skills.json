@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-05T08:20:13.041Z",
+  "updated_at": "2026-08-05T13:45:29.789Z",
   "sources": [
     {
       "source": "jetsung",
@@ -2916,6 +2916,12 @@
           "version": ""
         },
         {
+          "name": "wait-what",
+          "path": "skills/productivity/wait-what",
+          "description": "Stop. That last message did not land — re-pitch it.",
+          "version": ""
+        },
+        {
           "name": "grill-me",
           "path": "skills/productivity/grill-me",
           "description": "A relentless interview to sharpen a plan or design.",
@@ -3014,7 +3020,7 @@
         {
           "name": "wizard",
           "path": "skills/engineering/wizard",
-          "description": "Generate an interactive bash wizard that walks a human through a manual procedure — third-party setup, a one-off migration, an A→B state transition — opening URLs, capturing values, confirming each step, and writing .env files and GitHub Actions secrets.",
+          "description": "Generate an interactive bash wizard that walks a human through steps only they can perform. Use when provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover. Don't invoke this for steps the agent can perform itself.",
           "version": ""
         },
         {
@@ -3072,18 +3078,6 @@
           "version": ""
         },
         {
-          "name": "obsidian-vault",
-          "path": "skills/personal/obsidian-vault",
-          "description": "Search, create, and manage notes in the Obsidian vault with wikilinks and index notes. Use when user wants to find, create, or organize notes in Obsidian.",
-          "version": ""
-        },
-        {
-          "name": "edit-article",
-          "path": "skills/personal/edit-article",
-          "description": "Edit and improve articles by restructuring sections, improving clarity, and tightening prose. Use when user wants to edit, revise, or improve an article draft.",
-          "version": ""
-        },
-        {
           "name": "git-guardrails-claude-code",
           "path": "skills/misc/git-guardrails-claude-code",
           "description": "Set up Claude Code hooks to block dangerous git commands (push, reset --hard, clean, branch -D, etc.) before they execute. Use when user wants to prevent destructive git operations, add git safety hooks, or block git push/reset in Claude Code.",
@@ -3105,30 +3099,6 @@
           "name": "setup-pre-commit",
           "path": "skills/misc/setup-pre-commit",
           "description": "Set up Husky pre-commit hooks with lint-staged (Prettier), type checking, and tests in the current repo. Use when user wants to add pre-commit hooks, set up Husky, configure lint-staged, or add commit-time formatting/typechecking/testing.",
-          "version": ""
-        },
-        {
-          "name": "qa",
-          "path": "skills/deprecated/qa",
-          "description": "Interactive QA session where user reports bugs or issues conversationally, and the agent files GitHub issues. Explores the codebase in the background for context and domain language. Use when user wants to report bugs, do QA, file issues conversationally, or mentions \"QA session\".",
-          "version": ""
-        },
-        {
-          "name": "design-an-interface",
-          "path": "skills/deprecated/design-an-interface",
-          "description": "Generate multiple radically different interface designs for a module using parallel sub-agents. Use when user wants to design an API, explore interface options, compare module shapes, or mentions \"design it twice\".",
-          "version": ""
-        },
-        {
-          "name": "request-refactor-plan",
-          "path": "skills/deprecated/request-refactor-plan",
-          "description": "Create a detailed refactor plan with tiny commits via user interview, then file it as a GitHub issue. Use when user wants to plan a refactor, create a refactoring RFC, or break a refactor into safe incremental steps.",
-          "version": ""
-        },
-        {
-          "name": "ubiquitous-language",
-          "path": "skills/deprecated/ubiquitous-language",
-          "description": "Extract a DDD-style ubiquitous language glossary from the current conversation, flagging ambiguities and proposing canonical terms. Saves to UBIQUITOUS_LANGUAGE.md. Use when user wants to define domain terms, build a glossary, harden terminology, create a ubiquitous language, or mentions \"domain model\" or \"DDD\".",
           "version": ""
         }
       ]
