@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-05T01:45:26.422Z",
+  "updated_at": "2026-08-05T08:20:13.041Z",
   "sources": [
     {
       "source": "jetsung",
@@ -670,6 +670,12 @@
           "path": "skills/devops-rollout-plan",
           "description": "Generate comprehensive rollout plans with preflight checks, step-by-step deployment, verification signals, rollback procedures, and communication plans for infrastructure and application changes",
           "version": ""
+        },
+        {
+          "name": "shopify-review-triage",
+          "path": "skills/shopify-review-triage",
+          "description": "Use this skill when someone wants public Shopify App Store reviews, low-star reviews, or merchant feedback triaged, prioritized, clustered, or turned into a product or support brief. Trigger for prompts like \"triage these app store reviews\", \"what should we fix first from this feedback\", \"cluster our 1-star reviews\", or \"write a weekly low-star review brief\", for a single Shopify app or a portfolio plus watched competitors. Produces a P0-P3 brief covering incident risk, repeated friction, pricing confusion, feature requests, and an explicit needs-human-read bucket, where every item keeps its public source link and stays labeled first pass or human-checked. Do not trigger for support tickets, order data, or any other private merchant data, and never use it to reply to or contact a reviewer.",
+          "version": "1.0"
         },
         {
           "name": "go-mcp-server-generator",
@@ -1470,6 +1476,12 @@
           "version": ""
         },
         {
+          "name": "gh-attach",
+          "path": "skills/gh-attach",
+          "description": "Uploads a local file (screenshot, image, PDF, zip, video) to GitHub user-attachments, downloads GitHub user-attachments, and embeds local files in a PR, issue, or comment. Use when asked to \"attach a screenshot to the PR\", \"add an image to the issue\", \"embed before/after screenshots\", \"attach this file\", or \"download this GitHub attachment\". Powered by `gh-attach`.",
+          "version": ""
+        },
+        {
           "name": "gtm-0-to-1-launch",
           "path": "skills/gtm-0-to-1-launch",
           "description": "Launch new products from idea to first customers. Use when launching products, finding early adopters, building launch week playbooks, diagnosing why adoption stalls, or learning that press coverage does not equal growth. Includes the three-layer diagnosis, the 2-week experiment cycle, and the launch that got 50K impressions and 12 signups.",
@@ -1743,6 +1755,12 @@
           "name": "agent-governance",
           "path": "skills/agent-governance",
           "description": "Patterns and techniques for adding governance, safety, and trust controls to AI agent systems. Use this skill when:\n- Building AI agents that call external tools (APIs, databases, file systems)\n- Implementing policy-based access controls for agent tool usage\n- Adding semantic intent classification to detect dangerous prompts\n- Creating trust scoring systems for multi-agent workflows\n- Building audit trails for agent actions and decisions\n- Enforcing rate limits, content filters, or tool restrictions on agents\n- Working with any agent framework (PydanticAI, CrewAI, OpenAI Agents, LangChain, AutoGen)",
+          "version": ""
+        },
+        {
+          "name": "verify-agent-action",
+          "path": "skills/verify-agent-action",
+          "description": "Review a proposed AI-agent action or human-approval packet before execution. Use when an agent wants to run a consequential tool, command, deployment, message, purchase, credential operation, or data mutation; when checking whether approval still matches the exact action; or when auditing action evidence for forged results, parameter swaps, replay, correlated reviewers, missing evidence, expiry, or stale monitoring. Produce an evidence-based review only—never execute or authorize the action.",
           "version": ""
         },
         {
@@ -2127,6 +2145,12 @@
           "name": "doc-and-modernize",
           "path": "skills/doc-and-modernize",
           "description": "Two related workflows for a locally-cloned codebase, in one skill. Documentation mode produces a single, comprehensive, verifiable architecture document primarily by reading files on disk (local-first) — use it whenever the user wants to understand, map, document, research, or onboard onto a codebase (\"research this repo\", \"write up the architecture\", \"do an architecture deep dive\", \"document how this codebase works\", \"map the system design\", \"create an onboarding doc\"). Modernization mode generates a phased plan to modernize, migrate, upgrade, or rewrite a legacy system (\"modernize this\", \"plan the migration\", \"how would we rewrite this\", \"how do we get off this legacy stack\"); if no architecture document exists yet it first runs Documentation mode, then continues straight through to the plan. It assumes the legacy stack may be dead, runs a time-boxed feasibility spike, and picks the highest achievable rung on a safety ladder instead of demanding a fully-green legacy CI gate up front.",
+          "version": ""
+        },
+        {
+          "name": "build-evidence-map",
+          "path": "skills/build-evidence-map",
+          "description": "Build an auditable evidence map for a contested technical choice, research synthesis, proposal review, or consequential decision. Use when Copilot must preserve supporting, contradicting, qualifying, and missing evidence with exact source regions instead of collapsing disagreement into prose.",
           "version": ""
         },
         {
@@ -2868,6 +2892,12 @@
       "url": "https://github.com/mattpocock/skills",
       "skills": [
         {
+          "name": "writing-for-agents",
+          "path": "skills/productivity/writing-for-agents",
+          "description": "Writing documents for agents. Use when creating or editing skills, or modifying AGENTS.md or CLAUDE.md.",
+          "version": ""
+        },
+        {
           "name": "handoff",
           "path": "skills/productivity/handoff",
           "description": "Compact the current conversation into a handoff document for another agent to pick up.",
@@ -2886,15 +2916,15 @@
           "version": ""
         },
         {
-          "name": "writing-great-skills",
-          "path": "skills/productivity/writing-great-skills",
-          "description": "Reference for writing and editing skills well — the vocabulary and principles that make a skill predictable.",
-          "version": ""
-        },
-        {
           "name": "grill-me",
           "path": "skills/productivity/grill-me",
           "description": "A relentless interview to sharpen a plan or design.",
+          "version": ""
+        },
+        {
+          "name": "to-questionnaire",
+          "path": "skills/productivity/to-questionnaire",
+          "description": "Turn a decision you can't fully answer into a questionnaire for someone else to fill in.",
           "version": ""
         },
         {
@@ -2972,13 +3002,19 @@
         {
           "name": "code-review",
           "path": "skills/engineering/code-review",
-          "description": "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/PRD asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\".",
+          "description": "Review the changes since a fixed point (commit, branch, tag, or merge-base) along two axes — Standards (does the code follow this repo's documented coding standards?) and Spec (does the code match what the originating issue/spec asked for?). Runs both reviews in parallel sub-agents and reports them side by side. Use when the user wants to review a branch, a PR, work-in-progress changes, or asks to \"review since X\".",
           "version": ""
         },
         {
           "name": "ask-matt",
           "path": "skills/engineering/ask-matt",
           "description": "Ask which skill or flow fits your situation. A router over the skills in this repo.",
+          "version": ""
+        },
+        {
+          "name": "wizard",
+          "path": "skills/engineering/wizard",
+          "description": "Generate an interactive bash wizard that walks a human through a manual procedure — third-party setup, a one-off migration, an A→B state transition — opening URLs, capturing values, confirming each step, and writing .env files and GitHub Actions secrets.",
           "version": ""
         },
         {
@@ -3024,12 +3060,6 @@
           "version": ""
         },
         {
-          "name": "wizard",
-          "path": "skills/in-progress/wizard",
-          "description": "Generate an interactive bash wizard that walks a human through a manual procedure — third-party setup, a one-off migration, an A→B state transition — opening URLs, capturing values, confirming each step, and writing .env files and GitHub Actions secrets.",
-          "version": ""
-        },
-        {
           "name": "claude-handoff",
           "path": "skills/in-progress/claude-handoff",
           "description": "Hand the current conversation off to a fresh background agent that picks up the work immediately.",
@@ -3039,18 +3069,6 @@
           "name": "writing-shape",
           "path": "skills/in-progress/writing-shape",
           "description": "Writing, exploit — shape raw material into an article, paragraph by paragraph.",
-          "version": ""
-        },
-        {
-          "name": "batch-grill-me",
-          "path": "skills/in-progress/batch-grill-me",
-          "description": "A relentless interview that asks every frontier question at once, round by round.",
-          "version": ""
-        },
-        {
-          "name": "to-questionnaire",
-          "path": "skills/in-progress/to-questionnaire",
-          "description": "Turn a decision you can't fully answer into a questionnaire for someone else to fill in.",
           "version": ""
         },
         {
