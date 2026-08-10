@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-09T18:27:02.196Z",
+  "updated_at": "2026-08-10T01:02:54.598Z",
   "sources": [
     {
       "source": "jetsung",
@@ -390,6 +390,12 @@
           "version": "1.0"
         },
         {
+          "name": "server-side-conversion-tracking",
+          "path": "skills/server-side-conversion-tracking",
+          "description": "Set up server-side conversion tracking so purchases are reported accurately to Facebook, TikTok, Google and Bing despite iOS restrictions, ad blockers and cookie loss. Use when conversions are under-reported, when platform-reported purchases do not match real orders, when asked about Conversions API / Events API / offline conversions / CAPI, click id passthrough (fbclid, ttclid, gclid, msclkid), or when ad optimization has degraded after tracking changes.",
+          "version": ""
+        },
+        {
           "name": "slang-shader-engineer",
           "path": "skills/slang-shader-engineer",
           "description": "Use when working with Slang shaders, shader modules, HLSL-compatible GPU code, graphics pipelines, compute shaders, tessellation, ray tracing, parameter blocks, generics, interfaces, capabilities, cross-compilation, shader optimization, shader review, or C++ engine integration for Slang. Trigger on any mention of Slang, .slang files, slangc, SPIR-V from Slang, Slang modules, [shader(\"compute\")], [shader(\"vertex\")], or requests to write/review/refactor shader code with modern language features. Also trigger for Slang-to-HLSL/GLSL/Metal/CUDA cross-compile questions, or when the user says \"shader\" alongside \"generics\", \"interfaces\", \"parameter blocks\", \"autodiff\", or \"capabilities\".",
@@ -561,6 +567,12 @@
           "name": "qdrant-clients-sdk",
           "path": "skills/qdrant-clients-sdk",
           "description": "Qdrant provides client SDKs for various programming languages, allowing easy integration with Qdrant deployments.",
+          "version": ""
+        },
+        {
+          "name": "landing-page-conversion-audit",
+          "path": "skills/landing-page-conversion-audit",
+          "description": "Audit a landing page, sales page or checkout page for conversion leaks and return a fix list ordered by expected revenue impact. Use when asked to review, critique or improve a landing page, sales page, opt-in page, product page or checkout flow, when conversion rate is low, when paid traffic is not converting, or when someone asks \"why isn't this page converting\" or wants a CRO / landing page review.",
           "version": ""
         },
         {
