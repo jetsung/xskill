@@ -147,18 +147,50 @@
                 <div id="content" class="content">
                     <main>
                         <h3 id="platforms--管理配置平台"><a class="header" href="#platforms--管理配置平台"><code>platforms</code> — 管理配置平台</a></h3>
-<p>列出所有已配置的 AI 编程平台（按字母排序）：</p>
+<p>列出或重置所有已配置的 AI 编程平台。</p>
+<h4 id="platforms-list"><a class="header" href="#platforms-list"><code>platforms list</code></a></h4>
+<p>列出所有已配置的平台（按名称字母排序）：</p>
 <pre><code class="language-bash">xskill platforms list
 </code></pre>
 <p>裸命令 <code>xskill platforms</code> 等同于 <code>xskill platforms list</code>。</p>
-<p>显示详细平台信息：</p>
+<p>默认输出格式（<code>NAME</code>、<code>PATH</code>、<code>COMPAT</code> 三列）：</p>
+<pre><code>NAME    PATH     COMPAT
+claude  .claude  ✗
+codex   .codex   ✓
+</code></pre>
+<p><code>✓</code> 绿色表示兼容（<code>agents_compat: true</code>），<code>✗</code> 红色表示不兼容，便于肉眼区分。</p>
+<p>显示详细平台信息（<code>NAME</code>、<code>PATH</code>、<code>SKILLS</code>、<code>AGENTS</code>、<code>SOURCE</code>、<code>COMPAT</code> 六列）：</p>
 <pre><code class="language-bash">xskill platforms list -a
+</code></pre>
+<p>输出格式：</p>
+<pre><code>NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
+claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
+codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
 </code></pre>
 <p>选项：</p>
 <ul>
 <li><code>-a, --all</code> — 显示详细信息（路径、技能目录、代理文件、源文件和 agents 兼容性）</li>
 </ul>
-<p>默认输出显示名称、路径和 agents 兼容性（<code>COMPAT</code>）。详细输出额外显示技能目录、代理文件和源文件。兼容平台（<code>agents_compat: true</code>）会在 <code>add</code>、<code>link</code> 等命令的交互式目标平台选择器中自动预选。</p>
+<p>兼容平台（<code>agents_compat: true</code>）会在 <code>add</code>、<code>link</code> 等命令的交互式目标平台选择器中自动预选。</p>
+<h4 id="platforms-reset"><a class="header" href="#platforms-reset"><code>platforms reset</code></a></h4>
+<p>将 <code>platforms</code> 重置为内置默认平台列表，执行前弹出 skim 单选 TUI（<code>↑/↓</code> 选择，<code>Enter</code> 确认，<code>Esc</code> 取消，回车默认选中第一项）：</p>
+<ul>
+<li><strong>完全恢复</strong>（第一项，默认）— 所有平台恢复内置默认配置，移除自定义平台</li>
+<li><strong>谨慎合并</strong> — 只更新内置平台，自定义平台保留</li>
+<li><strong>取消</strong> — 不修改任何配置</li>
+</ul>
+<p>若存在自定义平台，会先打印提示。其他配置字段（<code>sources</code>、<code>cache</code>、<code>proxy</code> 等）不受影响。</p>
+<p>示例：</p>
+<pre><code class="language-bash">$ xskill platforms reset
+Custom platforms: my-custom
+# skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
+Platforms reset: 18 platforms, replaced with defaults (custom dropped)
+</code></pre>
+<p>边界情况：</p>
+<ul>
+<li>未配置任何平台时输出 “No platforms configured”。</li>
+<li>空字段显示 <code>-</code>。</li>
+</ul>
 
                     </main>
 

@@ -295,18 +295,50 @@ xskill sources rename -i &lt;index&gt; -N &lt;new-name&gt;
 </ul>
 <p>Priority: <code>--name</code>/<code>--url</code> &gt; <code>--index</code>. At least one of <code>--name</code>, <code>--url</code>, or <code>--index</code> is required.</p>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="platforms--manage-configured-platforms"><a class="header" href="#platforms--manage-configured-platforms"><code>platforms</code> — Manage configured platforms</a></h3>
-<p>List all configured AI coding platforms (sorted alphabetically):</p>
+<p>List or reset all configured AI coding platforms.</p>
+<h4 id="platforms-list"><a class="header" href="#platforms-list"><code>platforms list</code></a></h4>
+<p>List all configured platforms (sorted alphabetically by name):</p>
 <pre><code class="language-bash">xskill platforms list
 </code></pre>
 <p>The bare <code>xskill platforms</code> command is equivalent to <code>xskill platforms list</code>.</p>
-<p>Show detailed platform information:</p>
+<p>Default output format (columns <code>NAME</code>, <code>PATH</code>, <code>COMPAT</code>):</p>
+<pre><code>NAME    PATH     COMPAT
+claude  .claude  ✗
+codex   .codex   ✓
+</code></pre>
+<p><code>✓</code> in green indicates compatibility (<code>agents_compat: true</code>), <code>✗</code> in red indicates incompatibility.</p>
+<p>Show detailed platform information (columns <code>NAME</code>, <code>PATH</code>, <code>SKILLS</code>, <code>AGENTS</code>, <code>SOURCE</code>, <code>COMPAT</code>):</p>
 <pre><code class="language-bash">xskill platforms list -a
+</code></pre>
+<p>Output format:</p>
+<pre><code>NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
+claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
+codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
 </code></pre>
 <p>Options:</p>
 <ul>
 <li><code>-a, --all</code> — Show detailed information (path, skills directory, agents file, source file, and agents compatibility)</li>
 </ul>
-<p>The default output shows name, path, and agents compatibility (<code>COMPAT</code>). Detailed output additionally shows skills directory, agents file, and source file. Compatible platforms (<code>agents_compat: true</code>) are pre-selected in the interactive target-platform picker used by <code>add</code>, <code>link</code>, and related commands.</p>
+<p>Compatible platforms (<code>agents_compat: true</code>) are pre-selected in the interactive target-platform picker used by <code>add</code>, <code>link</code>, and related commands.</p>
+<h4 id="platforms-reset"><a class="header" href="#platforms-reset"><code>platforms reset</code></a></h4>
+<p>Reset <code>platforms</code> to the built-in default platform list. A skim single-select TUI is shown before applying (<code>↑/↓</code> to navigate, <code>Enter</code> to confirm, <code>Esc</code> to cancel; pressing Enter selects the first item by default):</p>
+<ul>
+<li><strong>Full restore</strong> (first item, default) — Restore all platforms to built-in defaults, dropping custom platforms</li>
+<li><strong>Careful merge</strong> — Update built-in platforms only, keep custom platforms</li>
+<li><strong>Cancel</strong> — Make no changes</li>
+</ul>
+<p>If custom platforms exist, a prompt is printed first. Other configuration fields (<code>sources</code>, <code>cache</code>, <code>proxy</code>, etc.) are not affected.</p>
+<p>Example:</p>
+<pre><code class="language-bash">$ xskill platforms reset
+Custom platforms: my-custom
+# skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
+Platforms reset: 18 platforms, replaced with defaults (custom dropped)
+</code></pre>
+<p>Edge cases:</p>
+<ul>
+<li>“No platforms configured” is printed when no platforms are configured.</li>
+<li>Empty fields are displayed as <code>-</code>.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="add--install-a-skill"><a class="header" href="#add--install-a-skill"><code>add</code> — Install a skill</a></h3>
 <p>Install a skill from a source to a target directory.</p>
 <pre><code class="language-bash">xskill add [OPTIONS] --from &lt;SOURCE&gt; --skill &lt;SKILL&gt;
@@ -634,7 +666,7 @@ false   foo    invalid                              bar
 </code></pre>
 <p>Options:</p>
 <ul>
-<li><code>-i, --init</code> — Initialize config file with default values (default platforms, cache, registry). Also writes a <code>proxy</code> key with an empty string as a placeholder.</li>
+<li><code>-i, --init</code> — Initialize config file with default values (default platforms, cache, registry).</li>
 <li><code>-e, --edit</code> — Open config in <code>$EDITOR</code> (defaults to <code>vi</code>)</li>
 <li><code>-g, --get &lt;key&gt;</code> — Get a config value by dot path (e.g., <code>cache.enabled</code>)</li>
 <li><code>-s, --set &lt;key=value&gt;</code> — Set a config value by dot path (e.g., <code>cache.enabled=true</code>)</li>
@@ -918,7 +950,7 @@ Fallback: copy (file duplication)
 <tr><td><code>recommended</code></td><td><code>RecommendedSource[]</code></td><td>No</td><td>Recommended skill sets grouped by source</td></tr>
 <tr><td><code>cache</code></td><td><code>CacheConfig</code></td><td>No</td><td>Cache settings for skills list caching</td></tr>
 <tr><td><code>registry</code></td><td><code>RegistryConfig</code></td><td>No</td><td>Registry settings for skill discovery</td></tr>
-<tr><td><code>proxy</code></td><td><code>string</code></td><td>No</td><td>Proxy URL for network access (e.g. <code>http://127.0.0.1:7890</code>, <code>socks5h://127.0.0.1:1080</code>). When set, <code>HTTP_PROXY</code>/<code>HTTPS_PROXY</code>/<code>ALL_PROXY</code> are exported so <code>git clone</code> and <code>curl</code>/<code>wget</code> use the proxy. Scheme may be <code>http</code>, <code>https</code>, <code>socks5</code>, <code>socks5h</code>, <code>socks4</code>, <code>socks4a</code>. Note: <code>socks5h</code>/<code>socks4a</code> resolve DNS at the proxy. <code>config --init</code> writes this key as an empty string placeholder</td></tr>
+<tr><td><code>proxy</code></td><td><code>string</code></td><td>No</td><td>Proxy URL for network access (e.g. <code>http://127.0.0.1:7890</code>, <code>socks5h://127.0.0.1:1080</code>). When set, <code>HTTP_PROXY</code>/<code>HTTPS_PROXY</code>/<code>ALL_PROXY</code> are exported so <code>git clone</code> and <code>curl</code>/<code>wget</code> use the proxy. Scheme may be <code>http</code>, <code>https</code>, <code>socks5</code>, <code>socks5h</code>, <code>socks4</code>, <code>socks4a</code>. Note: <code>socks5h</code>/<code>socks4a</code> resolve DNS at the proxy.</td></tr>
 </tbody></table>
 <p><strong>Platform</strong> (<code>platforms.*</code>):</p>
 <table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead><tbody>
@@ -960,7 +992,7 @@ Fallback: copy (file duplication)
 <p><strong>SourceEntry</strong> (<code>sources[]</code>):</p>
 <table><thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>source</code></td><td><code>string</code></td><td>Yes</td><td>Source name (e.g. <code>org/repo</code>)</td></tr>
-<tr><td><code>url</code></td><td><code>string</code></td><td>Yes</td><td>Source repository URL</td></tr>
+<tr><td><code>url</code></td><td><code>string</code></td><td>No</td><td>Source repository URL</td></tr>
 <tr><td><code>commit_hash</code></td><td><code>string</code></td><td>No</td><td>Latest commit hash (SHA) of the source repository at sync time</td></tr>
 <tr><td><code>skills</code></td><td><code>SkillEntry[]</code></td><td>Yes</td><td>Skills available from this source</td></tr>
 </tbody></table>

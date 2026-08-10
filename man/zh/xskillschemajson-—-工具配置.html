@@ -156,6 +156,7 @@
 <tr><td><code>recommended</code></td><td><code>RecommendedSource[]</code></td><td>否</td><td>按源分组的推荐技能集</td></tr>
 <tr><td><code>cache</code></td><td><code>CacheConfig</code></td><td>否</td><td>缓存配置</td></tr>
 <tr><td><code>registry</code></td><td><code>RegistryConfig</code></td><td>否</td><td>注册中心配置</td></tr>
+<tr><td><code>proxy</code></td><td><code>string</code></td><td>否</td><td>代理地址。设置后导出 <code>HTTP_PROXY</code>/<code>HTTPS_PROXY</code>/<code>ALL_PROXY</code>（含小写形式）环境变量，git clone 与 curl/wget 自动生效。协议支持 <code>http</code>、<code>https</code>、<code>socks5</code>、<code>socks5h</code>、<code>socks4</code>、<code>socks4a</code>（<code>socks5h</code>/<code>socks4a</code> 由代理端解析 DNS）。</td></tr>
 </tbody></table>
 <p><strong>Platform</strong>（<code>platforms.*</code>）：</p>
 <table><thead><tr><th>字段</th><th>类型</th><th>必填</th><th>默认值</th><th>说明</th></tr></thead><tbody>

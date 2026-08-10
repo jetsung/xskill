@@ -156,7 +156,14 @@
 <li><code>-e, --edit</code> — 在 <code>$EDITOR</code> 中打开配置（默认 <code>vi</code>）</li>
 <li><code>-g, --get &lt;key&gt;</code> — 通过点号路径获取配置值（如 <code>cache.enabled</code>）</li>
 <li><code>-s, --set &lt;key=value&gt;</code> — 通过点号路径设置配置值（如 <code>cache.enabled=true</code>）</li>
+<li><code>-w, --show</code> — 以美化后的 JSON 打印当前加载的完整配置（合并默认值，如补全缺失的平台）。输出无颜色，便于管道处理</li>
+<li><code>-V, --validate</code> — 校验配置文件。先做 JSON 语法与强类型结构校验，再对照 JSON Schema 做完整 Schema 校验。优先查找本地 Schema（<code>$XSKILL_SCHEMA</code>、<code>&lt;config_dir&gt;/schemas/xskill.schema.json</code>、从可执行文件目录向上查找、<code>&lt;exe_dir&gt;/../share/xskill/xskill.schema.json</code>）；本地均无则从 <code>https://xskill.gcli.cn/xskill.schema.json</code> 拉取（遵循代理配置）。成功输出 <code>Valid &lt;path&gt; (schema: &lt;source&gt;)</code>，失败打印每条错误（含 JSON 路径）并以 1 退出</li>
 </ul>
+<p>示例 — 读取/设置代理：</p>
+<pre><code class="language-bash">xskill config --get proxy
+xskill config --set proxy=socks5h://127.0.0.1:40027
+xskill config --validate
+</code></pre>
 <h4 id="示例"><a class="header" href="#示例">示例</a></h4>
 <pre><code class="language-bash"># 初始化配置文件
 xskill config --init

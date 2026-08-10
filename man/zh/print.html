@@ -298,18 +298,50 @@ xskill sources rename -i &lt;index&gt; -N &lt;new-name&gt;
 </ul>
 <p>优先级：<code>--name</code>/<code>--url</code> &gt; <code>--index</code>。至少需指定 <code>--name</code>、<code>--url</code> 或 <code>--index</code> 之一。</p>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="platforms--管理配置平台"><a class="header" href="#platforms--管理配置平台"><code>platforms</code> — 管理配置平台</a></h3>
-<p>列出所有已配置的 AI 编程平台（按字母排序）：</p>
+<p>列出或重置所有已配置的 AI 编程平台。</p>
+<h4 id="platforms-list"><a class="header" href="#platforms-list"><code>platforms list</code></a></h4>
+<p>列出所有已配置的平台（按名称字母排序）：</p>
 <pre><code class="language-bash">xskill platforms list
 </code></pre>
 <p>裸命令 <code>xskill platforms</code> 等同于 <code>xskill platforms list</code>。</p>
-<p>显示详细平台信息：</p>
+<p>默认输出格式（<code>NAME</code>、<code>PATH</code>、<code>COMPAT</code> 三列）：</p>
+<pre><code>NAME    PATH     COMPAT
+claude  .claude  ✗
+codex   .codex   ✓
+</code></pre>
+<p><code>✓</code> 绿色表示兼容（<code>agents_compat: true</code>），<code>✗</code> 红色表示不兼容，便于肉眼区分。</p>
+<p>显示详细平台信息（<code>NAME</code>、<code>PATH</code>、<code>SKILLS</code>、<code>AGENTS</code>、<code>SOURCE</code>、<code>COMPAT</code> 六列）：</p>
 <pre><code class="language-bash">xskill platforms list -a
+</code></pre>
+<p>输出格式：</p>
+<pre><code>NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
+claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
+codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
 </code></pre>
 <p>选项：</p>
 <ul>
 <li><code>-a, --all</code> — 显示详细信息（路径、技能目录、代理文件、源文件和 agents 兼容性）</li>
 </ul>
-<p>默认输出显示名称、路径和 agents 兼容性（<code>COMPAT</code>）。详细输出额外显示技能目录、代理文件和源文件。兼容平台（<code>agents_compat: true</code>）会在 <code>add</code>、<code>link</code> 等命令的交互式目标平台选择器中自动预选。</p>
+<p>兼容平台（<code>agents_compat: true</code>）会在 <code>add</code>、<code>link</code> 等命令的交互式目标平台选择器中自动预选。</p>
+<h4 id="platforms-reset"><a class="header" href="#platforms-reset"><code>platforms reset</code></a></h4>
+<p>将 <code>platforms</code> 重置为内置默认平台列表，执行前弹出 skim 单选 TUI（<code>↑/↓</code> 选择，<code>Enter</code> 确认，<code>Esc</code> 取消，回车默认选中第一项）：</p>
+<ul>
+<li><strong>完全恢复</strong>（第一项，默认）— 所有平台恢复内置默认配置，移除自定义平台</li>
+<li><strong>谨慎合并</strong> — 只更新内置平台，自定义平台保留</li>
+<li><strong>取消</strong> — 不修改任何配置</li>
+</ul>
+<p>若存在自定义平台，会先打印提示。其他配置字段（<code>sources</code>、<code>cache</code>、<code>proxy</code> 等）不受影响。</p>
+<p>示例：</p>
+<pre><code class="language-bash">$ xskill platforms reset
+Custom platforms: my-custom
+# skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
+Platforms reset: 18 platforms, replaced with defaults (custom dropped)
+</code></pre>
+<p>边界情况：</p>
+<ul>
+<li>未配置任何平台时输出 “No platforms configured”。</li>
+<li>空字段显示 <code>-</code>。</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="add--安装技能"><a class="header" href="#add--安装技能"><code>add</code> — 安装技能</a></h3>
 <p>从源安装技能到目标目录。</p>
 <pre><code class="language-bash">xskill add [OPTIONS] --from &lt;SOURCE&gt; --skill &lt;SKILL&gt;
@@ -641,7 +673,14 @@ false   foo    invalid                              bar
 <li><code>-e, --edit</code> — 在 <code>$EDITOR</code> 中打开配置（默认 <code>vi</code>）</li>
 <li><code>-g, --get &lt;key&gt;</code> — 通过点号路径获取配置值（如 <code>cache.enabled</code>）</li>
 <li><code>-s, --set &lt;key=value&gt;</code> — 通过点号路径设置配置值（如 <code>cache.enabled=true</code>）</li>
+<li><code>-w, --show</code> — 以美化后的 JSON 打印当前加载的完整配置（合并默认值，如补全缺失的平台）。输出无颜色，便于管道处理</li>
+<li><code>-V, --validate</code> — 校验配置文件。先做 JSON 语法与强类型结构校验，再对照 JSON Schema 做完整 Schema 校验。优先查找本地 Schema（<code>$XSKILL_SCHEMA</code>、<code>&lt;config_dir&gt;/schemas/xskill.schema.json</code>、从可执行文件目录向上查找、<code>&lt;exe_dir&gt;/../share/xskill/xskill.schema.json</code>）；本地均无则从 <code>https://xskill.gcli.cn/xskill.schema.json</code> 拉取（遵循代理配置）。成功输出 <code>Valid &lt;path&gt; (schema: &lt;source&gt;)</code>，失败打印每条错误（含 JSON 路径）并以 1 退出</li>
 </ul>
+<p>示例 — 读取/设置代理：</p>
+<pre><code class="language-bash">xskill config --get proxy
+xskill config --set proxy=socks5h://127.0.0.1:40027
+xskill config --validate
+</code></pre>
 <h4 id="示例-4"><a class="header" href="#示例-4">示例</a></h4>
 <pre><code class="language-bash"># 初始化配置文件
 xskill config --init
@@ -729,7 +768,8 @@ xskill config --set cache.enabled=true
   &quot;registry&quot;: {
     &quot;enabled&quot;: false,
     &quot;url&quot;: &quot;https://xskill.gcli.cn/skills.json&quot;
-  }
+  },
+  &quot;proxy&quot;: &quot;&quot;
 }
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="平台"><a class="header" href="#平台">平台</a></h3>
@@ -913,6 +953,7 @@ Valid agents: platform1, platform2, ...     （黑灰色）
 <tr><td><code>recommended</code></td><td><code>RecommendedSource[]</code></td><td>否</td><td>按源分组的推荐技能集</td></tr>
 <tr><td><code>cache</code></td><td><code>CacheConfig</code></td><td>否</td><td>缓存配置</td></tr>
 <tr><td><code>registry</code></td><td><code>RegistryConfig</code></td><td>否</td><td>注册中心配置</td></tr>
+<tr><td><code>proxy</code></td><td><code>string</code></td><td>否</td><td>代理地址。设置后导出 <code>HTTP_PROXY</code>/<code>HTTPS_PROXY</code>/<code>ALL_PROXY</code>（含小写形式）环境变量，git clone 与 curl/wget 自动生效。协议支持 <code>http</code>、<code>https</code>、<code>socks5</code>、<code>socks5h</code>、<code>socks4</code>、<code>socks4a</code>（<code>socks5h</code>/<code>socks4a</code> 由代理端解析 DNS）。</td></tr>
 </tbody></table>
 <p><strong>Platform</strong>（<code>platforms.*</code>）：</p>
 <table><thead><tr><th>字段</th><th>类型</th><th>必填</th><th>默认值</th><th>说明</th></tr></thead><tbody>
@@ -954,7 +995,7 @@ Valid agents: platform1, platform2, ...     （黑灰色）
 <p><strong>SourceEntry</strong>（<code>sources[]</code>）：</p>
 <table><thead><tr><th>字段</th><th>类型</th><th>必填</th><th>说明</th></tr></thead><tbody>
 <tr><td><code>source</code></td><td><code>string</code></td><td>是</td><td>源名称（如 <code>org/repo</code>）</td></tr>
-<tr><td><code>url</code></td><td><code>string</code></td><td>是</td><td>源仓库 URL</td></tr>
+<tr><td><code>url</code></td><td><code>string</code></td><td>否</td><td>源仓库 URL</td></tr>
 <tr><td><code>commit_hash</code></td><td><code>string</code></td><td>否</td><td>同步时源仓库的最新 commit hash（SHA）</td></tr>
 <tr><td><code>skills</code></td><td><code>SkillEntry[]</code></td><td>是</td><td>该源下可用的技能</td></tr>
 </tbody></table>
