@@ -18,8 +18,7 @@ pub fn run(name: &str, description: &str, _template: &str) -> Result<()> {
 
     // Generate SKILL.md
     let skill_md = generate_skill_md(name, description);
-    fs::write(project_dir.join("SKILL.md"), skill_md)
-        .context("Failed to create SKILL.md")?;
+    fs::write(project_dir.join("SKILL.md"), skill_md).context("Failed to create SKILL.md")?;
 
     println!("{}: {}", "Created skill project".green(), name);
     println!("  {}/SKILL.md", name.dimmed());

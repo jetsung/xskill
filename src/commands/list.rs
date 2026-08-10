@@ -19,23 +19,98 @@ struct InstalledSkill {
 pub fn run(global: bool, agent: Option<&str>) -> Result<()> {
     let config = Config::load()?;
 
+    // 标题：项目级 vs 全局级
+    if global {
+        println!("{}\n", "Global Skills".bold());
+    } else {
+        println!("{}\n", "Project Skills".bold());
+    }
+
+    // 收集 skills：
+    // - 指定平台时，只扫描该平台实际可用的 skills（合并目录，同名去重、规范目录优先）
+    // - 未指定时，扫描规范目录与所有平台目录，收集完整的 agent 关联列表
+    let skills = if let Some(platform_name) = agent {
+        if platform_name == "*" {
+            anyhow::bail!(
+                "--agent '*' is not supported for list; omit --agent to list all skills"
+            );
+        }
+        // 验证平台名称
+        validate_agent(&config, platform_name)?;
+        scan_platform_skills(&config, platform_name, global)?
+    } else {
+        scan_all_skills(&config, global)?
+    };
+
+    if skills.is_empty() {
+        println!("{}", "No skills installed".bright_black());
+        return Ok(());
+    }
+
+    // 按路径排序
+    let mut sorted_skills: Vec<(&String, &InstalledSkill)> = skills.iter().collect();
+    sorted_skills.sort_by_key(|(_, v)| display_path(&v.display_path));
+
+    // 计算列宽
+    let max_name_len = sorted_skills
+        .iter()
+        .map(|(k, _)| k.len())
+        .max()
+        .unwrap_or(0);
+    let max_path_len = sorted_skills
+        .iter()
+        .map(|(_, v)| display_path(&v.display_path).len())
+        .max()
+        .unwrap_or(0);
+
+    // 输出：指定平台时仅名称 + 路径两列；未指定时附加 Agents 列
+    for (name, info) in &sorted_skills {
+        let path_str = display_path(&info.display_path);
+        if agent.is_some() {
+            println!(
+                "{:<name_w$}    {:<path_w$}",
+                name.yellow(),
+                path_str.bright_black(),
+                name_w = max_name_len,
+                path_w = max_path_len,
+            );
+        } else {
+            let status_str = if info.platforms.is_empty() {
+                String::new()
+            } else {
+                format!("{} {}", "Agents:".bright_black(), info.platforms.join(", "))
+            };
+            println!(
+                "{:<name_w$}    {:<path_w$}    {}",
+                name.yellow(),
+                path_str.bright_black(),
+                status_str,
+                name_w = max_name_len,
+                path_w = max_path_len,
+            );
+        }
+    }
+
+    Ok(())
+}
+
+/// 扫描规范目录与所有平台目录，收集全部已安装 skills 及平台关联列表
+fn scan_all_skills(config: &Config, global: bool) -> Result<BTreeMap<String, InstalledSkill>> {
     let canonical_dir = canonical_skills_dir(global);
     let mut skills: BTreeMap<String, InstalledSkill> = BTreeMap::new();
 
     // 扫描规范目录
     for name in scan_skills_dir(&canonical_dir)? {
-        skills.entry(name.clone()).or_insert_with(|| InstalledSkill {
-            display_path: canonical_dir.join(&name),
-            in_canonical: true,
-            platforms: Vec::new(),
-        });
+        skills
+            .entry(name.clone())
+            .or_insert_with(|| InstalledSkill {
+                display_path: canonical_dir.join(&name),
+                in_canonical: true,
+                platforms: Vec::new(),
+            });
     }
 
     // 扫描各平台目录（始终扫描所有平台，以收集完整的 agent 列表）
-    if let Some(platform_name) = agent {
-        // 验证平台名称
-        validate_agent(&config, platform_name)?;
-    }
     for pname in config.platform_names() {
         let platform = config.platforms.get(pname);
         let is_agents_compat = platform.map(|p| p.agents_compat).unwrap_or(false);
@@ -48,13 +123,15 @@ pub fn run(global: bool, agent: Option<&str>) -> Result<()> {
                 }
             }
         } else {
-            let platform_skills = scan_platform_with_paths(&config, pname, global)?;
+            let platform_skills = scan_platform_with_paths(config, pname, global)?;
             for (name, platform_path) in platform_skills {
-                let entry = skills.entry(name.clone()).or_insert_with(|| InstalledSkill {
-                    display_path: platform_path.clone(),
-                    in_canonical: false,
-                    platforms: Vec::new(),
-                });
+                let entry = skills
+                    .entry(name.clone())
+                    .or_insert_with(|| InstalledSkill {
+                        display_path: platform_path.clone(),
+                        in_canonical: false,
+                        platforms: Vec::new(),
+                    });
                 // 如果不在规范目录中，使用平台路径
                 if !entry.in_canonical {
                     entry.display_path = platform_path;
@@ -66,65 +143,60 @@ pub fn run(global: bool, agent: Option<&str>) -> Result<()> {
         }
     }
 
-    // 标题：项目级 vs 全局级
-    if global {
-        println!("{}\n", "Global Skills".bold());
+    Ok(skills)
+}
+
+/// 扫描指定平台实际可用的 skills（合并其目录列表，同名去重、规范目录优先）
+fn scan_platform_skills(
+    config: &Config,
+    platform_name: &str,
+    global: bool,
+) -> Result<BTreeMap<String, InstalledSkill>> {
+    let mut skills: BTreeMap<String, InstalledSkill> = BTreeMap::new();
+
+    if let Some(dirs) = platform_skills_dirs(config, platform_name, global) {
+        for dir in dirs {
+            for (name, path) in scan_skills_dir_with_paths(&dir)? {
+                skills
+                    .entry(name.clone())
+                    .or_insert_with(|| InstalledSkill {
+                        display_path: path,
+                        in_canonical: true,
+                        platforms: Vec::new(),
+                    });
+            }
+        }
+    }
+
+    Ok(skills)
+}
+
+/// 根据平台配置解析实际扫描目录列表：
+/// - agents_compat 平台：返回 [规范目录, 平台自身 skills 目录]（规范目录在前）
+/// - 非兼容平台：返回 [平台自身 skills 目录]
+/// - 平台不存在或 skills 目录配置为空：返回 None
+fn platform_skills_dirs(
+    config: &Config,
+    platform_name: &str,
+    global: bool,
+) -> Option<Vec<PathBuf>> {
+    let platform = config.get_platform(platform_name)?;
+    if platform.skills.is_empty() {
+        return None;
+    }
+
+    let base_dir = if global {
+        dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"))
     } else {
-        println!("{}\n", "Project Skills".bold());
+        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+    };
+    let platform_skills_dir = base_dir.join(&platform.path).join(&platform.skills);
+
+    if platform.agents_compat {
+        Some(vec![canonical_skills_dir(global), platform_skills_dir])
+    } else {
+        Some(vec![platform_skills_dir])
     }
-
-    if skills.is_empty() {
-        println!("{}", "No skills installed".bright_black());
-        return Ok(());
-    }
-
-    // 按路径排序
-    let mut sorted_skills: Vec<(&String, &InstalledSkill)> = skills.iter().collect();
-    sorted_skills.sort_by(|a, b| display_path(&a.1.display_path).cmp(&display_path(&b.1.display_path)));
-
-    // 计算列宽
-    let max_name_len = sorted_skills.iter().map(|(k, _)| k.len()).max().unwrap_or(0);
-    let max_path_len = sorted_skills
-        .iter()
-        .map(|(_, v)| display_path(&v.display_path).len())
-        .max()
-        .unwrap_or(0);
-
-    // 输出
-    for (name, info) in &sorted_skills {
-        let path_str = display_path(&info.display_path);
-        let status_str = if let Some(filter_agent) = agent {
-            if info.platforms.contains(&filter_agent.to_string()) {
-                // 在过滤的平台中，显示 Agents
-                if info.platforms.is_empty() {
-                    String::new()
-                } else {
-                    format!("{} {}", "Agents:".bright_black(), info.platforms.join(", "))
-                }
-            } else {
-                // 不在过滤的平台中，显示 not symlinked
-                format!("{} {}", "Agents:".bright_black(), "not symlinked".yellow())
-            }
-        } else {
-            // 没有过滤，显示所有 Agents
-            if info.platforms.is_empty() {
-                String::new()
-            } else {
-                format!("{} {}", "Agents:".bright_black(), info.platforms.join(", "))
-            }
-        };
-
-        println!(
-            "{:<name_w$}    {:<path_w$}    {}",
-            name.yellow(),
-            path_str.bright_black(),
-            status_str,
-            name_w = max_name_len,
-            path_w = max_path_len,
-        );
-    }
-
-    Ok(())
 }
 
 /// 扫描指定平台目录，返回 (skill名称, 平台路径) 列表
@@ -167,7 +239,10 @@ fn scan_skills_dir(dir: &Path) -> Result<Vec<String>> {
         let path = entry.path();
 
         // 检查是否是目录或 symlink
-        let is_valid = entry.file_type().map(|t| t.is_dir() || t.is_symlink()).unwrap_or(false);
+        let is_valid = entry
+            .file_type()
+            .map(|t| t.is_dir() || t.is_symlink())
+            .unwrap_or(false);
         if !is_valid {
             continue;
         }
@@ -201,7 +276,10 @@ fn scan_skills_dir_with_paths(dir: &Path) -> Result<Vec<(String, PathBuf)>> {
         let path = entry.path();
 
         // 检查是否是目录或 symlink
-        let is_valid = entry.file_type().map(|t| t.is_dir() || t.is_symlink()).unwrap_or(false);
+        let is_valid = entry
+            .file_type()
+            .map(|t| t.is_dir() || t.is_symlink())
+            .unwrap_or(false);
         if !is_valid {
             continue;
         }
@@ -374,7 +452,11 @@ mod tests {
         config.platforms.insert(
             "test-platform".to_string(),
             Platform {
-                path: tmp.path().join(".test-platform").to_string_lossy().to_string(),
+                path: tmp
+                    .path()
+                    .join(".test-platform")
+                    .to_string_lossy()
+                    .to_string(),
                 skills: "skills".to_string(),
                 agents: "AGENTS.md".to_string(),
                 source: "AGENTS.md".to_string(),
@@ -402,5 +484,114 @@ mod tests {
         // 默认平台中不存在 "nonexistent"
         let items = scan_platform_with_paths(&config, "nonexistent", false).unwrap();
         assert!(items.is_empty());
+    }
+
+    // --- platform_skills_dirs ---
+
+    #[test]
+    fn test_platform_skills_dirs_non_compat_project() {
+        let mut config = Config::default();
+        config.platforms.insert(
+            "custom-plain".to_string(),
+            Platform {
+                path: ".custom-plain".to_string(),
+                skills: "skills".to_string(),
+                agents: "CUSTOM.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+            },
+        );
+
+        let dirs = platform_skills_dirs(&config, "custom-plain", false).unwrap();
+        assert_eq!(dirs.len(), 1);
+        let cwd = std::env::current_dir().unwrap();
+        assert_eq!(dirs[0], cwd.join(".custom-plain").join("skills"));
+    }
+
+    #[test]
+    fn test_platform_skills_dirs_non_compat_global() {
+        let mut config = Config::default();
+        config.platforms.insert(
+            "custom-plain".to_string(),
+            Platform {
+                path: ".custom-plain".to_string(),
+                skills: "skills".to_string(),
+                agents: "CUSTOM.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+            },
+        );
+
+        let dirs = platform_skills_dirs(&config, "custom-plain", true).unwrap();
+        assert_eq!(dirs.len(), 1);
+        let home = dirs::home_dir().unwrap();
+        assert_eq!(dirs[0], home.join(".custom-plain").join("skills"));
+    }
+
+    #[test]
+    fn test_platform_skills_dirs_agents_compat_project() {
+        let mut config = Config::default();
+        config.platforms.insert(
+            "custom-compat".to_string(),
+            Platform {
+                path: ".custom-compat".to_string(),
+                skills: "skills".to_string(),
+                agents: "CUSTOM.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: true,
+            },
+        );
+
+        let dirs = platform_skills_dirs(&config, "custom-compat", false).unwrap();
+        assert_eq!(dirs.len(), 2);
+        let cwd = std::env::current_dir().unwrap();
+        // 规范目录在前
+        assert_eq!(dirs[0], cwd.join(".agents").join("skills"));
+        assert_eq!(dirs[1], cwd.join(".custom-compat").join("skills"));
+    }
+
+    #[test]
+    fn test_platform_skills_dirs_agents_compat_global() {
+        let mut config = Config::default();
+        config.platforms.insert(
+            "custom-compat".to_string(),
+            Platform {
+                path: ".custom-compat".to_string(),
+                skills: "skills".to_string(),
+                agents: "CUSTOM.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: true,
+            },
+        );
+
+        let dirs = platform_skills_dirs(&config, "custom-compat", true).unwrap();
+        assert_eq!(dirs.len(), 2);
+        let home = dirs::home_dir().unwrap();
+        // 规范目录在前
+        assert_eq!(dirs[0], home.join(".agents").join("skills"));
+        assert_eq!(dirs[1], home.join(".custom-compat").join("skills"));
+    }
+
+    #[test]
+    fn test_platform_skills_dirs_platform_not_found() {
+        let config = Config::default();
+        assert!(platform_skills_dirs(&config, "nonexistent", false).is_none());
+    }
+
+    #[test]
+    fn test_platform_skills_dirs_empty_skills_config() {
+        let mut config = Config::default();
+        config.platforms.insert(
+            "custom-empty".to_string(),
+            Platform {
+                path: ".custom-empty".to_string(),
+                skills: String::new(),
+                agents: "CUSTOM.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+            },
+        );
+
+        assert!(platform_skills_dirs(&config, "custom-empty", false).is_none());
     }
 }

@@ -8,7 +8,7 @@ A skills management tool for discovering, installing, and managing reusable agen
 - **Platform management**: Install skills to multiple AI coding platforms (Claude, Codex, etc.) with a single command
 - **Lock file tracking**: Track installed skills with `.xskill-lock.json` for reproducible installs
 - **Global configuration**: Single global config at `~/.xskill/settings.json` with `XSKILL_CONFIG` override
-- **Recursive search**: Automatically discover skills in nested directory structures within repositories
+- **Recursive search**: Automatically discover skills in nested directory structures within repositories. Prefers `skills/` subdirectory; falls back to scanning the entire project root. Directories starting with `.` (e.g. `.git`, `.agents`) are excluded.
 - **Batch operations**: Install or remove all skills with `--all` flag or `*` wildcard
 - **Cache support**: Optional local cache for faster skill queries without network access
 - **Interactive TUI**: Fuzzy-find and install skills interactively with `find` command
@@ -79,6 +79,13 @@ Add a skill repository as a source:
 xskill sources add -n my-skills -u https://github.com/example/skills
 ```
 
+Or let the name be auto-extracted from the URL:
+
+```bash
+xskill sources add -u https://github.com/user/repo.git
+# Name auto-set to "user/repo"
+```
+
 ### 2. Query available skills
 
 List skills from a source:
@@ -119,11 +126,31 @@ xskill list
 xskill remove -s vue
 ```
 
+## Global Options
+
+The following options can be used before any subcommand:
+
+| Option | Description |
+|--------|-------------|
+| `-v, --verbose` | Show verbose output, including git command stderr. Useful for debugging installation issues. |
+| `-h, --help` | Print help information |
+| `-V, --version` | Print version information |
+
+Example:
+
+```bash
+# Debug mode — see git clone details
+xskill -v add -f my-skills -s vue
+
+# Verbose with global install
+xskill -v add -f my-skills -s vue -g
+```
+
 ## Commands
 
 ### `sources` — Manage configured sources
 
-List, add, remove, or edit skill sources in the configuration.
+List, add, remove, or rename skill sources in the configuration.
 
 #### `sources list`
 
@@ -137,8 +164,8 @@ xskill sources list
 
 Output format:
 ```
-NAME   TYPE URL
-antfu  git  https://github.com/antfu/skills
+#  NAME   TYPE URL
+1  antfu  git  https://github.com/antfu/skills
 ```
 
 #### `sources add`
@@ -150,54 +177,78 @@ xskill sources add -n <name> -u <url> [-t git|api]
 ```
 
 Options:
-- `-n, --name` — Source name (optional, alphanumeric with `-` and `_`; when empty, the URL is used as the name)
+- `-n, --name` — Source name (optional, alphanumeric with `-`, `_`, and `/` to support `user/repo` format; when omitted, the path is auto-extracted from the URL, e.g. `https://github.com/user/repo.git` → `user/repo`)
 - `-u, --url` — Source URL (required, must start with `http://` or `https://`)
 - `-t, --type` — Source type: `git` or `api` (default: `git`)
 
+Examples:
+
+```bash
+# With explicit name
+xskill sources add -n my-skills -u https://github.com/example/skills
+
+# Name auto-extracted as "user/repo"
+xskill sources add -u https://github.com/user/repo.git
+
+# Slash-separated name
+xskill sources add -n org/team/repo -u https://gitlab.com/org/team/repo
+```
+
 #### `sources remove`
 
-Remove a source by name and/or URL:
+Remove a source by name, URL, or index:
 
 ```bash
 xskill sources remove -n <name>
 xskill sources remove -u <url>
 xskill sources remove -n <name> -u <url>
+xskill sources remove -i <index>
 ```
 
 Options:
 - `-n, --name` — Source name to remove (optional)
 - `-u, --url` — Source URL to remove (optional)
+- `-i, --index` — Source index from `sources list` (optional, 1-based)
 
-At least one of `--name` or `--url` is required. When both are provided, both must match for the source to be removed.
+Priority: `--name`/`--url` > `--index`. At least one of `--name`, `--url`, or `--index` is required. When both `--name` and `--url` are provided, both must match for the source to be removed.
 
-#### `sources edit`
+#### `sources rename`
 
 Rename an existing source (only the name can be changed; `url` and `type` are immutable):
 
 ```bash
-xskill sources edit -n <name> -N <new-name>
+xskill sources rename -n <name> -N <new-name>
+xskill sources rename -i <index> -N <new-name>
 ```
 
 Options:
 - `-n, --name` — Current source name (or use `-u` to match by URL)
 - `-u, --url` — Current source URL (alternative identifier)
+- `-i, --index` — Source index from `sources list` (optional, 1-based)
 - `-N, --new-name` — New name (required, pass empty string to clear the name)
 
-### `platforms` — List configured platforms
+Priority: `--name`/`--url` > `--index`. At least one of `--name`, `--url`, or `--index` is required.
+
+### `platforms` — Manage configured platforms
 
 List all configured AI coding platforms (sorted alphabetically):
 
 ```bash
-xskill platforms
+xskill platforms list
 ```
+
+The bare `xskill platforms` command is equivalent to `xskill platforms list`.
 
 Show detailed platform information:
 
 ```bash
-xskill platforms -a
+xskill platforms list -a
 ```
 
-Detailed output includes path, skills directory, agents file, source file, and agents compatibility (`COMPAT`) for each platform. Platforms with `agents_compat: true` display `✓` in the COMPAT column, indicating they can reuse project-level `.agents/` resources.
+Options:
+- `-a, --all` — Show detailed information (path, skills directory, agents file, source file, and agents compatibility)
+
+The default output shows name, path, and agents compatibility (`COMPAT`). Detailed output additionally shows skills directory, agents file, and source file. Compatible platforms (`agents_compat: true`) are pre-selected in the interactive target-platform picker used by `add`, `link`, and related commands.
 
 ### `add` — Install a skill
 
@@ -235,8 +286,9 @@ When `-f` is not specified and multiple sources (including registry) contain ide
 
 #### Output style
 
-Labels (`Name`, `Description`, `Version`) are displayed in cyan bold. `Name` values are shown in yellow. Empty `Description` or `Version` lines are hidden.
+Labels (`Name`, `Description`, `Version`, `Path`) are displayed in cyan bold. `Name` values are shown in yellow. Empty `Description` or `Version` lines are hidden.
 
+- `Path` (cyan bold): skill path within the repository (e.g. `skills/vue/SKILL.md`).
 - `Installed` (green): canonical directory path.
 - `Symlinked` (green): platform directory path (no arrow or target shown, as `Installed` already displays the canonical path).
 - `Source` (cyan bold): `Source: <name> (<url>)`.
@@ -420,9 +472,9 @@ xskill list [OPTIONS]
 
 Options:
 - `-g, --global` — List global skills
-- `-a, --agent <AGENT>` — Filter by platform name
+- `-a, --agent <AGENT>` — List only skills available to the specified platform; for `agents_compat` platforms, skills under the canonical directory are merged with the platform's own skills directory; `*` is not supported
 
-Output format:
+Output format (without `-a`):
 ```
 Project Skills
 
@@ -430,9 +482,18 @@ vue     ~/.agents/skills/vue     Agents: codebuddy, gemini
 react   ~/.agents/skills/react   Agents: codebuddy
 ```
 
+With `-a <agent>` (e.g. `-a claude` — only skills available to that platform, no `Agents:` column):
+```
+Project Skills
+
+vue     ~/.claude/skills/vue
+react   ~/.claude/skills/react
+```
+
 - Skill names are displayed in yellow, paths in dimmed gray (`~/` prefix replaces home directory).
-- `Agents:` prefix in dimmed gray, platform names in default white.
-- With `-a <agent>`, skills not linked to that platform show `Agents: not symlinked` (`Agents:` dimmed gray, `not symlinked` yellow).
+- `Agents:` prefix in dimmed gray, platform names in default white (only shown without `-a`).
+- For `agents_compat` platforms (e.g. atomcode), skills under the canonical directory (`.agents/skills`) are merged with skills under the platform's own skills directory; duplicate names are shown once, preferring the canonical directory entry.
+- `-a '*'` is not supported: omit `-a` to list all skills.
 - Sorted by path alphabetically.
 
 ### `query` — Query skills from a source
@@ -470,7 +531,7 @@ Options:
 
 1. **Skill selection** — Multi-select substring search (exact mode) from cached skills. Display format: `name [source]` (registry entries show `name [registry] [source]`). Non-selected names use default color, selected names use blue. Source tags are always dark gray; `[registry]` tags turn green when selected. Search box at bottom, list arranged upward. Keyboard hints: `TAB: multi-select | enter confirm | esc cancel`. Press TAB to toggle multiple skills, Enter to confirm. If nothing is toggled, the cursor item is used.
 2. **Platform selection** — Multi-select target platforms. First item is `Default` (disabled, means no platform symlinks). `agents_compat` platforms are excluded from the list and shown as `SELECTED: <platform1>, <platform2>, ...` in the header. Remaining items are non-compat configured platforms. Press TAB to select/deselect, Enter to confirm. Selected rows use blue text with dark background highlight.
-3. **Install** — Skills are grouped by source URL; each repo is cloned once. For each skill, the correct path is extracted from `CachedSkill.path` (supports nested paths like `skills/engineering/grill/SKILL.md`). The skill is installed to the canonical directory (`.agents/skills/<name>` or `~/.agents/skills/<name>` with `-g`), then relative symlinks are created for each selected platform. Reports `Installed:`, `Symlinked:`, and any `Failed:` platforms. Each skill's output is separated by a blank line. Registry skills are cloned directly from their URL, independent of local `sources` configuration.
+3. **Install** — Skills are grouped by source URL; each repo is cloned once. For each skill, the correct path is extracted from `CachedSkill.path` (supports nested paths like `skills/engineering/grill/SKILL.md` or root-level `my-skill/SKILL.md`). The skill is installed to the canonical directory (`.agents/skills/<name>` or `~/.agents/skills/<name>` with `-g`), then relative symlinks are created for each selected platform. Reports `Installed:`, `Symlinked:`, and any `Failed:` platforms. Each skill's output is separated by a blank line. Registry skills are cloned directly from their URL, independent of local `sources` configuration.
 
 Press Esc or Ctrl-C at any step to cancel.
 
@@ -603,10 +664,19 @@ xskill config [OPTIONS]
 ```
 
 Options:
-- `-i, --init` — Initialize config file with default values (default platforms, cache, registry)
+- `-i, --init` — Initialize config file with default values (default platforms, cache, registry). Also writes a `proxy` key with an empty string as a placeholder.
 - `-e, --edit` — Open config in `$EDITOR` (defaults to `vi`)
 - `-g, --get <key>` — Get a config value by dot path (e.g., `cache.enabled`)
 - `-s, --set <key=value>` — Set a config value by dot path (e.g., `cache.enabled=true`)
+- `-w, --show` — Print the full loaded configuration as pretty JSON (merges defaults, e.g. fills in missing platforms). Output is uncolored and pipe-friendly.
+- `-V, --validate` — Validate the config file. Performs JSON syntax + strong-type structure checks, then full JSON Schema validation. Tries local schema files first (`$XSKILL_SCHEMA`, `<config_dir>/schemas/xskill.schema.json`, walk-up from the executable, `<exe_dir>/../share/xskill/xskill.schema.json`); if none found, fetches the schema from `https://xskill.gcli.cn/xskill.schema.json` (honoring the proxy config). Prints `Valid <path> (schema: <source>)` on success, or each error with its JSON path on failure (exit 1).
+
+Example — read/set the proxy:
+```bash
+xskill config --get proxy
+xskill config --set proxy=socks5h://127.0.0.1:40027
+xskill config --validate
+```
 
 #### Examples
 
@@ -678,6 +748,12 @@ There is no project-level configuration. Only one global config file is used.
       "skills": "skills",
       "agents": "AGENTS.md",
       "agents_compat": true
+    },
+    "pi": {
+      "path": ".pi/agent",
+      "skills": "skills",
+      "agents": "AGENTS.md",
+      "agents_compat": true
     }
   },
   "sources": [
@@ -699,12 +775,13 @@ There is no project-level configuration. Only one global config file is used.
   ],
   "cache": {
     "enabled": true,
-    "ttl": 600
+    "ttl": 86400
   },
   "registry": {
     "enabled": false,
     "url": "https://xskill.gcli.cn/skills.json"
-  }
+  },
+  "proxy": ""
 }
 ```
 
@@ -720,7 +797,7 @@ Each platform entry configures how skills are installed for a specific AI coding
 | `skills` | No | — | Skills subdirectory name relative to `path`. Omit to skip skill installation |
 | `agents` | No | — | Agents config file name relative to `path`. Omit to skip agents installation |
 | `source` | No | `"AGENTS.md"` | Source file name under the fixed `.agents/` directory |
-| `agents_compat` | No | `false` | Whether this platform can reuse `.agents/` resources. When `true`, the platform reads directly from the canonical directory — add/remove/link/restore skip symlink operations (single platform: `Skipped` output; `-a '*'`: silent). find TUI lists and selects normally, silently skips symlink during install. list `-a` shows all canonical skills as linked. |
+| `agents_compat` | No | `false` | Whether this platform can reuse `.agents/` resources. When `true`, the platform reads directly from the canonical directory — add/remove/link/restore skip symlink operations (single platform: `Skipped` output; `-a '*'`: silent). find TUI lists and selects normally, silently skips symlink during install. list `-a` merges the canonical directory with the platform's own skills directory (duplicates shown once, canonical preferred). |
 
 #### Symlink behavior
 
@@ -746,7 +823,7 @@ Sources define where skills are fetched from.
 
 | Field | Required | Default | Description |
 |-------|----------|---------|-------------|
-| `name` | No | — | Unique identifier (alphanumeric, `-`, `_`); when empty or invalid, the URL is used as the name |
+| `name` | No | — | Unique identifier (alphanumeric, `-`, `_`, `/`); supports `user/repo` format. When empty or invalid, the URL is used as the name |
 | `type` | No | `"git"` | Source type: `git` or `api` |
 | `url` | Yes | — | Repository URL (must start with `http://` or `https://`) |
 
@@ -764,7 +841,7 @@ Recommended skills are managed by the `rec` command for easy installation.
 | Field | Required | Default | Description |
 |-------|----------|---------|-------------|
 | `cache.enabled` | No | `false` | Enable local skills cache for `query` and `find` commands |
-| `cache.ttl` | No | `600` | Cache time-to-live in seconds (default: 10 minutes). Applies to both the main cache (`skills.json`) and URL cache (`source_<md5>.json`) |
+| `cache.ttl` | No | `86400` | Cache time-to-live in seconds (default: 24 hours). Applies to both the main cache (`skills.json`) and URL cache (`source_<md5>.json`) |
 
 When enabled, `xskill cache update` fetches skill metadata from all sources and stores it locally. Subsequent `query` and `find` commands check `cache.ttl` for staleness: if the cache is fresh, it is used directly; if stale or empty with configured sources, sources are re-cloned and the cache is automatically refreshed.
 
@@ -895,6 +972,15 @@ The lock file tracks installed skills for reproducibility.
       "skill_folder_hash": "abc123...",
       "installed_at": "2026-07-15T18:16:42.852Z",
       "updated_at": "2026-07-15T18:16:42.852Z"
+    },
+    "my-skill": {
+      "source": "custom",
+      "source_type": "git",
+      "source_url": "https://github.com/user/my-skill.git",
+      "skill_path": "my-skill/SKILL.md",
+      "skill_folder_hash": "def456...",
+      "installed_at": "2026-07-25T10:00:00.000Z",
+      "updated_at": "2026-07-25T10:00:00.000Z"
     }
   },
   "updated_at": "2026-07-15T18:16:42.852Z"
@@ -908,7 +994,7 @@ The lock file tracks installed skills for reproducibility.
 | `source` | Source name from configuration |
 | `source_type` | Source type (`git`) |
 | `source_url` | Full repository URL |
-| `skill_path` | Relative path to `SKILL.md` within the repo |
+| `skill_path` | Relative path to `SKILL.md` within the repo (e.g. `skills/vue/SKILL.md` or `my-skill/SKILL.md` for root-level skills) |
 | `skill_folder_hash` | Git tree hash of the skill folder for change detection |
 | `installed_at` | ISO 8601 timestamp of first installation (`YYYY-MM-DDTHH:MM:SS.sssZ`) |
 | `updated_at` | ISO 8601 timestamp of last update for this skill (`YYYY-MM-DDTHH:MM:SS.sssZ`) |
@@ -942,6 +1028,7 @@ For `~/.xskill/settings.json`. Defines the full configuration structure.
 | `recommended` | `RecommendedSource[]` | No | Recommended skill sets grouped by source |
 | `cache` | `CacheConfig` | No | Cache settings for skills list caching |
 | `registry` | `RegistryConfig` | No | Registry settings for skill discovery |
+| `proxy` | `string` | No | Proxy URL for network access (e.g. `http://127.0.0.1:7890`, `socks5h://127.0.0.1:1080`). When set, `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY` are exported so `git clone` and `curl`/`wget` use the proxy. Scheme may be `http`, `https`, `socks5`, `socks5h`, `socks4`, `socks4a`. Note: `socks5h`/`socks4a` resolve DNS at the proxy. `config --init` writes this key as an empty string placeholder |
 
 **Platform** (`platforms.*`):
 
@@ -957,7 +1044,7 @@ For `~/.xskill/settings.json`. Defines the full configuration structure.
 
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
-| `name` | `string` | No | `""` | Unique source identifier. Pattern: `^[a-zA-Z0-9_-]+$`. When empty or invalid, the `url` is used as the name |
+| `name` | `string` | No | `""` | Unique source identifier. Pattern: `^[a-zA-Z0-9_/-]+$` (supports `user/repo` format). When empty or invalid, the `url` is used as the name |
 | `type` | `string` | No | `"git"` | Source type. Enum: `"git"`, `"api"` |
 | `url` | `string` | Yes | — | Source repository URL. Must be a valid URI starting with `http://` or `https://` |
 
@@ -974,7 +1061,7 @@ For `~/.xskill/settings.json`. Defines the full configuration structure.
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
 | `enabled` | `boolean` | No | `false` | Enable skills list caching. When enabled, `query` and `find` read from local cache |
-| `ttl` | `integer` | No | `600` | Cache time-to-live in seconds (default 10 minutes). Applies to both main cache (`skills.json`) and URL cache (`source_<md5>.json`). Minimum: 0 |
+| `ttl` | `integer` | No | `86400` | Cache time-to-live in seconds (default 24 hours). Applies to both main cache (`skills.json`) and URL cache (`source_<md5>.json`). Minimum: 0 |
 
 **RegistryConfig** (`registry`):
 
@@ -1000,6 +1087,7 @@ For the registry API response (`skills.json`). Defines the skills index data str
 |-------|------|----------|-------------|
 | `source` | `string` | Yes | Source name (e.g. `org/repo`) |
 | `url` | `string` | Yes | Source repository URL |
+| `commit_hash` | `string` | No | Latest commit hash (SHA) of the source repository at sync time |
 | `skills` | `SkillEntry[]` | Yes | Skills available from this source |
 
 **SkillEntry** (`sources[].skills[]`):
@@ -1007,7 +1095,7 @@ For the registry API response (`skills.json`). Defines the skills index data str
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
 | `name` | `string` | Yes | — | Skill name |
-| `path` | `string` | Yes | — | Path to `SKILL.md` relative to repository root |
+| `path` | `string` | Yes | — | Path to `SKILL.md` relative to repository root (e.g. `skills/vue/SKILL.md` or `my-skill/SKILL.md` for root-level skills) |
 | `description` | `string` | No | `""` | Skill description |
 | `version` | `string` | No | `""` | Skill version |
 

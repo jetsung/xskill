@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::utils::{canonical_skills_dir, create_relative_symlink, display_path, validate_agent};
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use colored::Colorize;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -174,11 +174,7 @@ fn symlink_skill_to_platform(
 }
 
 /// 创建 skill 到所有已存在平台的 symlink
-fn symlink_skill_to_all_platforms(
-    config: &Config,
-    skill_name: &str,
-    global: bool,
-) -> Result<()> {
+fn symlink_skill_to_all_platforms(config: &Config, skill_name: &str, global: bool) -> Result<()> {
     let base_dir = if global {
         dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"))
     } else {
@@ -225,12 +221,7 @@ fn symlink_skill_to_all_platforms(
                 linked_platforms.push(name.to_string());
             }
             Err(e) => {
-                eprintln!(
-                    "{}: Failed to link to {}: {}",
-                    "Warning".yellow(),
-                    name,
-                    e
-                );
+                eprintln!("{}: Failed to link to {}: {}", "Warning".yellow(), name, e);
             }
         }
     }
@@ -380,11 +371,7 @@ mod tests {
         config.platforms.insert(
             "claude".to_string(),
             Platform {
-                path: tmp
-                    .path()
-                    .join(".claude")
-                    .to_string_lossy()
-                    .to_string(),
+                path: tmp.path().join(".claude").to_string_lossy().to_string(),
                 skills: "skills".to_string(),
                 agents: "CLAUDE.md".to_string(),
                 source: "AGENTS.md".to_string(),
@@ -445,11 +432,7 @@ mod tests {
         config.platforms.insert(
             "claude".to_string(),
             Platform {
-                path: tmp
-                    .path()
-                    .join(".claude")
-                    .to_string_lossy()
-                    .to_string(),
+                path: tmp.path().join(".claude").to_string_lossy().to_string(),
                 skills: "skills".to_string(),
                 agents: "CLAUDE.md".to_string(),
                 source: "AGENTS.md".to_string(),
@@ -459,11 +442,7 @@ mod tests {
         config.platforms.insert(
             "codebuddy".to_string(),
             Platform {
-                path: tmp
-                    .path()
-                    .join(".codebuddy")
-                    .to_string_lossy()
-                    .to_string(),
+                path: tmp.path().join(".codebuddy").to_string_lossy().to_string(),
                 skills: "skills".to_string(),
                 agents: "CODEBUDDY.md".to_string(),
                 source: "AGENTS.md".to_string(),

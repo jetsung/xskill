@@ -40,8 +40,7 @@ pub fn resolve_skills(config: &Config, from: Option<&str>) -> Result<CacheData> 
         // Try cache first, check staleness and empty sources
         if let Some(cached) = CacheData::load() {
             let stale = cached.is_stale(config.cache.ttl);
-            let empty_but_sources_exist =
-                cached.sources.is_empty() && !config.sources.is_empty();
+            let empty_but_sources_exist = cached.sources.is_empty() && !config.sources.is_empty();
             if !stale && !empty_but_sources_exist {
                 return Ok(cached);
             }
@@ -147,32 +146,37 @@ pub fn find_all_skills(
 }
 
 /// Search a specific source for a skill match.
-fn search_source_for_match(
-    config: &Config,
-    src: &str,
-    skill_name: &str,
-) -> Option<SkillMatch> {
+fn search_source_for_match(config: &Config, src: &str, skill_name: &str) -> Option<SkillMatch> {
     let resolved = resolve_source(config, src).ok()?;
     let url = normalize_url(&resolved.url);
     let tmp_dir = git::clone_for_listing(&url).ok()?;
     let skills_dir = tmp_dir.path().join("skills");
 
-    if !skills_dir.exists() {
-        return None;
-    }
+    let (scan_dir, base_prefix) = if skills_dir.exists() {
+        (skills_dir.as_path(), "skills")
+    } else {
+        (tmp_dir.path(), "")
+    };
 
     let source_name = config
         .get_source(src)
         .map(|s| s.effective_name())
         .unwrap_or_else(|| src.to_string());
 
-    search_skills_in_dir(&skills_dir, skill_name, &source_name, &resolved.url, "")
-        .map(|(name, url, path)| SkillMatch {
-            source_name: name,
-            source_url: url,
-            skill_path: path,
-            is_registry: false,
-        })
+    search_skills_in_dir(
+        scan_dir,
+        skill_name,
+        &source_name,
+        &resolved.url,
+        "",
+        base_prefix,
+    )
+    .map(|(name, url, path)| SkillMatch {
+        source_name: name,
+        source_url: url,
+        skill_path: path,
+        is_registry: false,
+    })
 }
 
 /// Search the registry for a skill match, skipping already-seen URLs.
@@ -195,11 +199,7 @@ fn search_registry_for_match(
     };
 
     // Collect local source names for conflict detection
-    let local_names: HashSet<String> = config
-        .sources
-        .iter()
-        .map(|s| s.effective_name())
-        .collect();
+    let local_names: HashSet<String> = config.sources.iter().map(|s| s.effective_name()).collect();
 
     let mut results = Vec::new();
 
@@ -259,7 +259,7 @@ fn resolve_from_source(config: &Config, src: &str) -> Result<CacheData> {
 
     // Otherwise resolve as a named source
     let resolved = resolve_source(config, src)?;
-    let skills = clone_and_collect(&resolved.url)?;
+    let (skills, commit_hash) = clone_and_collect(&resolved.url)?;
 
     let source_name = config
         .get_source(src)
@@ -274,6 +274,7 @@ fn resolve_from_source(config: &Config, src: &str) -> Result<CacheData> {
             source: source_name,
             url: Some(resolved.url),
             registry_url: None,
+            commit_hash,
             skills,
         }],
     })
@@ -290,8 +291,7 @@ fn load_local_skills(config: &Config) -> CacheData {
     if config.is_cache_enabled() {
         if let Some(cached) = CacheData::load() {
             let stale = cached.is_stale(config.cache.ttl);
-            let empty_but_sources_exist =
-                cached.sources.is_empty() && !config.sources.is_empty();
+            let empty_but_sources_exist = cached.sources.is_empty() && !config.sources.is_empty();
             if !stale && !empty_but_sources_exist {
                 return cached;
             }
@@ -310,11 +310,12 @@ fn clone_all_sources(config: &Config) -> CacheData {
     for source in &config.sources {
         let source_name = source.effective_name();
         match clone_and_collect(&source.url) {
-            Ok(skills) => {
+            Ok((skills, commit_hash)) => {
                 sources.push(SourceCache {
                     source: source_name,
                     url: Some(source.url.clone()),
                     registry_url: None,
+                    commit_hash,
                     skills,
                 });
             }
@@ -348,11 +349,7 @@ fn fetch_registry(config: &Config) -> CacheData {
     let body = match fetch_json(&central_url) {
         Ok(b) => b,
         Err(e) => {
-            eprintln!(
-                "{}: Failed to fetch registry: {}",
-                "Warning".yellow(),
-                e
-            );
+            eprintln!("{}: Failed to fetch registry: {}", "Warning".yellow(), e);
             return CacheData::default();
         }
     };
@@ -381,11 +378,7 @@ fn merge_skills(local: CacheData, central: CacheData) -> CacheData {
         .collect();
 
     // Collect local source names for name-based dedup
-    let local_names: HashSet<String> = local
-        .sources
-        .iter()
-        .map(|s| s.source.clone())
-        .collect();
+    let local_names: HashSet<String> = local.sources.iter().map(|s| s.source.clone()).collect();
 
     let mut merged_sources = local.sources;
 
@@ -414,6 +407,7 @@ fn merge_skills(local: CacheData, central: CacheData) -> CacheData {
                 source: display_name,
                 url: central_src.url.clone(),
                 registry_url: central_src.url,
+                commit_hash: central_src.commit_hash,
                 skills: filtered_skills,
             });
         }
@@ -434,6 +428,7 @@ fn search_skills_in_dir(
     source_name: &str,
     source_url: &str,
     prefix: &str,
+    base_prefix: &str,
 ) -> Option<(String, String, String)> {
     let entries = fs::read_dir(dir).ok()?;
 
@@ -444,6 +439,9 @@ fn search_skills_in_dir(
         }
 
         let dir_name = entry.file_name().to_string_lossy().to_string();
+        if is_hidden_dir(&dir_name) {
+            continue;
+        }
         let rel_path = if prefix.is_empty() {
             dir_name.clone()
         } else {
@@ -455,17 +453,23 @@ fn search_skills_in_dir(
             let meta = SkillMeta::from_file(&path).unwrap_or_default();
             let display = meta.display_name(&dir_name);
             if display == target || dir_name == target {
-                return Some((
-                    source_name.to_string(),
-                    source_url.to_string(),
-                    format!("skills/{}/SKILL.md", rel_path),
-                ));
+                let full_path = if base_prefix.is_empty() {
+                    format!("{}/SKILL.md", rel_path)
+                } else {
+                    format!("{}/{}/SKILL.md", base_prefix, rel_path)
+                };
+                return Some((source_name.to_string(), source_url.to_string(), full_path));
             }
         }
 
-        if let Some(found) =
-            search_skills_in_dir(&path, target, source_name, source_url, &rel_path)
-        {
+        if let Some(found) = search_skills_in_dir(
+            &path,
+            target,
+            source_name,
+            source_url,
+            &rel_path,
+            base_prefix,
+        ) {
             return Some(found);
         }
     }
@@ -482,18 +486,27 @@ pub fn is_url(s: &str) -> bool {
     s.starts_with("http://") || s.starts_with("https://")
 }
 
-/// Clone a repo and collect all skills.
-fn clone_and_collect(url: &str) -> Result<Vec<CachedSkill>> {
+/// Check if a directory name starts with '.' (should be excluded from scanning).
+fn is_hidden_dir(dir_name: &str) -> bool {
+    dir_name.starts_with('.')
+}
+
+/// Clone a repo and collect all skills, returning (skills, commit_hash).
+fn clone_and_collect(url: &str) -> Result<(Vec<CachedSkill>, String)> {
     let url = normalize_url(url);
     let tmp_dir = git::clone_for_listing(&url)?;
     let skills_dir = tmp_dir.path().join("skills");
 
     let mut skills = Vec::new();
-    if skills_dir.exists() {
-        collect_skills_from_dir(&skills_dir, &mut skills, &mut String::new());
-    }
+    let (scan_dir, base_prefix) = if skills_dir.exists() {
+        (skills_dir.as_path(), "skills")
+    } else {
+        (tmp_dir.path(), "")
+    };
+    collect_skills_from_dir(scan_dir, &mut skills, &mut String::new(), base_prefix);
 
-    Ok(skills)
+    let commit_hash = git::get_latest_commit_hash(tmp_dir.path()).unwrap_or_default();
+    Ok((skills, commit_hash))
 }
 
 /// Load from URL cache if fresh, otherwise clone and save.
@@ -502,7 +515,7 @@ fn load_or_fetch_url_cache(url: &str, ttl_secs: u64) -> Result<CacheData> {
         return Ok(cached);
     }
 
-    let skills = clone_and_collect(url)?;
+    let (skills, commit_hash) = clone_and_collect(url)?;
     // Normalize URL: strip .git suffix for consistent source name
     let normalized = url.strip_suffix(".git").unwrap_or(url);
 
@@ -514,6 +527,7 @@ fn load_or_fetch_url_cache(url: &str, ttl_secs: u64) -> Result<CacheData> {
             source: normalized.to_string(),
             url: Some(normalized.to_string()),
             registry_url: None,
+            commit_hash,
             skills,
         }],
     };
@@ -529,6 +543,7 @@ pub fn collect_skills_from_dir(
     dir: &std::path::Path,
     skills: &mut Vec<CachedSkill>,
     current_path: &mut String,
+    base_prefix: &str,
 ) {
     let entries = match fs::read_dir(dir) {
         Ok(e) => e,
@@ -542,6 +557,9 @@ pub fn collect_skills_from_dir(
         }
 
         let dir_name = entry.file_name().to_string_lossy().to_string();
+        if is_hidden_dir(&dir_name) {
+            continue;
+        }
         let saved = current_path.clone();
         let rel_path = if current_path.is_empty() {
             dir_name.clone()
@@ -553,9 +571,15 @@ pub fn collect_skills_from_dir(
         let skill_md = path.join("SKILL.md");
         if skill_md.exists() {
             let meta = SkillMeta::from_file(&path).unwrap_or_default();
+            // 构建完整路径（包含 base_prefix）
+            let full_path = if base_prefix.is_empty() {
+                format!("{}/SKILL.md", rel_path)
+            } else {
+                format!("{}/{}/SKILL.md", base_prefix, rel_path)
+            };
             skills.push(CachedSkill {
                 name: meta.display_name(&dir_name),
-                path: format!("{}/SKILL.md", rel_path),
+                path: full_path,
                 description: meta.display_description(),
                 version: meta
                     .metadata
@@ -565,7 +589,7 @@ pub fn collect_skills_from_dir(
             });
         }
 
-        collect_skills_from_dir(&path, skills, current_path);
+        collect_skills_from_dir(&path, skills, current_path, base_prefix);
         *current_path = saved;
     }
 }
@@ -626,6 +650,7 @@ mod tests {
                 source: "local-src".to_string(),
                 url: Some("https://local/repo".to_string()),
                 registry_url: None,
+                commit_hash: String::new(),
                 skills: vec![CachedSkill {
                     name: "vue".to_string(),
                     path: "skills/vue/SKILL.md".to_string(),
@@ -640,6 +665,7 @@ mod tests {
                 source: "central-src".to_string(),
                 url: Some("https://central/repo".to_string()),
                 registry_url: None,
+                commit_hash: String::new(),
                 skills: vec![CachedSkill {
                     name: "react".to_string(),
                     path: "skills/react/SKILL.md".to_string(),
@@ -665,6 +691,7 @@ mod tests {
                 source: "antfu".to_string(),
                 url: Some("https://github.com/antfu/skills".to_string()),
                 registry_url: None,
+                commit_hash: String::new(),
                 skills: vec![CachedSkill {
                     name: "vue".to_string(),
                     path: "skills/vue/SKILL.md".to_string(),
@@ -679,6 +706,7 @@ mod tests {
                 source: "antfu".to_string(),
                 url: Some("https://github.com/antfu/skills".to_string()),
                 registry_url: None,
+                commit_hash: String::new(),
                 skills: vec![CachedSkill {
                     name: "vue".to_string(),
                     path: "skills/vue/SKILL.md".to_string(),
@@ -701,6 +729,7 @@ mod tests {
                 source: "local".to_string(),
                 url: Some("https://local/repo".to_string()),
                 registry_url: None,
+                commit_hash: String::new(),
                 skills: vec![CachedSkill {
                     name: "vue".to_string(),
                     path: "skills/vue/SKILL.md".to_string(),
@@ -715,6 +744,7 @@ mod tests {
                 source: "other".to_string(),
                 url: Some("https://other/repo".to_string()),
                 registry_url: None,
+                commit_hash: String::new(),
                 skills: vec![
                     CachedSkill {
                         name: "vue".to_string(),
@@ -734,11 +764,7 @@ mod tests {
 
         let merged = merge_skills(local, central);
         // Different URL → keep all skills (including same-name "vue")
-        let central_src = merged
-            .sources
-            .iter()
-            .find(|s| s.source == "other")
-            .unwrap();
+        let central_src = merged.sources.iter().find(|s| s.source == "other").unwrap();
         assert_eq!(central_src.skills.len(), 2);
         assert_eq!(central_src.skills[0].name, "vue");
         assert_eq!(central_src.skills[1].name, "react");
@@ -752,6 +778,7 @@ mod tests {
                 source: "myrepo".to_string(),
                 url: Some("https://local/myrepo".to_string()),
                 registry_url: None,
+                commit_hash: String::new(),
                 skills: vec![CachedSkill {
                     name: "skill-a".to_string(),
                     path: "skills/skill-a/SKILL.md".to_string(),
@@ -766,6 +793,7 @@ mod tests {
                 source: "myrepo".to_string(),
                 url: Some("https://central/myrepo".to_string()),
                 registry_url: None,
+                commit_hash: String::new(),
                 skills: vec![
                     CachedSkill {
                         name: "skill-a".to_string(),

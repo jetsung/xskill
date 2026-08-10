@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::git;
-use crate::lock::{LockFile, LockEntry};
+use crate::lock::{LockEntry, LockFile};
 use crate::skill_meta::SkillMeta;
 use crate::utils::validate_agent;
 use anyhow::{Context, Result};
@@ -11,9 +11,8 @@ use std::path::{Path, PathBuf};
 
 /// Extract skill directory name from skillPath (e.g. "skills/vue/SKILL.md" -> "vue")
 fn extract_skill_name(skill_path: &str) -> String {
-    skill_path
-        .replace("/SKILL.md", "")
-        .replace("skills/", "")
+    // Extract directory path from skillPath (e.g., "skills/name/SKILL.md" -> "skills/name")
+    skill_path.replace("/SKILL.md", "")
 }
 
 /// Get project-level .agents/skills directory
@@ -64,10 +63,12 @@ fn resolve_restore_target(global: bool, agent: Option<&str>) -> Result<Vec<PathB
                 // agents_compat 平台直接读取规范目录，无需 restore symlink
                 return Ok(targets);
             }
-            let skills_dir = platform.skills_dir_with_base(&base_dir)
-                .ok_or_else(|| anyhow::anyhow!(
-                    "Platform {} has no skills directory configured", agent_value
-                ))?;
+            let skills_dir = platform.skills_dir_with_base(&base_dir).ok_or_else(|| {
+                    anyhow::anyhow!(
+                        "Platform {} has no skills directory configured",
+                        agent_value
+                    )
+                })?;
             targets.push(skills_dir);
         }
     } else if global {
@@ -104,8 +105,8 @@ pub fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
     fs::create_dir_all(dst)
         .with_context(|| format!("Failed to create directory: {}", dst.display()))?;
 
-    for entry in fs::read_dir(src)
-        .with_context(|| format!("Failed to read directory: {}", src.display()))?
+    for entry in
+        fs::read_dir(src).with_context(|| format!("Failed to read directory: {}", src.display()))?
     {
         let entry = entry?;
         let src_path = entry.path();
@@ -139,12 +140,16 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
         println!();
 
         // Calculate column widths
-        let name_w = lock_file.skills.keys()
+        let name_w = lock_file
+            .skills
+            .keys()
             .map(|k| k.len())
             .max()
             .unwrap_or(4)
             .max(4); // "NAME"
-        let source_w = lock_file.skills.values()
+        let source_w = lock_file
+            .skills
+            .values()
             .map(|e| e.source_url.len())
             .max()
             .unwrap_or(6)
@@ -155,13 +160,23 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
 
         // Header
         if use_color {
-            println!("{:<name_w$}  {:<source_w$}  {}",
-                "NAME".blue(), "SOURCE".blue(), "TARGET".blue(),
-                name_w = name_w, source_w = source_w);
+            println!(
+                "{:<name_w$}  {:<source_w$}  {}",
+                "NAME".blue(),
+                "SOURCE".blue(),
+                "TARGET".blue(),
+                name_w = name_w,
+                source_w = source_w
+            );
         } else {
-            println!("{:<name_w$}  {:<source_w$}  {}",
-                "NAME", "SOURCE", "TARGET",
-                name_w = name_w, source_w = source_w);
+            println!(
+                "{:<name_w$}  {:<source_w$}  {}",
+                "NAME",
+                "SOURCE",
+                "TARGET",
+                name_w = name_w,
+                source_w = source_w
+            );
         }
 
         for (skill_name, entry) in &lock_file.skills {
@@ -169,18 +184,33 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
             for target_dir in &targets {
                 let dest_dir = target_dir.join(skill_name);
                 if first {
-                    println!("{:<name_w$}  {:<source_w$}  {}",
-                        skill_name, entry.source_url, dest_dir.display(),
-                        name_w = name_w, source_w = source_w);
+                    println!(
+                        "{:<name_w$}  {:<source_w$}  {}",
+                        skill_name,
+                        entry.source_url,
+                        dest_dir.display(),
+                        name_w = name_w,
+                        source_w = source_w
+                    );
                     first = false;
                 } else if use_color {
-                    println!("{:<name_w$}  {:<source_w$}  {}",
-                        "", "", dest_dir.display().to_string().bright_black(),
-                        name_w = name_w, source_w = source_w);
+                    println!(
+                        "{:<name_w$}  {:<source_w$}  {}",
+                        "",
+                        "",
+                        dest_dir.display().to_string().bright_black(),
+                        name_w = name_w,
+                        source_w = source_w
+                    );
                 } else {
-                    println!("{:<name_w$}  {:<source_w$}  {}",
-                        "", "", dest_dir.display(),
-                        name_w = name_w, source_w = source_w);
+                    println!(
+                        "{:<name_w$}  {:<source_w$}  {}",
+                        "",
+                        "",
+                        dest_dir.display(),
+                        name_w = name_w,
+                        source_w = source_w
+                    );
                 }
             }
         }
@@ -199,7 +229,10 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
     // Group skills by source_url to clone each repo only once
     let mut groups: HashMap<String, Vec<(&String, &LockEntry)>> = HashMap::new();
     for (skill_name, entry) in &lock_file.skills {
-        groups.entry(entry.source_url.clone()).or_default().push((skill_name, entry));
+        groups
+            .entry(entry.source_url.clone())
+            .or_default()
+            .push((skill_name, entry));
     }
 
     let mut success_count = 0;
@@ -219,22 +252,32 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
             }
         };
 
-        let skills_dir = tmp_dir.path().join("skills");
-
         for (skill_name, entry) in skills {
-            let skill_dir_name = extract_skill_name(&entry.skill_path);
-            let source_dir = skills_dir.join(&skill_dir_name);
+            let skill_dir_path = extract_skill_name(&entry.skill_path);
+            let source_dir = tmp_dir.path().join(&skill_dir_path);
 
             if !source_dir.exists() {
-                println!("  {}: {}", skill_name, "skill directory not found in repo".red());
+                println!(
+                    "  {}: {}",
+                    skill_name,
+                    "skill directory not found in repo".red()
+                );
                 fail_count += 1;
                 continue;
             }
 
             // Read skill metadata from clone
             let meta = SkillMeta::from_file(&source_dir).unwrap_or_default();
-            println!("  {}: {}", "Name".cyan().bold(), meta.display_name(skill_name).yellow());
-            println!("  {}: {}", "Description".cyan().bold(), meta.display_description());
+            println!(
+                "  {}: {}",
+                "Name".cyan().bold(),
+                meta.display_name(skill_name).yellow()
+            );
+            println!(
+                "  {}: {}",
+                "Description".cyan().bold(),
+                meta.display_description()
+            );
             if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
                 if !version.is_empty() {
                     println!("  {}: {}", "Version".cyan().bold(), version);
@@ -242,17 +285,24 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
             }
 
             // Get skill_folder_hash from the shared clone
-            let skill_folder_hash = git::get_skill_folder_hash(tmp_dir.path(), skill_name)
-                .unwrap_or_default();
+            let skill_folder_hash =
+                git::get_skill_folder_hash(tmp_dir.path(), &skill_dir_path).unwrap_or_default();
 
             // Copy to each target directory
             let mut any_target_ok = false;
             for target_dir in &targets {
                 let dest_dir = target_dir.join(skill_name);
                 match copy_skill_to_dest(&source_dir, &dest_dir) {
-                    Ok(_) => { any_target_ok = true; }
+                    Ok(_) => {
+                        any_target_ok = true;
+                    }
                     Err(e) => {
-                        println!("  {} for {}: {}", "Copy failed".red(), dest_dir.display(), e);
+                        println!(
+                            "  {} for {}: {}",
+                            "Copy failed".red(),
+                            dest_dir.display(),
+                            e
+                        );
                     }
                 }
             }
@@ -290,7 +340,12 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
         updated_lock.save(lock_is_global)?;
     }
 
-    println!("{}: {} succeeded, {} failed", "Restore complete".green(), format!("{}", success_count).green(), format!("{}", fail_count).red());
+    println!(
+        "{}: {} succeeded, {} failed",
+        "Restore complete".green(),
+        format!("{}", success_count).green(),
+        format!("{}", fail_count).red()
+    );
 
     Ok(())
 }
@@ -333,10 +388,17 @@ mod tests {
 
     #[test]
     fn test_extract_skill_name() {
-        assert_eq!(extract_skill_name("skills/vue/SKILL.md"), "vue");
-        assert_eq!(extract_skill_name("skills/react/SKILL.md"), "react");
-        assert_eq!(extract_skill_name("skills/my-plugin/SKILL.md"), "my-plugin");
-        assert_eq!(extract_skill_name("skills/antfu-design/SKILL.md"), "antfu-design");
+        assert_eq!(extract_skill_name("skills/vue/SKILL.md"), "skills/vue");
+        assert_eq!(extract_skill_name("skills/react/SKILL.md"), "skills/react");
+        assert_eq!(
+            extract_skill_name("skills/my-plugin/SKILL.md"),
+            "skills/my-plugin"
+        );
+        assert_eq!(
+            extract_skill_name("skills/antfu-design/SKILL.md"),
+            "skills/antfu-design"
+        );
+        assert_eq!(extract_skill_name("vue/SKILL.md"), "vue");
     }
 
     #[test]
@@ -379,7 +441,10 @@ mod tests {
         // Verify
         assert!(dest_dir.join("SKILL.md").exists());
         assert!(dest_dir.join("README.md").exists());
-        assert_eq!(fs::read_to_string(dest_dir.join("SKILL.md")).unwrap(), "# Vue Skill");
+        assert_eq!(
+            fs::read_to_string(dest_dir.join("SKILL.md")).unwrap(),
+            "# Vue Skill"
+        );
     }
 
     #[test]
@@ -413,55 +478,68 @@ mod tests {
 
         copy_skill_to_dest(&src_dir, &dest_dir).unwrap();
 
-        assert_eq!(fs::read_to_string(dest_dir.join("SKILL.md")).unwrap(), "new content");
+        assert_eq!(
+            fs::read_to_string(dest_dir.join("SKILL.md")).unwrap(),
+            "new content"
+        );
         assert!(!dest_dir.join("old-file.txt").exists());
     }
 
     #[test]
     fn test_copy_skill_to_dest_missing_source() {
         let dst = tempfile::tempdir().unwrap();
-        let result = copy_skill_to_dest(
-            &PathBuf::from("/nonexistent/path"),
-            &dst.path().join("vue"),
-        );
+        let result =
+            copy_skill_to_dest(&PathBuf::from("/nonexistent/path"), &dst.path().join("vue"));
         assert!(result.is_err());
     }
 
     #[test]
     fn test_group_skills_by_source_url() {
         let mut lock = LockFile::default();
-        lock.upsert_skill("vue", LockEntry {
-            source: "antfu".to_string(),
-            source_type: "git".to_string(),
-            source_url: "https://github.com/antfu/skills.git".to_string(),
-            skill_path: "skills/vue/SKILL.md".to_string(),
-            skill_folder_hash: "abc".to_string(),
-            installed_at: "2026-07-17T00:00:00.000Z".to_string(),
-            updated_at: "2026-07-17T00:00:00.000Z".to_string(),
-        });
-        lock.upsert_skill("react", LockEntry {
-            source: "antfu".to_string(),
-            source_type: "git".to_string(),
-            source_url: "https://github.com/antfu/skills.git".to_string(),
-            skill_path: "skills/react/SKILL.md".to_string(),
-            skill_folder_hash: "def".to_string(),
-            installed_at: "2026-07-17T00:00:00.000Z".to_string(),
-            updated_at: "2026-07-17T00:00:00.000Z".to_string(),
-        });
-        lock.upsert_skill("tdd", LockEntry {
-            source: "mattpocock".to_string(),
-            source_type: "git".to_string(),
-            source_url: "https://github.com/mattpocock/skills.git".to_string(),
-            skill_path: "skills/tdd/SKILL.md".to_string(),
-            skill_folder_hash: "ghi".to_string(),
-            installed_at: "2026-07-17T00:00:00.000Z".to_string(),
-            updated_at: "2026-07-17T00:00:00.000Z".to_string(),
-        });
+        lock.upsert_skill(
+            "vue",
+            LockEntry {
+                source: "antfu".to_string(),
+                source_type: "git".to_string(),
+                source_url: "https://github.com/antfu/skills.git".to_string(),
+                skill_path: "skills/vue/SKILL.md".to_string(),
+                skill_folder_hash: "abc".to_string(),
+                installed_at: "2026-07-17T00:00:00.000Z".to_string(),
+                updated_at: "2026-07-17T00:00:00.000Z".to_string(),
+            },
+        );
+        lock.upsert_skill(
+            "react",
+            LockEntry {
+                source: "antfu".to_string(),
+                source_type: "git".to_string(),
+                source_url: "https://github.com/antfu/skills.git".to_string(),
+                skill_path: "skills/react/SKILL.md".to_string(),
+                skill_folder_hash: "def".to_string(),
+                installed_at: "2026-07-17T00:00:00.000Z".to_string(),
+                updated_at: "2026-07-17T00:00:00.000Z".to_string(),
+            },
+        );
+        lock.upsert_skill(
+            "tdd",
+            LockEntry {
+                source: "mattpocock".to_string(),
+                source_type: "git".to_string(),
+                source_url: "https://github.com/mattpocock/skills.git".to_string(),
+                skill_path: "skills/tdd/SKILL.md".to_string(),
+                skill_folder_hash: "ghi".to_string(),
+                installed_at: "2026-07-17T00:00:00.000Z".to_string(),
+                updated_at: "2026-07-17T00:00:00.000Z".to_string(),
+            },
+        );
 
         // Group by source_url
         let mut groups: HashMap<String, Vec<(&String, &LockEntry)>> = HashMap::new();
         for (skill_name, entry) in &lock.skills {
-            groups.entry(entry.source_url.clone()).or_default().push((skill_name, entry));
+            groups
+                .entry(entry.source_url.clone())
+                .or_default()
+                .push((skill_name, entry));
         }
 
         assert_eq!(groups.len(), 2);
@@ -473,15 +551,18 @@ mod tests {
     fn test_installed_at_preservation() {
         let mut target_lock = LockFile::default();
         // Simulate existing entry in target lock with original installed_at
-        target_lock.upsert_skill("vue", LockEntry {
-            source: "antfu".to_string(),
-            source_type: "git".to_string(),
-            source_url: "https://github.com/antfu/skills.git".to_string(),
-            skill_path: "skills/vue/SKILL.md".to_string(),
-            skill_folder_hash: "old_hash".to_string(),
-            installed_at: "2026-07-10T00:00:00.000Z".to_string(),
-            updated_at: "2026-07-10T00:00:00.000Z".to_string(),
-        });
+        target_lock.upsert_skill(
+            "vue",
+            LockEntry {
+                source: "antfu".to_string(),
+                source_type: "git".to_string(),
+                source_url: "https://github.com/antfu/skills.git".to_string(),
+                skill_path: "skills/vue/SKILL.md".to_string(),
+                skill_folder_hash: "old_hash".to_string(),
+                installed_at: "2026-07-10T00:00:00.000Z".to_string(),
+                updated_at: "2026-07-10T00:00:00.000Z".to_string(),
+            },
+        );
 
         // Source entry from project lock
         let source_entry = LockEntry {

@@ -12,6 +12,7 @@
 - **批量操作** — 使用 `--all` 标志安装/移除所有技能
 - **缓存支持** — 可选本地缓存，支持离线技能查询
 - **交互式 TUI** — 通过 `find` 命令多选批量安装技能
+- **调试模式** — 使用 `-v` / `--verbose` 标志调试安装问题
 
 ## 安装
 
@@ -98,14 +99,17 @@ xskill link -s vue -a claude
 
 # 移除技能
 xskill remove -s vue
+
+# 调试模式（显示 git 命令详情）
+xskill -v add -f my-skills -s vue
 ```
 
 ## 命令
 
 | 命令 | 说明 |
 |------|------|
-| `sources` | 管理配置源（list/add/remove/edit） |
-| `platforms` | 列出配置平台 |
+| `sources` | 管理配置源（list/add/remove/rename） |
+| `platforms` | 管理配置平台（list/reset） |
 | `add` | 安装技能 |
 | `link` | 将已有技能软链接到指定平台 |
 | `remove` | 移除技能 |
@@ -134,8 +138,9 @@ xskill remove -s vue
     { "name": "antfu", "type": "git", "url": "https://github.com/antfu/skills" }
   ],
   "recommended": [{ "name": "antfu", "skills": ["vue"] }],
-  "cache": { "enabled": true, "ttl": 600 },
-  "registry": { "enabled": false, "url": "https://xskill.gcli.cn/skills.json" }
+  "cache": { "enabled": true, "ttl": 86400 },
+  "registry": { "enabled": false, "url": "https://xskill.gcli.cn/skills.json" },
+  "proxy": ""
 }
 ```
 

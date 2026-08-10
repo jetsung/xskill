@@ -8,7 +8,7 @@
 - **平台管理**：一条命令将技能安装到多个 AI 编程平台（Claude、Codex 等）
 - **锁文件追踪**：通过 `.xskill-lock.json` 追踪已安装技能，确保可复现安装
 - **全局配置**：单一全局配置文件 `~/.xskill/settings.json`，支持 `XSKILL_CONFIG` 环境变量覆盖
-- **递归搜索**：自动发现仓库中嵌套目录结构下的技能
+- **递归搜索**：自动发现仓库中嵌套目录结构下的技能。优先扫描 `skills/` 子目录，若不存在则回退到项目根目录扫描。以 `.` 开头的目录（如 `.git`、`.agents`）会被排除。
 - **批量操作**：使用 `--all` 标志或 `*` 通配符安装或移除所有技能
 - **缓存支持**：可选的本地缓存，实现无网络访问的快速技能查询
 - **交互式 TUI**：通过 `find` 命令模糊搜索并交互式安装技能
@@ -85,6 +85,13 @@ cargo install --path .
 xskill sources add -n my-skills -u https://github.com/example/skills
 ```
 
+或让名称从 URL 自动提取：
+
+```bash
+xskill sources add -u https://github.com/user/repo.git
+# 名称自动设为 "user/repo"
+```
+
 ### 2. 查询可用技能
 
 列出源中的技能：
@@ -125,11 +132,31 @@ xskill list
 xskill remove -s vue
 ```
 
+## 全局选项
+
+以下选项可在任何子命令之前使用：
+
+| 选项 | 说明 |
+|------|------|
+| `-v, --verbose` | 显示详细输出，包括 git 命令的 stderr。用于调试安装问题。 |
+| `-h, --help` | 显示帮助信息 |
+| `-V, --version` | 显示版本信息 |
+
+示例：
+
+```bash
+# 调试模式 — 查看 git clone 详情
+xskill -v add -f my-skills -s vue
+
+# 调试模式 + 全局安装
+xskill -v add -f my-skills -s vue -g
+```
+
 ## 命令
 
 ### `sources` — 管理配置源
 
-列出、添加、移除或编辑配置中的技能源。
+列出、添加、移除或重命名配置中的技能源。
 
 #### `sources list`
 
@@ -143,8 +170,8 @@ xskill sources list
 
 输出格式：
 ```
-NAME   TYPE URL
-antfu  git  https://github.com/antfu/skills
+#  NAME   TYPE URL
+1  antfu  git  https://github.com/antfu/skills
 ```
 
 #### `sources add`
@@ -156,54 +183,78 @@ xskill sources add -n <name> -u <url> [-t git|api]
 ```
 
 选项：
-- `-n, --name` — 源名称（可选，仅允许字母数字、`-` 和 `_`；留空时自动使用 URL 作为名称）
+- `-n, --name` — 源名称（可选，仅允许字母数字、`-`、`_` 和 `/`，支持 `user/repo` 格式；未指定时自动从 URL 提取路径作为默认名称，如 `https://github.com/user/repo.git` → `user/repo`）
 - `-u, --url` — 源地址（必填，须以 `http://` 或 `https://` 开头）
 - `-t, --type` — 源类型：`git` 或 `api`（默认：`git`）
 
+示例：
+
+```bash
+# 显式指定名称
+xskill sources add -n my-skills -u https://github.com/example/skills
+
+# 名称自动提取为 "user/repo"
+xskill sources add -u https://github.com/user/repo.git
+
+# 斜杠分隔的名称
+xskill sources add -n org/team/repo -u https://gitlab.com/org/team/repo
+```
+
 #### `sources remove`
 
-按名称和/或 URL 移除源：
+按名称、URL 或索引移除源：
 
 ```bash
 xskill sources remove -n <name>
 xskill sources remove -u <url>
 xskill sources remove -n <name> -u <url>
+xskill sources remove -i <index>
 ```
 
 选项：
 - `-n, --name` — 要移除的源名称（可选）
 - `-u, --url` — 要移除的源地址（可选）
+- `-i, --index` — 源索引，来自 `sources list` 的 `#` 列（可选，从 1 开始）
 
-至少需指定 `--name` 或 `--url` 之一。同时指定时两者都匹配才删除。
+优先级：`--name`/`--url` > `--index`。至少需指定 `--name`、`--url` 或 `--index` 之一。同时指定 `--name` 和 `--url` 时两者都匹配才删除。
 
-#### `sources edit`
+#### `sources rename`
 
 重命名已有源（仅允许修改名称，`url` 和 `type` 不可变更）：
 
 ```bash
-xskill sources edit -n <name> -N <new-name>
+xskill sources rename -n <name> -N <new-name>
+xskill sources rename -i <index> -N <new-name>
 ```
 
 选项：
 - `-n, --name` — 当前源名称（或使用 `-u` 按 URL 匹配）
 - `-u, --url` — 当前源地址（替代标识符）
+- `-i, --index` — 源索引，来自 `sources list` 的 `#` 列（可选，从 1 开始）
 - `-N, --new-name` — 新名称（必填，传空字符串清空名称）
 
-### `platforms` — 列出配置平台
+优先级：`--name`/`--url` > `--index`。至少需指定 `--name`、`--url` 或 `--index` 之一。
+
+### `platforms` — 管理配置平台
 
 列出所有已配置的 AI 编程平台（按字母排序）：
 
 ```bash
-xskill platforms
+xskill platforms list
 ```
+
+裸命令 `xskill platforms` 等同于 `xskill platforms list`。
 
 显示详细平台信息：
 
 ```bash
-xskill platforms -a
+xskill platforms list -a
 ```
 
-详细输出包含每个平台的路径、技能目录、代理文件、源文件和 agents 兼容性（`COMPAT`）信息。`agents_compat: true` 的平台在 COMPAT 列显示 `✓`，表示可复用项目级 `.agents/` 资源。
+选项：
+- `-a, --all` — 显示详细信息（路径、技能目录、代理文件、源文件和 agents 兼容性）
+
+默认输出显示名称、路径和 agents 兼容性（`COMPAT`）。详细输出额外显示技能目录、代理文件和源文件。兼容平台（`agents_compat: true`）会在 `add`、`link` 等命令的交互式目标平台选择器中自动预选。
 
 ### `add` — 安装技能
 
@@ -241,8 +292,9 @@ xskill add [OPTIONS] --from <SOURCE> --skill <SKILL>
 
 #### 输出样式
 
-标签（`Name`、`Description`、`Version`）使用 cyan bold 显示。`Name` 值使用黄色显示。`Description` 或 `Version` 为空时不显示该行。
+标签（`Name`、`Description`、`Version`、`Path`）使用 cyan bold 显示。`Name` 值使用黄色显示。`Description` 或 `Version` 为空时不显示该行。
 
+- `Path`（cyan bold）：技能在仓库中的完整路径（如 `skills/vue/SKILL.md`）。
 - `Installed`（green）：规范目录路径。
 - `Symlinked`（green）：平台目录路径（不显示箭头和目标，因 `Installed` 行已展示规范目录）。
 - `Source`（cyan bold）：`Source: <name> (<url>)`。
@@ -426,9 +478,9 @@ xskill list [OPTIONS]
 
 选项：
 - `-g, --global` — 列出全局技能
-- `-a, --agent <AGENT>` — 按平台名称筛选
+- `-a, --agent <AGENT>` — 只列出指定平台实际可用的技能；`agents_compat` 平台合并列出规范目录与其自身 skills 目录下的技能；不支持 `*`
 
-输出格式：
+输出格式（不带 `-a`）：
 ```
 Project Skills
 
@@ -436,9 +488,18 @@ vue     ~/.agents/skills/vue     Agents: codebuddy, gemini
 react   ~/.agents/skills/react   Agents: codebuddy
 ```
 
+指定 `-a <agent>` 时（例如 `-a claude`，仅列出该平台实际可用的技能，无 `Agents:` 列）：
+```
+Project Skills
+
+vue     ~/.claude/skills/vue
+react   ~/.claude/skills/react
+```
+
 - 技能名称显示为黄色，路径显示为暗灰色（使用 `~/` 前缀替代 home 目录）。
-- `Agents:` 前缀为黑灰色，平台名为默认白色。
-- 使用 `-a <agent>` 过滤时，未链接到指定平台的技能显示 `Agents: not symlinked`（`Agents:` 黑灰色，`not symlinked` 黄色）。
+- `Agents:` 前缀为黑灰色，平台名为默认白色（仅不带 `-a` 时显示）。
+- `agents_compat` 平台（如 atomcode）合并列出规范目录（`.agents/skills`）与其自身 skills 目录下的技能，同名技能仅显示一次（规范目录优先）。
+- `-a '*'` 不受支持：不加 `-a` 即为列出全部技能。
 - 按路径字母顺序排序。
 
 ### `query` — 查询源中的技能
@@ -476,7 +537,7 @@ xskill find [OPTIONS]
 
 1. **选择技能** — 多选子串搜索（exact 模式）。显示格式：`name [source]`（注册中心条目显示 `name [registry] [source]`）。非选中行技能名称使用默认色，选中行使用蓝色。source 标签始终暗灰色；`[registry]` 标签选中时变为绿色。搜索框在底部，列表向上排列。快捷键提示：`TAB: multi-select | enter confirm | esc cancel`。按 TAB 多选技能，Enter 确认。未 TAB 选中时直接 Enter，使用光标所在项。
 2. **选择目标平台** — TUI 多选。首项为 `Default`（不可选中，表示不创建平台符号链接）。`agents_compat` 平台不在可选列表中，以 `SELECTED: <platform1>, <platform2>, ...` 形式显示在 header 中。后续为非兼容的配置平台。按 TAB 选择/取消选择，Enter 确认。选中行使用蓝色文字和深色背景高亮。
-3. **安装** — 按 source URL 分组，每组仅 clone 一次仓库。从 `CachedSkill.path` 提取正确安装路径（支持嵌套路径，如 `skills/engineering/grill/SKILL.md`）。安装到规范目录（`.agents/skills/<name>` 或 `-g` 时 `~/.agents/skills/<name>`），然后为每个选中的平台创建相对符号链接。输出 `Installed:`、`Symlinked:` 和失败的平台（如有）。各技能输出之间以空行分隔。注册中心的技能直接使用 URL 克隆，不依赖本地 `sources` 配置。
+3. **安装** — 按 source URL 分组，每组仅 clone 一次仓库。从 `CachedSkill.path` 提取正确安装路径（支持嵌套路径，如 `skills/engineering/grill/SKILL.md`，或根目录级别的 `my-skill/SKILL.md`）。安装到规范目录（`.agents/skills/<name>` 或 `-g` 时 `~/.agents/skills/<name>`），然后为每个选中的平台创建相对符号链接。输出 `Installed:`、`Symlinked:` 和失败的平台（如有）。各技能输出之间以空行分隔。注册中心的技能直接使用 URL 克隆，不依赖本地 `sources` 配置。
 
 任意步骤按 Esc 或 Ctrl-C 取消。
 
@@ -684,6 +745,12 @@ xskill new --name <name> [--description <desc>] [--template <template>]
       "skills": "skills",
       "agents": "AGENTS.md",
       "agents_compat": true
+    },
+    "pi": {
+      "path": ".pi/agent",
+      "skills": "skills",
+      "agents": "AGENTS.md",
+      "agents_compat": true
     }
   },
   "sources": [
@@ -726,7 +793,7 @@ xskill new --name <name> [--description <desc>] [--template <template>]
 | `skills` | 否 | — | 技能子目录名（相对于 `path`），省略则跳过技能安装 |
 | `agents` | 否 | — | 代理配置文件名（相对于 `path`），省略则跳过代理安装 |
 | `source` | 否 | `"AGENTS.md"` | 固定 `.agents/` 目录下的源文件名 |
-| `agents_compat` | 否 | `false` | 是否兼容 `.agents/` 资源。为 `true` 时直接读取规范目录 — add/remove/link/restore 跳过 symlink（单平台输出 `Skipped`，`-a '*'` 静默）。find TUI 正常列出，安装时静默跳过 symlink。list `-a` 显示所有规范目录 skill。 |
+| `agents_compat` | 否 | `false` | 是否兼容 `.agents/` 资源。为 `true` 时直接读取规范目录 — add/remove/link/restore 跳过 symlink（单平台输出 `Skipped`，`-a '*'` 静默）。find TUI 正常列出，安装时静默跳过 symlink。list `-a` 时合并列出规范目录与平台自身 skills 目录下的 skill（同名去重、规范目录优先）。 |
 
 #### 符号链接行为
 
@@ -752,7 +819,7 @@ xskill new --name <name> [--description <desc>] [--template <template>]
 
 | 字段 | 必填 | 默认值 | 说明 |
 |------|------|--------|------|
-| `name` | 否 | — | 唯一标识符（字母数字、`-`、`_`）；留空或无效时自动使用 URL 作为名称 |
+| `name` | 否 | — | 唯一标识符（字母数字、`-`、`_`、`/`），支持 `user/repo` 格式；留空或无效时自动使用 URL 作为名称 |
 | `type` | 否 | `"git"` | 源类型：`git` 或 `api` |
 | `url` | 是 | — | 仓库 URL（须以 `http://` 或 `https://` 开头） |
 
@@ -901,6 +968,15 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
       "skill_folder_hash": "abc123...",
       "installed_at": "2026-07-15T18:16:42.852Z",
       "updated_at": "2026-07-15T18:16:42.852Z"
+    },
+    "my-skill": {
+      "source": "custom",
+      "source_type": "git",
+      "source_url": "https://github.com/user/my-skill.git",
+      "skill_path": "my-skill/SKILL.md",
+      "skill_folder_hash": "def456...",
+      "installed_at": "2026-07-25T10:00:00.000Z",
+      "updated_at": "2026-07-25T10:00:00.000Z"
     }
   },
   "updated_at": "2026-07-15T18:16:42.852Z"
@@ -914,7 +990,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 | `source` | 配置中的源名称 |
 | `source_type` | 源类型（`git`） |
 | `source_url` | 完整仓库 URL |
-| `skill_path` | 仓库中 `SKILL.md` 的相对路径 |
+| `skill_path` | 仓库中 `SKILL.md` 的相对路径（如 `skills/vue/SKILL.md` 或根目录级别的 `my-skill/SKILL.md`） |
 | `skill_folder_hash` | 技能目录的 Git 树哈希，用于变更检测 |
 | `installed_at` | 首次安装的 ISO 8601 时间戳（`YYYY-MM-DDTHH:MM:SS.sssZ`） |
 | `updated_at` | 该技能最后更新的 ISO 8601 时间戳（`YYYY-MM-DDTHH:MM:SS.sssZ`） |
@@ -963,7 +1039,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 | 字段 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
-| `name` | `string` | 否 | `""` | 唯一标识符。正则：`^[a-zA-Z0-9_-]+$`。留空或无效时自动使用 `url` 作为名称 |
+| `name` | `string` | 否 | `""` | 唯一标识符。正则：`^[a-zA-Z0-9_/-]+$`（支持 `user/repo` 格式）。留空或无效时自动使用 `url` 作为名称 |
 | `type` | `string` | 否 | `"git"` | 源类型。枚举：`"git"`、`"api"` |
 | `url` | `string` | 是 | — | 源仓库 URL。须以 `http://` 或 `https://` 开头 |
 
@@ -1006,6 +1082,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 |------|------|------|------|
 | `source` | `string` | 是 | 源名称（如 `org/repo`） |
 | `url` | `string` | 是 | 源仓库 URL |
+| `commit_hash` | `string` | 否 | 同步时源仓库的最新 commit hash（SHA） |
 | `skills` | `SkillEntry[]` | 是 | 该源下可用的技能 |
 
 **SkillEntry**（`sources[].skills[]`）：
@@ -1013,7 +1090,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 | 字段 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
 | `name` | `string` | 是 | — | 技能名称 |
-| `path` | `string` | 是 | — | `SKILL.md` 相对于仓库根目录的路径 |
+| `path` | `string` | 是 | — | `SKILL.md` 相对于仓库根目录的路径（如 `skills/vue/SKILL.md` 或根目录级别的 `my-skill/SKILL.md`） |
 | `description` | `string` | 否 | `""` | 技能描述 |
 | `version` | `string` | 否 | `""` | 技能版本 |
 

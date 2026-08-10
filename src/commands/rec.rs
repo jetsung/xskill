@@ -13,36 +13,40 @@ pub fn run() -> Result<()> {
     }
 
     let headers = &["SOURCE", "NAME", "URL", "SKILLS"];
-    let rows: Vec<Vec<String>> = config.recommended.iter().map(|item| {
-        let found_source = if !item.name.is_empty() {
-            config.get_source(&item.name)
-        } else {
-            None
-        };
-
-        let (display_url, is_valid) = if let Some(source) = found_source {
-            if item.url.is_empty() {
-                (source.url.clone(), true)
-            } else if item.url == source.url {
-                (item.url.clone(), true)
+    let rows: Vec<Vec<String>> = config
+        .recommended
+        .iter()
+        .map(|item| {
+            let found_source = if !item.name.is_empty() {
+                config.get_source(&item.name)
             } else {
+                None
+            };
+
+            let (display_url, is_valid) = if let Some(source) = found_source {
+                if item.url.is_empty() {
+                    (source.url.clone(), true)
+                } else if item.url == source.url {
+                    (item.url.clone(), true)
+                } else {
+                    (format!("{}", "invalid".red()), false)
+                }
+            } else if item.url.is_empty() {
                 (format!("{}", "invalid".red()), false)
-            }
-        } else if item.url.is_empty() {
-            (format!("{}", "invalid".red()), false)
-        } else {
-            (item.url.clone(), false)
-        };
+            } else {
+                (item.url.clone(), false)
+            };
 
-        let source_col = if is_valid { "true" } else { "false" }.to_string();
+            let source_col = if is_valid { "true" } else { "false" }.to_string();
 
-        vec![
-            source_col,
-            item.name.clone(),
-            display_url,
-            item.skills.join(", "),
-        ]
-    }).collect();
+            vec![
+                source_col,
+                item.name.clone(),
+                display_url,
+                item.skills.join(", "),
+            ]
+        })
+        .collect();
     print_table(headers, &rows);
 
     Ok(())
@@ -109,7 +113,8 @@ pub fn run_add(name: Option<&str>, url: Option<&str>, skills: &str) -> Result<()
 
             // Validate name exists in sources
             if config.get_source(name).is_none() {
-                let existing: Vec<String> = config.sources.iter().map(|s| s.effective_name()).collect();
+                let existing: Vec<String> =
+                    config.sources.iter().map(|s| s.effective_name()).collect();
                 anyhow::bail!(
                     "Source '{}' not found in sources. Available: {}",
                     name,
@@ -137,11 +142,7 @@ pub fn run_add(name: Option<&str>, url: Option<&str>, skills: &str) -> Result<()
     };
 
     // Check if recommended entry already exists
-    if let Some(idx) = config
-        .recommended
-        .iter()
-        .position(|r| r.name == entry_name)
-    {
+    if let Some(idx) = config.recommended.iter().position(|r| r.name == entry_name) {
         // Entry exists, append new skills (avoid duplicates)
         let existing_skills = &mut config.recommended[idx].skills;
         let mut added_count = 0;
@@ -153,7 +154,11 @@ pub fn run_add(name: Option<&str>, url: Option<&str>, skills: &str) -> Result<()
         }
 
         if added_count == 0 {
-            println!("{} already exist in '{}'.", "All skills".yellow(), entry_name);
+            println!(
+                "{} already exist in '{}'.",
+                "All skills".yellow(),
+                entry_name
+            );
         } else {
             println!(
                 "{} {} skill(s) to '{}'. Total: {}",
@@ -170,7 +175,11 @@ pub fn run_add(name: Option<&str>, url: Option<&str>, skills: &str) -> Result<()
             url: entry_url,
             skills: skills_list,
         });
-        println!("{} '{}' added successfully.", "Recommended source".green(), entry_name);
+        println!(
+            "{} '{}' added successfully.",
+            "Recommended source".green(),
+            entry_name
+        );
     }
 
     config.save()?;
@@ -184,11 +193,7 @@ pub fn run_add(name: Option<&str>, url: Option<&str>, skills: &str) -> Result<()
 /// - When only name: delete entire entry with that name
 /// - When name and skills: delete specific skills from entry with that name
 /// - When url and skills: delete specific skills from entry with that url
-pub fn run_remove(
-    name: Option<&str>,
-    url: Option<&str>,
-    skills: Option<&str>,
-) -> Result<()> {
+pub fn run_remove(name: Option<&str>, url: Option<&str>, skills: Option<&str>) -> Result<()> {
     let mut config = Config::load()?;
 
     // Parse skills to remove
@@ -249,12 +254,21 @@ pub fn run_remove(
             config.recommended.remove(idx);
             println!("{}", "All skills removed, entry deleted.".green());
         } else {
-            println!("{} {} skill(s) from '{}'.", "Removed".green(), removed_count, entry.name);
+            println!(
+                "{} {} skill(s) from '{}'.",
+                "Removed".green(),
+                removed_count,
+                entry.name
+            );
         }
     } else {
         // Remove the entire entry
         let removed = config.recommended.remove(idx);
-        println!("{} '{}' removed successfully.", "Recommended source".green(), removed.name);
+        println!(
+            "{} '{}' removed successfully.",
+            "Recommended source".green(),
+            removed.name
+        );
     }
 
     config.save()?;

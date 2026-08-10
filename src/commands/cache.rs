@@ -22,7 +22,7 @@ pub fn run_update(from: Option<&str>) -> Result<()> {
     if let Some(src) = from {
         if is_url(src) && config.get_source(src).is_none() {
             let url = normalize_url(src);
-            let skills = collect_source_skills(&url, src)?;
+            let (skills, commit_hash) = collect_source_skills(&url, src)?;
             let count = skills.len();
             // Normalize URL: strip .git suffix for consistent source name
             let normalized = src.strip_suffix(".git").unwrap_or(src);
@@ -32,6 +32,7 @@ pub fn run_update(from: Option<&str>) -> Result<()> {
                     source: normalized.to_string(),
                     url: Some(url),
                     registry_url: None,
+                    commit_hash,
                     skills,
                 }],
             };
@@ -43,7 +44,10 @@ pub fn run_update(from: Option<&str>) -> Result<()> {
 
     if config.sources.is_empty() {
         if config.is_registry_enabled() {
-            println!("{}", "No local sources configured. Registry will be used for skill discovery.".yellow());
+            println!(
+                "{}",
+                "No local sources configured. Registry will be used for skill discovery.".yellow()
+            );
         } else {
             println!("{}", "No sources configured. Add sources with 'xskill sources add' or enable registry with 'xskill config --set registry.enabled=true'.".yellow());
         }
@@ -54,7 +58,11 @@ pub fn run_update(from: Option<&str>) -> Result<()> {
     let sources_to_update = if let Some(name) = from {
         let s = config.get_source(name).ok_or_else(|| {
             let existing: Vec<String> = config.sources.iter().map(|s| s.effective_name()).collect();
-            anyhow::anyhow!("Source '{}' not found.\nAvailable: {}", name, existing.join(", "))
+            anyhow::anyhow!(
+                "Source '{}' not found.\nAvailable: {}",
+                name,
+                existing.join(", ")
+            )
         })?;
         vec![s]
     } else {
@@ -71,7 +79,7 @@ pub fn run_update(from: Option<&str>) -> Result<()> {
     for source in &sources_to_update {
         let source_name = source.effective_name();
         match collect_source_skills(&source.url, &source_name) {
-            Ok(skills) => {
+            Ok((skills, commit_hash)) => {
                 let count = skills.len();
                 println!("{}: {} {}", source_name, count, "skills".cyan());
                 total_skills += count;
@@ -79,11 +87,13 @@ pub fn run_update(from: Option<&str>) -> Result<()> {
                 // Update or add source cache
                 if let Some(existing) = data.sources.iter_mut().find(|s| s.source == source_name) {
                     existing.skills = skills;
+                    existing.commit_hash = commit_hash;
                 } else {
                     data.sources.push(SourceCache {
                         source: source_name,
                         url: Some(source.url.clone()),
                         registry_url: None,
+                        commit_hash,
                         skills,
                     });
                 }
@@ -101,9 +111,20 @@ pub fn run_update(from: Option<&str>) -> Result<()> {
 
     println!();
     if failed > 0 {
-        println!("{}: {} sources, {} skills total ({} failed)", "Cache updated".green(), success, total_skills, format!("{} failed", failed).red());
+        println!(
+            "{}: {} sources, {} skills total ({} failed)",
+            "Cache updated".green(),
+            success,
+            total_skills,
+            format!("{} failed", failed).red()
+        );
     } else {
-        println!("{}: {} sources, {} skills total", "Cache updated".green(), success, total_skills);
+        println!(
+            "{}: {} sources, {} skills total",
+            "Cache updated".green(),
+            success,
+            total_skills
+        );
     }
     Ok(())
 }
@@ -121,14 +142,19 @@ pub fn run_clear(from: Option<&str>) -> Result<()> {
     if let Some(name) = from {
         // Remove specific source entry (normalize URL for comparison)
         let before = data.sources.len();
-        data.sources.retain(|s| strip_git_suffix(&s.source) != strip_git_suffix(name));
+        data.sources
+            .retain(|s| strip_git_suffix(&s.source) != strip_git_suffix(name));
         if data.sources.len() < before {
             data.updated_at = Utc::now().format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string();
             data.save()?;
             let url_cache_count = cache::clear_url_caches()?;
             println!("{} for '{}'", "Cache cleared".green(), name);
             if url_cache_count > 0 {
-                println!("{} {} URL cache files removed", "Cleaned".green(), url_cache_count);
+                println!(
+                    "{} {} URL cache files removed",
+                    "Cleaned".green(),
+                    url_cache_count
+                );
             }
         } else {
             println!("{} '{}' not found in cache", "Source".yellow(), name);
@@ -140,25 +166,37 @@ pub fn run_clear(from: Option<&str>) -> Result<()> {
         data.updated_at = Utc::now().format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string();
         data.save()?;
         let url_cache_count = cache::clear_url_caches()?;
-        println!("{}: {} sources cleared", "Cache cleared".green(), source_count);
+        println!(
+            "{}: {} sources cleared",
+            "Cache cleared".green(),
+            source_count
+        );
         if url_cache_count > 0 {
-            println!("{} {} URL cache files removed", "Cleaned".green(), url_cache_count);
+            println!(
+                "{} {} URL cache files removed",
+                "Cleaned".green(),
+                url_cache_count
+            );
         }
     }
     Ok(())
 }
 
-/// Collect skills from a single source
-fn collect_source_skills(url: &str, _source_name: &str) -> Result<Vec<CachedSkill>> {
+/// Collect skills from a single source, returning (skills, commit_hash)
+fn collect_source_skills(url: &str, _source_name: &str) -> Result<(Vec<CachedSkill>, String)> {
     let url = normalize_url(url);
     let tmp_dir = git::clone_for_listing(&url)?;
     let skills_dir = tmp_dir.path().join("skills");
 
-    if !skills_dir.exists() {
-        return Ok(vec![]);
-    }
+    let scan_dir = if skills_dir.exists() {
+        skills_dir.as_path()
+    } else {
+        tmp_dir.path()
+    };
 
-    collect_skills_from_repo(tmp_dir.path(), &skills_dir)
+    let commit_hash = git::get_latest_commit_hash(tmp_dir.path()).unwrap_or_default();
+    let skills = collect_skills_from_repo(tmp_dir.path(), scan_dir)?;
+    Ok((skills, commit_hash))
 }
 
 /// Recursively collect skills from a repo directory, parsing SKILL.md frontmatter
@@ -168,13 +206,9 @@ fn collect_skills_from_repo(repo_root: &Path, dir: &Path) -> Result<Vec<CachedSk
     Ok(skills)
 }
 
-fn collect_recursive(
-    repo_root: &Path,
-    dir: &Path,
-    skills: &mut Vec<CachedSkill>,
-) -> Result<()> {
-    for entry in fs::read_dir(dir)
-        .with_context(|| format!("Failed to read directory: {}", dir.display()))?
+fn collect_recursive(repo_root: &Path, dir: &Path, skills: &mut Vec<CachedSkill>) -> Result<()> {
+    for entry in
+        fs::read_dir(dir).with_context(|| format!("Failed to read directory: {}", dir.display()))?
     {
         let entry = entry?;
         let path = entry.path();
@@ -184,6 +218,11 @@ fn collect_recursive(
         }
 
         let dir_name = entry.file_name().to_string_lossy().to_string();
+        // Skip hidden directories (starting with '.')
+        if dir_name.starts_with('.') {
+            continue;
+        }
+
         let skill_md = path.join("SKILL.md");
 
         if skill_md.exists() {
@@ -196,7 +235,7 @@ fn collect_recursive(
 
             skills.push(CachedSkill {
                 name: meta.display_name(&dir_name),
-                path: full_rel,
+                path: format!("{}/SKILL.md", full_rel),
                 description: meta.display_description(),
                 version: meta.display_version(),
             });

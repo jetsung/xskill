@@ -8,11 +8,11 @@ use std::path::{Path, PathBuf};
 /// 内置注册中心默认 URL
 const DEFAULT_REGISTRY_URL: &str = "https://xskill.gcli.cn/skills.json";
 
-/// JSON Schema URL（用于 settings.json 的 $schema 字段）
-const CONFIG_SCHEMA_URL: &str = "https://xskill.gcli.cn/xskill.schema.json";
+/// JSON Schema URL（用于 settings.json 的 $schema 字段，及云端校验回退）
+pub const CONFIG_SCHEMA_URL: &str = "https://xskill.gcli.cn/xskill.schema.json";
 
-/// 默认缓存 TTL（秒），10 分钟
-const DEFAULT_CACHE_TTL_SECS: u64 = 600;
+/// 默认缓存 TTL（秒），24 小时
+const DEFAULT_CACHE_TTL_SECS: u64 = 86400;
 
 /// 反序列化辅助：null 值视为默认值
 fn deserialize_null_default<'de, D, T>(deserializer: D) -> Result<T, D::Error>
@@ -39,6 +39,14 @@ pub struct Config {
     pub cache: CacheConfig,
     #[serde(default, deserialize_with = "deserialize_null_default")]
     pub registry: RegistryConfig,
+    /// 代理地址（如 http://127.0.0.1:7890），用于访问 GitHub 等网络受限的场景。
+    /// 设置后导出 HTTP_PROXY/HTTPS_PROXY/ALL_PROXY 等环境变量，git/curl/wget 自动生效。
+    #[serde(
+        default,
+        deserialize_with = "deserialize_null_default",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub proxy: Option<String>,
 }
 
 /// 缓存配置
@@ -47,7 +55,7 @@ pub struct CacheConfig {
     /// 是否启用缓存，默认 false
     #[serde(default)]
     pub enabled: bool,
-    /// 缓存 TTL（秒），默认 600（10 分钟）
+    /// 缓存 TTL（秒），默认 86400（24 小时）
     #[serde(default = "default_cache_ttl")]
     pub ttl: u64,
 }
@@ -124,13 +132,13 @@ fn default_schema_url() -> String {
     CONFIG_SCHEMA_URL.to_string()
 }
 
-/// 构建默认平台列表（来自 platforms.json）
+/// 构建默认平台列表（来自 PLATFORMS.md）
 pub fn default_platforms() -> HashMap<String, Platform> {
     // (name, path, skills, agents, agents_compat)
     let entries: Vec<(&str, &str, &str, &str, bool)> = vec![
-        ("atomcode", ".atomcode", "skills", "ATOMCODE.md", false),
+        ("atomcode", ".atomcode", "skills", "ATOMCODE.md", true),
         ("claude", ".claude", "skills", "CLAUDE.md", false),
-        ("cline", ".cline", "skills", "CLAUDE.md", false),
+        ("cline", ".cline", "skills", "CLAUDE.md", true),
         ("codebuddy", ".codebuddy", "skills", "CODEBUDDY.md", false),
         ("codex", ".codex", "skills", "AGENTS.md", true),
         ("factory", ".factory", "skills", "AGENTS.md", true),
@@ -140,7 +148,14 @@ pub fn default_platforms() -> HashMap<String, Platform> {
         ("langcli", ".langcli", "skills", "LANGCLI.md", false),
         ("opencode", ".opencode", "skills", "AGENTS.md", true),
         ("openclaude", ".openclaude", "skills", "CLAUDE.md", false),
-        ("openinterpreter", ".openinterpreter", "skills", "AGENTS.md", true),
+        (
+            "openinterpreter",
+            ".openinterpreter",
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        ("pi", ".pi/agent", "skills", "AGENTS.md", true),
         ("qoder", ".qoder", "skills", "AGENTS.md", true),
         ("qwen", ".qwen", "skills", "AGENTS.md", true),
         ("roo", ".roo", "skills", "AGENTS.md", true),
@@ -178,6 +193,8 @@ pub fn default_config() -> Config {
             enabled: false,
             url: DEFAULT_REGISTRY_URL.to_string(),
         },
+        // init 时补全 proxy 键，值为空字符串（不生效，仅占位以便用户填写）
+        proxy: Some(String::new()),
     }
 }
 
@@ -208,19 +225,25 @@ impl Default for Config {
             recommended: vec![],
             cache: CacheConfig::default(),
             registry: RegistryConfig::default(),
+            proxy: None,
         }
     }
 }
 
 impl Config {
-    /// 加载配置：仅全局 settings.json
-    /// 环境变量 XSKILL_CONFIG 若设置则替代默认路径
-    pub fn load() -> Result<Self> {
-        let path = if let Ok(p) = std::env::var("XSKILL_CONFIG") {
+    /// 获取配置文件路径：XSKILL_CONFIG 环境变量 > 默认 ~/.xskill/settings.json
+    pub fn config_path() -> PathBuf {
+        if let Ok(p) = std::env::var("XSKILL_CONFIG") {
             PathBuf::from(p)
         } else {
             Self::settings_path()
-        };
+        }
+    }
+
+    /// 加载配置：仅全局 settings.json
+    /// 环境变量 XSKILL_CONFIG 若设置则替代默认路径
+    pub fn load() -> Result<Self> {
+        let path = Self::config_path();
 
         let mut config = if path.exists() {
             Self::load_from_file(&path)
@@ -234,7 +257,36 @@ impl Config {
             config.platforms = default_platforms();
         }
 
+        // 导出代理环境变量，使 git/curl/wget 等子进程自动走代理
+        config.apply_proxy_env();
+
         Ok(config)
+    }
+
+    /// 若配置了 `proxy`，导出 HTTP_PROXY/HTTPS_PROXY/ALL_PROXY 等环境变量
+    /// （含小写形式）。git clone 与 curl/wget 拉取均会自动读取这些变量。
+    /// 仅当配置中显式设置了代理时才覆盖已有环境变量。
+    pub fn apply_proxy_env(&self) {
+        let Some(proxy) = self.proxy.as_ref() else {
+            return;
+        };
+        if proxy.is_empty() {
+            return;
+        }
+        for var in [
+            "HTTP_PROXY",
+            "HTTPS_PROXY",
+            "ALL_PROXY",
+            "http_proxy",
+            "https_proxy",
+            "all_proxy",
+        ] {
+            // `set_var` is unsafe in the current edition; the value is always a
+            // valid String from config, so this is sound.
+            unsafe {
+                std::env::set_var(var, proxy);
+            }
+        }
     }
 
     /// 全局配置路径：~/.xskill/settings.json
@@ -292,9 +344,7 @@ impl Config {
         let url = self.registry.url.trim();
 
         // 空值或无效协议，回退默认
-        if url.is_empty()
-            || !(url.starts_with("http://") || url.starts_with("https://"))
-        {
+        if url.is_empty() || !(url.starts_with("http://") || url.starts_with("https://")) {
             return DEFAULT_REGISTRY_URL.to_string();
         }
 
@@ -314,8 +364,7 @@ impl Config {
                 }
 
                 // 取路径最后一个非空段，判断是否为文件名
-                let last_segment =
-                    path.rsplit('/').find(|s| !s.is_empty()).unwrap_or("");
+                let last_segment = path.rsplit('/').find(|s| !s.is_empty()).unwrap_or("");
                 if last_segment.contains('.') {
                     url.to_string()
                 } else {
@@ -327,30 +376,29 @@ impl Config {
 
     /// 保存配置到 settings.json
     pub fn save(&self) -> Result<()> {
-        let path = Self::settings_path();
+        let path = Self::config_path();
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)
                 .with_context(|| format!("Failed to create directory: {}", parent.display()))?;
         }
-        let json =
-            serde_json::to_string_pretty(self).context("Failed to serialize config")?;
+        let json = serde_json::to_string_pretty(self).context("Failed to serialize config")?;
         fs::write(&path, json)
             .with_context(|| format!("Failed to write config file: {}", path.display()))?;
         Ok(())
     }
 }
 
-/// 校验源名称格式：空值合法（表示清空），非空时仅允许字母、数字、下划线、连字符
+/// 校验源名称格式：空值合法（表示清空），非空时仅允许字母、数字、下划线、连字符、斜杠（支持 user/repo 格式）
 pub fn validate_source_name(name: &str) -> Result<()> {
     if name.is_empty() {
         return Ok(());
     }
-    let re = Regex::new(r"^[a-zA-Z0-9_-]+$").unwrap();
+    let re = Regex::new(r"^[a-zA-Z0-9_/-]+$").unwrap();
     if re.is_match(name) {
         Ok(())
     } else {
         anyhow::bail!(
-            "Invalid source name '{}'. Only letters, digits, hyphens and underscores are allowed.",
+            "Invalid source name '{}'. Only letters, digits, hyphens, underscores and slashes are allowed.",
             name
         )
     }
@@ -602,6 +650,7 @@ mod tests {
             recommended: vec![],
             cache: CacheConfig::default(),
             registry: RegistryConfig::default(),
+            proxy: None,
         };
 
         // Save
@@ -619,27 +668,92 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 17);
+        assert_eq!(platforms.len(), 18);
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
         assert!(platforms.contains_key("gemini"));
         assert!(platforms.contains_key("jcode"));
+        assert!(platforms.contains_key("pi"));
         assert!(platforms.contains_key("zcode"));
 
         let claude = &platforms["claude"];
         assert_eq!(claude.path, ".claude");
         assert_eq!(claude.skills, "skills");
         assert_eq!(claude.agents, "CLAUDE.md");
+
+        // pi 渠道默认路径为 .pi/agent（与 PLATFORMS.md 一致）
+        let pi = &platforms["pi"];
+        assert_eq!(pi.path, ".pi/agent");
+        assert_eq!(pi.skills, "skills");
+        assert_eq!(pi.agents, "AGENTS.md");
+
+        // 兼容性标记与 PLATFORMS.md 一致：atomcode ✓、cline ✅、claude ❌
+        assert!(platforms["atomcode"].agents_compat);
+        assert!(platforms["cline"].agents_compat);
+        assert!(!platforms["claude"].agents_compat);
+        assert!(!platforms["codebuddy"].agents_compat);
     }
 
     #[test]
     fn test_default_config() {
         let config = default_config();
         assert!(!config.cache.enabled);
-        assert_eq!(config.cache.ttl, 600);
+        assert_eq!(config.cache.ttl, 86400);
         assert!(!config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 17);
+        assert_eq!(config.platforms.len(), 18);
+        // init 时 proxy 键占位为空字符串（不生效，供用户填写）
+        assert_eq!(config.proxy, Some(String::new()));
+    }
+
+    #[test]
+    fn test_apply_proxy_env() {
+        // Save & restore existing env to avoid leaking into other tests.
+        let saved: Vec<(String, Option<String>)> = [
+            "HTTP_PROXY",
+            "HTTPS_PROXY",
+            "ALL_PROXY",
+            "http_proxy",
+            "https_proxy",
+            "all_proxy",
+        ]
+        .iter()
+        .map(|v| (v.to_string(), std::env::var(v).ok()))
+        .collect();
+
+        let proxy = "http://127.0.0.1:7890";
+        let config = Config {
+            proxy: Some(proxy.to_string()),
+            ..default_config()
+        };
+        config.apply_proxy_env();
+
+        for var in [
+            "HTTP_PROXY",
+            "HTTPS_PROXY",
+            "ALL_PROXY",
+            "http_proxy",
+            "https_proxy",
+            "all_proxy",
+        ] {
+            assert_eq!(std::env::var(var).as_deref(), Ok(proxy));
+        }
+
+        // None proxy → no env change beyond what was set before
+        let config2 = Config {
+            proxy: None,
+            ..default_config()
+        };
+        config2.apply_proxy_env();
+        assert_eq!(std::env::var("HTTPS_PROXY").as_deref(), Ok(proxy));
+
+        // Restore
+        for (var, val) in saved {
+            match val {
+                Some(v) => unsafe { std::env::set_var(var, v) },
+                None => unsafe { std::env::remove_var(var) },
+            }
+        }
     }
 
     #[test]
@@ -706,6 +820,9 @@ mod tests {
     fn test_no_null_values_in_serialized_config() {
         let config = default_config();
         let json = serde_json::to_string_pretty(&config).unwrap();
-        assert!(!json.contains("null"), "Config JSON should not contain null values");
+        assert!(
+            !json.contains("null"),
+            "Config JSON should not contain null values"
+        );
     }
 }

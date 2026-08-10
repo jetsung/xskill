@@ -1,7 +1,7 @@
 pub mod add;
 pub mod cache;
-pub mod find;
 pub mod config;
+pub mod find;
 pub mod link;
 pub mod list;
 pub mod new;

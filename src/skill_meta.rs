@@ -50,7 +50,9 @@ impl SkillMeta {
 
     /// 获取描述
     pub fn display_description(&self) -> String {
-        self.description.clone().unwrap_or_else(|| "N/A".to_string())
+        self.description
+            .clone()
+            .unwrap_or_else(|| "N/A".to_string())
     }
 
     /// 获取版本（不存在时返回空字符串）
@@ -82,7 +84,10 @@ Some content here.
         let meta = SkillMeta::parse(content).unwrap();
         assert_eq!(meta.name, Some("my-skill".to_string()));
         assert_eq!(meta.description, Some("A useful skill".to_string()));
-        assert_eq!(meta.metadata.as_ref().unwrap().version, Some("1.0.0".to_string()));
+        assert_eq!(
+            meta.metadata.as_ref().unwrap().version,
+            Some("1.0.0".to_string())
+        );
     }
 
     #[test]
@@ -136,7 +141,9 @@ name: partial-skill
         assert_eq!(meta.display_version(), "");
 
         let meta = SkillMeta {
-            metadata: Some(Metadata { version: Some("2.0.0".to_string()) }),
+            metadata: Some(Metadata {
+                version: Some("2.0.0".to_string()),
+            }),
             ..Default::default()
         };
         assert_eq!(meta.display_version(), "2.0.0");

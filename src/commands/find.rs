@@ -115,7 +115,8 @@ impl SkimItem for SelectItem {
             Line::from(vec![
                 Span::styled(format!("{} ", label), base.fg(Color::Green)),
                 Span::styled(
-                    self.display.strip_prefix(&format!("{}: ", label))
+                    self.display
+                        .strip_prefix(&format!("{}: ", label))
                         .unwrap_or(&self.display)
                         .to_string(),
                     base,
@@ -133,6 +134,14 @@ impl SkimItem for SelectItem {
 
 /// Find and install a skill interactively via multi-step TUI.
 pub fn run(skill: Option<&str>, source: Option<&str>, global: bool) -> Result<()> {
+    // `find` is interactive single/multi-select; bulk install of every skill
+    // is intentionally unsupported here — use `add -s '*'` instead.
+    if skill == Some("*") {
+        bail!(
+            "'find' does not support installing all skills. Use 'add -s \"*\"' for bulk install."
+        );
+    }
+
     // Detect non-interactive terminal
     if !std::io::stdin().is_terminal() {
         bail!("'find' requires an interactive terminal. Use 'query' for non-interactive listing.");
@@ -179,7 +188,9 @@ fn install_skills(
             &item.source
         };
         let url = if item.is_registry {
-            item.source_url.clone().unwrap_or_else(|| source_name.to_string())
+            item.source_url
+                .clone()
+                .unwrap_or_else(|| source_name.to_string())
         } else {
             resolve_source(config, source_name)?.url
         };
@@ -200,14 +211,23 @@ fn install_skills(
             let skill_name = &item.skill.name;
             let (skill_path, dest_name) = extract_skill_path(&item.skill.path);
 
-            // Source dir from the clone — use CachedSkill.path directly
-            let source_dir = workdir.join(&item.skill.path).parent()
-                .map(|p| p.to_path_buf())
-                .unwrap_or_else(|| workdir.join("skills").join(&skill_path));
+            // Derive the skill's source directory from the *leaf* skill path
+            // (e.g. "git-commit"), never from `item.skill.path.parent()`.
+            // The cached `path` omits the "/SKILL.md" suffix, so taking
+            // `.parent()` of it would resolve one level too high (the whole
+            // `skills/` directory) and copy the entire repo into one folder.
+            let source_dir = resolve_skill_source_dir(workdir, &skill_path);
             if !source_dir.exists() {
-                all_failed.push(format!("{} (not found in repo: {})", skill_name, item.skill.path));
+                all_failed.push(format!(
+                    "{} (not found in repo: {})",
+                    skill_name, item.skill.path
+                ));
                 continue;
             }
+
+            // 在克隆存活期间计算 tree hash（避免 update_lock_file 再次克隆）
+            let skill_folder_hash =
+                git::get_skill_folder_hash(workdir, &skill_path).unwrap_or_default();
 
             // 1. Install to canonical .agents directory
             let canonical_dir = if global {
@@ -239,6 +259,8 @@ fn install_skills(
                 "Installed".green(),
                 crate::utils::display_path(&canonical_dir)
             );
+            // 显示 skill 在仓库中的路径
+            eprintln!("{}: {}", "Path".cyan().bold(), &item.skill.path);
 
             // 2. Create symlinks for selected platforms
             let mut linked: Vec<String> = Vec::new();
@@ -252,7 +274,8 @@ fn install_skills(
                 let dest_dir = match resolve_platform_dest(config, platform, &dest_name, global) {
                     Some(dir) => dir,
                     None => {
-                        all_failed.push(format!("{}: {} (platform not found)", skill_name, platform));
+                        all_failed
+                            .push(format!("{}: {} (platform not found)", skill_name, platform));
                         continue;
                     }
                 };
@@ -289,6 +312,7 @@ fn install_skills(
                 &item.skill.path,
                 skill_name,
                 global,
+                &skill_folder_hash,
             )?;
 
             eprintln!();
@@ -358,7 +382,6 @@ fn run_skill_tui(items: Vec<FindItem>, initial_query: Option<&str>) -> Result<Ve
         .ok_or_else(|| anyhow::anyhow!("Failed to retrieve selected skill"))?;
     Ok(vec![item])
 }
-
 
 /// Step 2: Select target platforms (multi-select).
 fn run_platform_tui(config: &Config) -> Result<Vec<String>> {
@@ -465,18 +488,16 @@ fn update_lock_file(
     skill_path: &str,
     skill_name: &str,
     global: bool,
+    skill_folder_hash: &str,
 ) -> Result<()> {
     let config = Config::load()?;
     let mut lock_file = LockFile::load(global)?;
 
-    let source_type = if source.contains('/') {
-        "git".to_string()
-    } else {
-        config
-            .get_source(source)
-            .map(|s| s.effective_type())
-            .unwrap_or_else(|| "git".to_string())
-    };
+    // 获取 sourceType：优先从已配置的源中查找，未找到则默认 git
+    let source_type = config
+        .get_source(source)
+        .map(|s| s.effective_type())
+        .unwrap_or_else(|| "git".to_string());
 
     // Normalize skill_path: ensure it starts with skills/ and ends with /SKILL.md
     let skill_path_in_repo = {
@@ -491,15 +512,6 @@ fn update_lock_file(
             format!("{}/SKILL.md", with_prefix)
         }
     };
-    let tmp_dir = git::clone_for_listing(source_url)?;
-    // Extract the sub-path under skills/ (without /SKILL.md) for hash lookup
-    let hash_key = skill_path_in_repo
-        .strip_prefix("skills/")
-        .unwrap_or(&skill_path_in_repo)
-        .strip_suffix("/SKILL.md")
-        .unwrap_or(&skill_path_in_repo);
-    let skill_folder_hash =
-        git::get_skill_folder_hash(tmp_dir.path(), hash_key).unwrap_or_default();
 
     let now = chrono::Utc::now();
     let timestamp = now.format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string();
@@ -515,7 +527,7 @@ fn update_lock_file(
         source_type,
         source_url: source_url.to_string(),
         skill_path: skill_path_in_repo,
-        skill_folder_hash,
+        skill_folder_hash: skill_folder_hash.to_string(),
         installed_at,
         updated_at: timestamp,
     };
@@ -585,17 +597,33 @@ fn format_display(
 /// e.g. "skills/engineering/grill/SKILL.md" → ("engineering/grill", "grill")
 /// e.g. "skills/vue/SKILL.md" → ("vue", "vue")
 fn extract_skill_path(full_path: &str) -> (String, String) {
-    let stripped = full_path
-        .strip_prefix("skills/")
-        .unwrap_or(full_path)
-        .strip_suffix("/SKILL.md")
-        .unwrap_or(full_path);
-    let dest_name = stripped
-        .split('/')
-        .last()
-        .unwrap_or(stripped)
-        .to_string();
+    // Strip the optional "skills/" prefix and the optional "/SKILL.md" suffix
+    // independently. The cached `path` may omit the suffix (e.g.
+    // "skills/git-commit"), so a failing `strip_suffix` must NOT discard a
+    // previously successful `strip_prefix` (the old `unwrap_or(full_path)`
+    // did exactly that).
+    let mut stripped = full_path.strip_prefix("skills/").unwrap_or(full_path);
+    if let Some(s) = stripped.strip_suffix("/SKILL.md") {
+        stripped = s;
+    }
+    let dest_name = stripped.split('/').last().unwrap_or(stripped).to_string();
     (stripped.to_string(), dest_name)
+}
+
+/// Resolve the on-disk directory of a single skill inside a cloned repo.
+///
+/// `skill_path` is the leaf path returned by `extract_skill_path` (e.g.
+/// "git-commit"). The cached `path` omits the trailing "/SKILL.md", so we must
+/// build the directory from `skill_path` directly — never via
+/// `path.parent()`, which would resolve one level too high (the whole
+/// `skills/` directory) and copy the entire repo into one folder.
+fn resolve_skill_source_dir(workdir: &std::path::Path, skill_path: &str) -> std::path::PathBuf {
+    let preferred = workdir.join("skills").join(skill_path);
+    if preferred.exists() {
+        preferred
+    } else {
+        workdir.join(skill_path)
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -694,6 +722,45 @@ mod tests {
         assert_eq!(name, "c");
     }
 
+    #[test]
+    fn test_resolve_skill_source_dir_with_skills_prefix() {
+        // Repo has a top-level `skills/` dir; skill_path is the leaf path.
+        let tmp = std::env::temp_dir().join("xskill_test_skillsdir");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let workdir = tmp.join("repo");
+        let skill_dir = workdir.join("skills").join("git-commit");
+        std::fs::create_dir_all(&skill_dir).unwrap();
+        // Ensure the whole-repo dir exists so a wrong `.parent()` impl would pick it.
+        std::fs::create_dir_all(workdir.join("skills").join("other-skill")).unwrap();
+
+        let resolved = resolve_skill_source_dir(&workdir, "git-commit");
+        assert_eq!(resolved, skill_dir);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn test_resolve_skill_source_dir_no_skills_prefix_fallback() {
+        // Repo without a top-level `skills/` dir (skill lives at repo root).
+        let tmp = std::env::temp_dir().join("xskill_test_noskillsdir");
+        let _ = std::fs::remove_dir_all(&tmp);
+        let workdir = tmp.join("repo");
+        let skill_dir = workdir.join("git-commit");
+        std::fs::create_dir_all(&skill_dir).unwrap();
+
+        let resolved = resolve_skill_source_dir(&workdir, "git-commit");
+        assert_eq!(resolved, skill_dir);
+        let _ = std::fs::remove_dir_all(&tmp);
+    }
+
+    #[test]
+    fn test_cached_path_without_skill_md_suffix_is_leaf() {
+        // Regression: cached path omits "/SKILL.md". extract_skill_path must
+        // still yield the leaf path so install targets only that skill.
+        let (path, name) = extract_skill_path("skills/git-commit");
+        assert_eq!(path, "git-commit");
+        assert_eq!(name, "git-commit");
+    }
+
     fn make_cache() -> CacheData {
         CacheData {
             updated_at: "2026-07-18T12:00:00Z".to_string(),
@@ -702,6 +769,7 @@ mod tests {
                     source: "antfu".to_string(),
                     url: None,
                     registry_url: None,
+                    commit_hash: String::new(),
                     skills: vec![
                         CachedSkill {
                             name: "vue".to_string(),
@@ -721,6 +789,7 @@ mod tests {
                     source: "other".to_string(),
                     url: None,
                     registry_url: None,
+                    commit_hash: String::new(),
                     skills: vec![CachedSkill {
                         name: "react".to_string(),
                         path: "skills/react/SKILL.md".to_string(),
@@ -763,6 +832,7 @@ mod tests {
                     source: "local-src".to_string(),
                     url: Some("https://example.com/local".to_string()),
                     registry_url: None,
+                    commit_hash: String::new(),
                     skills: vec![CachedSkill {
                         name: "vue".to_string(),
                         path: "skills/vue/SKILL.md".to_string(),
@@ -774,6 +844,7 @@ mod tests {
                     source: "remote-src".to_string(),
                     url: Some("https://example.com/remote".to_string()),
                     registry_url: Some("https://xskill.gcli.cn/skills.json".to_string()),
+                    commit_hash: String::new(),
                     skills: vec![CachedSkill {
                         name: "react".to_string(),
                         path: "skills/react/SKILL.md".to_string(),
@@ -980,6 +1051,19 @@ mod tests {
                     .contains("interactive terminal")
             );
         }
+    }
+
+    #[test]
+    fn test_find_rejects_wildcard_skill() {
+        // Bulk install is unsupported in `find`; `add -s '*'` covers it.
+        let result = run(Some("*"), None, false);
+        assert!(result.is_err());
+        assert!(
+            result
+                .unwrap_err()
+                .to_string()
+                .contains("does not support installing all skills")
+        );
     }
 
     #[test]

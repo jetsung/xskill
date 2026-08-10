@@ -70,11 +70,10 @@ impl LockFile {
         let content = fs::read_to_string(&path)
             .with_context(|| format!("Failed to read lock file: {}", path.display()))?;
 
-        let lock_file: Self = serde_json::from_str(&content)
-            .unwrap_or_else(|_| {
-                // 如果格式错误，返回默认值
-                Self::default()
-            });
+        let lock_file: Self = serde_json::from_str(&content).unwrap_or_else(|_| {
+            // 如果格式错误，返回默认值
+            Self::default()
+        });
 
         Ok(lock_file)
     }
@@ -91,8 +90,8 @@ impl LockFile {
             }
         }
 
-        let content = serde_json::to_string_pretty(self)
-            .with_context(|| "Failed to serialize lock file")?;
+        let content =
+            serde_json::to_string_pretty(self).with_context(|| "Failed to serialize lock file")?;
 
         fs::write(&path, content)
             .with_context(|| format!("Failed to write lock file: {}", path.display()))?;

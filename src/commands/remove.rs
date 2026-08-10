@@ -52,7 +52,11 @@ pub fn run(skill: &str, global: bool, agent: Option<&str>) -> Result<()> {
     };
 
     if removed == 0 {
-        println!("{}: skill '{}' not installed", "Nothing to remove".yellow(), skill);
+        println!(
+            "{}: skill '{}' not installed",
+            "Nothing to remove".yellow(),
+            skill
+        );
     }
 
     // Update lock file
@@ -74,11 +78,7 @@ fn resolve_remove_target(agent: Option<&str>) -> RemoveTarget {
 }
 
 /// Remove all skills
-fn remove_all_skills(
-    config: &Config,
-    target: &RemoveTarget,
-    global: bool,
-) -> Result<()> {
+fn remove_all_skills(config: &Config, target: &RemoveTarget, global: bool) -> Result<()> {
     let removed = match target {
         RemoveTarget::Canonical => {
             // 移除各平台的 symlink（悬空文件夹）
@@ -123,7 +123,10 @@ fn remove_all_from_dir(dir: &PathBuf) -> Result<usize> {
     let entries: Vec<_> = fs::read_dir(dir)?
         .filter_map(|e| e.ok())
         .filter(|e| {
-            let is_dir = e.file_type().map(|t| t.is_dir() || t.is_symlink()).unwrap_or(false);
+            let is_dir = e
+                .file_type()
+                .map(|t| t.is_dir() || t.is_symlink())
+                .unwrap_or(false);
             is_dir && e.path().join("SKILL.md").exists()
         })
         .collect();
@@ -151,7 +154,12 @@ fn remove_from_platform(
     let platform = config.get_platform(platform_name).unwrap();
 
     if platform.agents_compat {
-        println!("{}: {} ({})", "Skipped".dimmed(), platform_name, "agents_compat");
+        println!(
+            "{}: {} ({})",
+            "Skipped".dimmed(),
+            platform_name,
+            "agents_compat"
+        );
         return Ok(0);
     }
 
@@ -160,8 +168,12 @@ fn remove_from_platform(
     } else {
         std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
     };
-    let skills_dir = platform.skills_dir_with_base(&base_dir)
-        .ok_or_else(|| anyhow::anyhow!("Platform {} has no skills directory configured", platform_name))?;
+    let skills_dir = platform.skills_dir_with_base(&base_dir).ok_or_else(|| {
+            anyhow::anyhow!(
+                "Platform {} has no skills directory configured",
+                platform_name
+            )
+        })?;
 
     let link_path = skills_dir.join(skill);
 
@@ -176,11 +188,7 @@ fn remove_from_platform(
 }
 
 /// Remove skill from all existing platforms
-fn remove_from_all_platforms(
-    config: &Config,
-    skill: &str,
-    global: bool,
-) -> Result<usize> {
+fn remove_from_all_platforms(config: &Config, skill: &str, global: bool) -> Result<usize> {
     let base_dir = if global {
         dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"))
     } else {
@@ -215,16 +223,17 @@ fn remove_from_all_platforms(
 }
 
 /// Remove all skills from platform
-fn remove_all_from_platform(
-    config: &Config,
-    platform_name: &str,
-    global: bool,
-) -> Result<usize> {
+fn remove_all_from_platform(config: &Config, platform_name: &str, global: bool) -> Result<usize> {
     validate_agent(config, platform_name)?;
     let platform = config.get_platform(platform_name).unwrap();
 
     if platform.agents_compat {
-        println!("{}: {} ({})", "Skipped".dimmed(), platform_name, "agents_compat");
+        println!(
+            "{}: {} ({})",
+            "Skipped".dimmed(),
+            platform_name,
+            "agents_compat"
+        );
         return Ok(0);
     }
 
@@ -530,6 +539,9 @@ mod tests {
         utils::remove_symlink(&link).unwrap();
         assert!(!link.exists());
         assert!(target.join("important.txt").exists());
-        assert_eq!(fs::read_to_string(target.join("important.txt")).unwrap(), "keep me");
+        assert_eq!(
+            fs::read_to_string(target.join("important.txt")).unwrap(),
+            "keep me"
+        );
     }
 }

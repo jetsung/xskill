@@ -23,9 +23,11 @@ pub fn run(skill: &str, source: Option<&str>) -> Result<()> {
 
     if let Some(src) = source {
         // Query specific source (normalize URL for comparison)
-        if let Some(source_cache) = cache_data.sources.iter().find(|s| {
-            strip_git_suffix(&s.source) == strip_git_suffix(src)
-        }) {
+        if let Some(source_cache) = cache_data
+            .sources
+            .iter()
+            .find(|s| strip_git_suffix(&s.source) == strip_git_suffix(src))
+        {
             query_in_cache(source_cache, skill, &mut found);
         }
     } else {
@@ -41,7 +43,10 @@ pub fn run(skill: &str, source: Option<&str>) -> Result<()> {
         // Hint: suggest cache update when sources exist but cache may be stale
         if !config.sources.is_empty() || config.is_registry_enabled() {
             if config.is_cache_enabled() {
-                println!("{}", "Hint: run `xskill cache update` to refresh skills cache".cyan());
+                println!(
+                    "{}",
+                    "Hint: run `xskill cache update` to refresh skills cache".cyan()
+                );
             }
         }
     }
@@ -50,14 +55,12 @@ pub fn run(skill: &str, source: Option<&str>) -> Result<()> {
 }
 
 /// Query skill in cache
-fn query_in_cache(
-    source_cache: &SourceCache,
-    skill: &str,
-    found: &mut bool,
-) {
-    let matches: Vec<_> = source_cache.skills.iter().filter(|s| {
-        s.name == skill || s.path.contains(skill)
-    }).collect();
+fn query_in_cache(source_cache: &SourceCache, skill: &str, found: &mut bool) {
+    let matches: Vec<_> = source_cache
+        .skills
+        .iter()
+        .filter(|s| s.name == skill || s.path.contains(skill))
+        .collect();
 
     if matches.is_empty() {
         return;

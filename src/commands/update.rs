@@ -1,5 +1,5 @@
 use crate::git;
-use crate::lock::{LockFile, LockEntry};
+use crate::lock::{LockEntry, LockFile};
 use crate::skill_meta::SkillMeta;
 use anyhow::Result;
 use colored::Colorize;
@@ -47,7 +47,11 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
         } else {
             // Update specific skill
             if let Some(_entry) = lock_file.skills.get(skill_name) {
-                lock_file.skills.iter().filter(|(k, _)| k.as_str() == skill_name).collect()
+                lock_file
+                    .skills
+                    .iter()
+                    .filter(|(k, _)| k.as_str() == skill_name)
+                    .collect()
             } else {
                 anyhow::bail!("Skill not found in lock file: {}", skill_name);
             }
@@ -82,7 +86,10 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
     // Group skills by source_url to clone each repo only once
     let mut groups: HashMap<String, Vec<(&String, &LockEntry)>> = HashMap::new();
     for (skill_name, entry) in &skills_to_update {
-        groups.entry(entry.source_url.clone()).or_default().push((skill_name, entry));
+        groups
+            .entry(entry.source_url.clone())
+            .or_default()
+            .push((skill_name, entry));
     }
 
     for (source_url, skills) in &groups {
@@ -99,19 +106,19 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
             }
         };
 
-        let skills_dir = tmp_dir.path().join("skills");
-
         for (skill_name, entry) in skills {
             println!("  {}: {}", "Updating".cyan(), skill_name);
 
-            // Extract skill directory name from skillPath
-            let skill_dir_name = entry.skill_path
-                .replace("/SKILL.md", "")
-                .replace("skills/", "");
-            let source_dir = skills_dir.join(&skill_dir_name);
+            // Extract skill directory path from skillPath (e.g., "skills/name" or "name")
+            let skill_dir_path = entry.skill_path.replace("/SKILL.md", "");
+            let source_dir = tmp_dir.path().join(&skill_dir_path);
 
             if !source_dir.exists() {
-                println!("    {}: {}", skill_name, "skill directory not found in repo".red());
+                println!(
+                    "    {}: {}",
+                    skill_name,
+                    "skill directory not found in repo".red()
+                );
                 fail_count += 1;
                 println!();
                 continue;
@@ -119,8 +126,16 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
 
             // Read new version info from the clone
             let meta = SkillMeta::from_file(&source_dir).unwrap_or_default();
-            println!("    {}: {}", "Name".cyan().bold(), meta.display_name(skill_name).yellow());
-            println!("    {}: {}", "Description".cyan().bold(), meta.display_description());
+            println!(
+                "    {}: {}",
+                "Name".cyan().bold(),
+                meta.display_name(skill_name).yellow()
+            );
+            println!(
+                "    {}: {}",
+                "Description".cyan().bold(),
+                meta.display_description()
+            );
             if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
                 if !version.is_empty() {
                     println!("    {}: {}", "Version".cyan().bold(), version);
@@ -136,8 +151,8 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
             crate::commands::restore::copy_dir_recursive(&source_dir, &dest_dir)?;
 
             // Get skill_folder_hash from the shared clone
-            let skill_folder_hash = git::get_skill_folder_hash(tmp_dir.path(), skill_name)
-                .unwrap_or_default();
+            let skill_folder_hash =
+                git::get_skill_folder_hash(tmp_dir.path(), &skill_dir_path).unwrap_or_default();
 
             // Update lock file entry
             let entry_timestamp = top_timestamp.clone();
@@ -165,7 +180,12 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
     updated_lock_file.save(is_global)?;
 
     // Print statistics
-    println!("{}: {} succeeded, {} failed", "Update complete".green(), format!("{}", success_count).green(), format!("{}", fail_count).red());
+    println!(
+        "{}: {} succeeded, {} failed",
+        "Update complete".green(),
+        format!("{}", success_count).green(),
+        format!("{}", fail_count).red()
+    );
 
     Ok(())
 }
@@ -186,15 +206,18 @@ mod tests {
         let mut lock = LockFile::default();
         assert!(lock.skills.get("vue").is_none());
 
-        lock.upsert_skill("vue", crate::lock::LockEntry {
-            source: "test".to_string(),
-            source_type: "git".to_string(),
-            source_url: "https://example.com".to_string(),
-            skill_path: "skills/vue/SKILL.md".to_string(),
-            skill_folder_hash: "abc".to_string(),
-            installed_at: "2026-07-17T00:00:00.000Z".to_string(),
-            updated_at: "2026-07-17T00:00:00.000Z".to_string(),
-        });
+        lock.upsert_skill(
+            "vue",
+            crate::lock::LockEntry {
+                source: "test".to_string(),
+                source_type: "git".to_string(),
+                source_url: "https://example.com".to_string(),
+                skill_path: "skills/vue/SKILL.md".to_string(),
+                skill_folder_hash: "abc".to_string(),
+                installed_at: "2026-07-17T00:00:00.000Z".to_string(),
+                updated_at: "2026-07-17T00:00:00.000Z".to_string(),
+            },
+        );
 
         assert!(lock.skills.get("vue").is_some());
         assert_eq!(lock.skills["vue"].source, "test");

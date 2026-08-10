@@ -1,15 +1,31 @@
 use crate::skill_meta::SkillMeta;
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::sync::atomic::Ordering;
 use tempfile::TempDir;
+
+/// 获取 verbose 模式状态
+fn is_verbose() -> bool {
+    crate::VERBOSE.load(Ordering::Relaxed)
+}
+
+/// 根据 verbose 模式返回 Stdio：verbose 时继承，否则丢弃
+fn stderr_stdio() -> std::process::Stdio {
+    if is_verbose() {
+        std::process::Stdio::inherit()
+    } else {
+        std::process::Stdio::null()
+    }
+}
 
 /// 安装结果
 #[allow(dead_code)]
 pub struct InstallResult {
     pub dest: String,
     pub version_change: String,
+    pub skill_folder_hash: String,
 }
 
 /// 从 Git 仓库安装 skill（仅拉取目标子树）
@@ -20,7 +36,12 @@ pub struct InstallResult {
 /// 3. 检测默认分支
 /// 4. 迁移到本地 dest_dir/
 /// 5. 清理临时目录
-pub fn install_skill(repo_url: &str, skill_path: &str, dest_name: &str, dest_dir: &Path) -> Result<InstallResult> {
+pub fn install_skill(
+    repo_url: &str,
+    skill_path: &str,
+    dest_name: &str,
+    dest_dir: &Path,
+) -> Result<InstallResult> {
     let dest = dest_name.to_string();
 
     // 检查是否已安装，记录旧版本
@@ -43,13 +64,10 @@ pub fn install_skill(repo_url: &str, skill_path: &str, dest_name: &str, dest_dir
     clone_sparse(repo_url, skill_path, &tmp_path)?;
 
     // 将子树内容迁移到目标目录
-    let sparse_checkout_dir = tmp_path.join("skills").join(skill_path);
+    // skill_path is already the full relative path (e.g., "skills/name" or "name")
+    let sparse_checkout_dir = tmp_path.join(skill_path);
     if !sparse_checkout_dir.exists() {
-        bail!(
-            "Skill not found in repo {}: skills/{}",
-            repo_url,
-            skill_path
-        );
+        bail!("Skill not found in repo {}: {}", repo_url, skill_path);
     }
 
     // 确保目标目录存在
@@ -62,6 +80,9 @@ pub fn install_skill(repo_url: &str, skill_path: &str, dest_name: &str, dest_dir
 
     // 复制文件
     copy_dir_recursive(&sparse_checkout_dir, &dest_dir)?;
+
+    // 在 tmp_dir 存活时计算 tree hash（避免后续再次克隆）
+    let skill_folder_hash = get_skill_folder_hash(&tmp_path, skill_path).unwrap_or_default();
 
     // 读取新版本
     let new_meta = SkillMeta::from_file(&dest_dir)?;
@@ -76,17 +97,26 @@ pub fn install_skill(repo_url: &str, skill_path: &str, dest_name: &str, dest_dir
     Ok(InstallResult {
         dest,
         version_change,
+        skill_folder_hash,
     })
 }
 
 /// 使用 git CLI 进行 sparse checkout 克隆（静默模式）
 fn clone_sparse(repo_url: &str, skill_path: &str, dest: &Path) -> Result<()> {
-    let sparse_path = format!("skills/{}", skill_path);
+    // skill_path is already the full relative path (e.g., "skills/name" or "name")
 
     // 1. 检测默认分支
     let default_branch = detect_default_branch(repo_url)?;
 
     // 2. 克隆仓库（浅克隆 + sparse checkout，静默模式）
+    if is_verbose() {
+        eprintln!(
+            "[verbose] git clone --filter=blob:none --depth=1 --sparse --branch={} {} {}",
+            default_branch,
+            repo_url,
+            dest.display()
+        );
+    }
     let status = Command::new("git")
         .args([
             "clone",
@@ -98,38 +128,60 @@ fn clone_sparse(repo_url: &str, skill_path: &str, dest: &Path) -> Result<()> {
             dest.to_str().unwrap_or(""),
         ])
         .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
+        .stderr(stderr_stdio())
         .status()
         .with_context(|| "Failed to run git clone")?;
 
     if !status.success() {
-        bail!("git clone failed");
+        bail!(
+            "git clone failed (exit code: {})",
+            status.code().unwrap_or(-1)
+        );
     }
 
     // 3. Initialize sparse checkout (cone mode)
+    if is_verbose() {
+        eprintln!(
+            "[verbose] git sparse-checkout init --cone (in {})",
+            dest.display()
+        );
+    }
     let status = Command::new("git")
         .current_dir(dest)
         .args(["sparse-checkout", "init", "--cone"])
         .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
+        .stderr(stderr_stdio())
         .status()
         .with_context(|| "Failed to run git sparse-checkout init")?;
 
     if !status.success() {
-        bail!("git sparse-checkout init failed");
+        bail!(
+            "git sparse-checkout init failed (exit code: {})",
+            status.code().unwrap_or(-1)
+        );
     }
 
     // 4. Set sparse checkout path (silent mode)
+    if is_verbose() {
+        eprintln!(
+            "[verbose] git sparse-checkout set {} (in {})",
+            skill_path,
+            dest.display()
+        );
+    }
     let status = Command::new("git")
         .current_dir(dest)
-        .args(["sparse-checkout", "set", &sparse_path])
+        .args(["sparse-checkout", "set", skill_path])
         .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
+        .stderr(stderr_stdio())
         .status()
         .with_context(|| "Failed to run git sparse-checkout set")?;
 
     if !status.success() {
-        bail!("git sparse-checkout set failed");
+        bail!(
+            "git sparse-checkout set failed (exit code: {})",
+            status.code().unwrap_or(-1)
+        );
     }
 
     Ok(())
@@ -168,8 +220,8 @@ pub fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
     fs::create_dir_all(dst)
         .with_context(|| format!("Failed to create directory: {}", dst.display()))?;
 
-    for entry in fs::read_dir(src)
-        .with_context(|| format!("Failed to read directory: {}", src.display()))?
+    for entry in
+        fs::read_dir(src).with_context(|| format!("Failed to read directory: {}", src.display()))?
     {
         let entry = entry?;
         let src_path = entry.path();
@@ -190,14 +242,19 @@ pub fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
 /// The caller can copy from the returned path to multiple targets.
 /// The TempDir must be kept alive until copying is done.
 #[allow(dead_code)]
-pub fn install_skill_sparse(repo_url: &str, skill_path: &str, dest_name: &str) -> Result<(TempDir, PathBuf)> {
+pub fn install_skill_sparse(
+    repo_url: &str,
+    skill_path: &str,
+    _dest_name: &str,
+) -> Result<(TempDir, PathBuf)> {
     let tmp_dir = TempDir::new()?;
     let tmp_path = tmp_dir.path().to_path_buf();
     clone_sparse(repo_url, skill_path, &tmp_path)?;
 
-    let source_dir = tmp_path.join("skills").join(dest_name);
+    // skill_path is already the full relative path (e.g., "skills/name" or "name")
+    let source_dir = tmp_path.join(skill_path);
     if !source_dir.exists() {
-        bail!("Skill not found in repo: skills/{}", skill_path);
+        bail!("Skill not found in repo: {}", skill_path);
     }
 
     Ok((tmp_dir, source_dir))
@@ -222,7 +279,7 @@ pub fn clone_for_listing(repo_url: &str) -> Result<TempDir> {
             tmp_path.to_str().unwrap_or(""),
         ])
         .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
+        .stderr(stderr_stdio())
         .status()
         .with_context(|| "Failed to run git clone")?;
 
@@ -233,10 +290,25 @@ pub fn clone_for_listing(repo_url: &str) -> Result<TempDir> {
     Ok(tmp_dir)
 }
 
-/// Get the git tree hash of a skill folder
-pub fn get_skill_folder_hash(repo_dir: &Path, skill_name: &str) -> Result<String> {
-    let skill_path = format!("skills/{}", skill_name);
+/// Get the latest commit ID (SHA) of a git repository
+pub fn get_latest_commit_hash(repo_dir: &Path) -> Result<String> {
+    let output = Command::new("git")
+        .current_dir(repo_dir)
+        .args(["rev-parse", "HEAD"])
+        .output()
+        .with_context(|| "Failed to run git rev-parse HEAD")?;
 
+    if !output.status.success() {
+        return Ok(String::new());
+    }
+
+    let commit_hash = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    Ok(commit_hash)
+}
+
+/// Get the git tree hash of a skill folder
+pub fn get_skill_folder_hash(repo_dir: &Path, skill_path: &str) -> Result<String> {
+    // skill_path is the full relative path from repo root (e.g., "skills/name" or "name")
     let output = Command::new("git")
         .current_dir(repo_dir)
         .args(["rev-parse", &format!("HEAD:{}", skill_path)])

@@ -27,7 +27,11 @@ pub fn print_table(headers: &[&str], rows: &[Vec<String>]) {
     for row in rows {
         for (i, val) in row.iter().enumerate() {
             if i < num_cols {
-                let display_len = if val.is_empty() { EMPTY_PLACEHOLDER.len() } else { visible_length(val) };
+                let display_len = if val.is_empty() {
+                    EMPTY_PLACEHOLDER.len()
+                } else {
+                    visible_length(val)
+                };
                 if display_len > col_widths[i] {
                     col_widths[i] = display_len;
                 }

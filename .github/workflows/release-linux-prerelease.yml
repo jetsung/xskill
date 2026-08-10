@@ -82,6 +82,8 @@ jobs:
   publish-npm:
     needs: [build-linux, create-release]
     runs-on: ubuntu-latest
+    # preview/alpha 标签只发布 GitHub Release，不发布到 npm 包管理平台
+    if: ${{ !contains(github.ref, '-preview') && !contains(github.ref, '-alpha') }}
     steps:
       - uses: actions/checkout@v7
 
@@ -148,12 +150,8 @@ jobs:
           VERSION="${{ steps.tag.outputs.VERSION }}"
           TAG="${{ steps.tag.outputs.TAG }}"
 
-          # 从 tag 中提取 npm tag（如 preview、alpha、beta、rc）
-          if [[ "$TAG" == *-preview* ]]; then
-            NPM_TAG="preview"
-          elif [[ "$TAG" == *-alpha* ]]; then
-            NPM_TAG="alpha"
-          elif [[ "$TAG" == *-beta* ]]; then
+          # 从 tag 中提取 npm tag（preview/alpha 已被 job 级 if 过滤，不会到达此处）
+          if [[ "$TAG" == *-beta* ]]; then
             NPM_TAG="beta"
           elif [[ "$TAG" == *-rc* ]]; then
             NPM_TAG="rc"

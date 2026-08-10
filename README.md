@@ -12,6 +12,7 @@ A skills management tool for discovering, installing, and managing reusable agen
 - **Batch operations** — Install/remove all skills with `--all` flag
 - **Cache support** — Optional local cache for offline skill queries
 - **Interactive TUI** — Multi-select skill finder with `find` command
+- **Verbose mode** — Debug installation issues with `-v` / `--verbose` flag
 
 ## Installation
 
@@ -92,14 +93,17 @@ xskill link -s vue -a claude
 
 # Remove a skill
 xskill remove -s vue
+
+# Debug mode (show git command details)
+xskill -v add -f my-skills -s vue
 ```
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `sources` | Manage configured sources (list/add/remove/edit) |
-| `platforms` | List configured platforms |
+| `sources` | Manage configured sources (list/add/remove/rename) |
+| `platforms` | Manage configured platforms (list/reset) |
 | `add` | Install a skill |
 | `link` | Symlink existing skills to a platform |
 | `remove` | Remove a skill |
@@ -128,8 +132,9 @@ Config file: `~/.xskill/settings.json` (override with `XSKILL_CONFIG` env var).
     { "name": "antfu", "type": "git", "url": "https://github.com/antfu/skills" }
   ],
   "recommended": [{ "name": "antfu", "skills": ["vue"] }],
-  "cache": { "enabled": true, "ttl": 600 },
-  "registry": { "enabled": false, "url": "https://xskill.gcli.cn/skills.json" }
+  "cache": { "enabled": true, "ttl": 86400 },
+  "registry": { "enabled": false, "url": "https://xskill.gcli.cn/skills.json" },
+  "proxy": ""
 }
 ```
 

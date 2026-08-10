@@ -1,13 +1,13 @@
 use crate::config::Config;
 use crate::git;
-use crate::lock::{LockFile, LockEntry};
+use crate::lock::{LockEntry, LockFile};
 use crate::skill_meta::SkillMeta;
 use crate::skill_resolver;
 use crate::utils::{
-    canonical_skills_dir, create_relative_symlink, display_path, resolve_source, validate_agent,
-    ResolvedSource,
+    ResolvedSource, canonical_skills_dir, create_relative_symlink, display_path, resolve_source,
+    validate_agent,
 };
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use colored::Colorize;
 use ratatui::style::Color;
 use ratatui::text::{Line, Span};
@@ -34,7 +34,9 @@ pub fn run(url: Option<&str>, skill: &str, global: bool, agent: Option<&str>) ->
 
     // 处理 -s '*' 的情况（安装所有 skills，需要 --from）
     if skill == "*" {
-        let url = url.ok_or_else(|| anyhow::anyhow!("--from is required when using '*' to install all skills"))?;
+        let url = url.ok_or_else(|| {
+            anyhow::anyhow!("--from is required when using '*' to install all skills")
+        })?;
         let resolved = resolve_source(&config, url)?;
         return install_all_skills(&config, &resolved, &target, url, global);
     }
@@ -44,7 +46,12 @@ pub fn run(url: Option<&str>, skill: &str, global: bool, agent: Option<&str>) ->
         find_skill_with_fallback(&config, skill, url)?;
 
     // 显示源信息
-    println!("{}: {} ({})", "Source".cyan().bold(), source_name, source_url);
+    println!(
+        "{}: {} ({})",
+        "Source".cyan().bold(),
+        source_name,
+        source_url
+    );
 
     let resolved = ResolvedSource {
         url: source_url.clone(),
@@ -56,7 +63,14 @@ pub fn run(url: Option<&str>, skill: &str, global: bool, agent: Option<&str>) ->
 
     // 安装到规范目录
     let canonical_dir = canonical_skills_dir(global).join(&dest_name);
-    install_to_canonical(&resolved, &skill_path, &dest_name, &canonical_dir, &source_name, global)?;
+    install_to_canonical(
+        &resolved,
+        &skill_path,
+        &dest_name,
+        &canonical_dir,
+        &source_name,
+        global,
+    )?;
 
     // 根据目标创建软链接
     match &target {
@@ -83,6 +97,15 @@ fn resolve_install_target(agent: Option<&str>) -> InstallTarget {
     }
 }
 
+/// 根据 global 标志获取基础目录（home 或当前工作目录）
+fn base_dir_for(global: bool) -> PathBuf {
+    if global {
+        dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"))
+    } else {
+        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+    }
+}
+
 /// 安装 skill 到规范目录
 fn install_to_canonical(
     resolved: &ResolvedSource,
@@ -98,26 +121,46 @@ fn install_to_canonical(
     }
 
     // 安装
-    let _result = git::install_skill(&resolved.url, skill_path, dest_name, dest_dir)
+    let result = git::install_skill(&resolved.url, skill_path, dest_name, dest_dir)
         .with_context(|| format!("Failed to install skill '{}'", dest_name))?;
 
     // 读取 SKILL.md 信息
     let meta = SkillMeta::from_file(dest_dir)?;
 
     // 显示 skill 信息
-    println!("{}: {}", "Name".cyan().bold(), meta.display_name(dest_name).yellow());
-    println!("{}: {}", "Description".cyan().bold(), meta.display_description());
+    println!(
+        "{}: {}",
+        "Name".cyan().bold(),
+        meta.display_name(dest_name).yellow()
+    );
+    println!(
+        "{}: {}",
+        "Description".cyan().bold(),
+        meta.display_description()
+    );
     if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
         if !version.is_empty() {
             println!("{}: {}", "Version".cyan().bold(), version);
         }
     }
+    println!(
+        "{}: {}",
+        "Path".cyan().bold(),
+        format!("{}/SKILL.md", skill_path)
+    );
 
     // 显示安装路径
     println!("{}: {}", "Installed".green(), display_path(dest_dir));
 
-    // 更新锁文件
-    update_lock_file(source, resolved, skill_path, dest_name, global)?;
+    // 更新锁文件（复用 install_skill 中已计算的 hash，避免再次克隆）
+    update_lock_file(
+        source,
+        resolved,
+        skill_path,
+        dest_name,
+        global,
+        &result.skill_folder_hash,
+    )?;
 
     Ok(())
 }
@@ -133,20 +176,38 @@ fn symlink_to_platform(
     let platform = config.get_platform(platform_name).unwrap();
 
     if platform.agents_compat {
-        println!("{}: {} ({})", "Skipped".dimmed(), platform_name, "agents_compat");
+        println!(
+            "{}: {} ({})",
+            "Skipped".dimmed(),
+            platform_name,
+            "agents_compat"
+        );
         return Ok(());
     }
 
     if platform.skills.is_empty() {
-        bail!("Platform {} has no skills directory configured", platform_name);
+        bail!(
+            "Platform {} has no skills directory configured",
+            platform_name
+        );
+    }
+
+    // 跳过与规范目录相同的平台（避免自引用链接）
+    let platform_skills_dir = base_dir_for(global)
+        .join(&platform.path)
+        .join(&platform.skills);
+    if platform_skills_dir == canonical_skills_dir(global) {
+        println!(
+            "{}: {} ({})",
+            "Skipped".dimmed(),
+            platform_name,
+            "same as canonical dir"
+        );
+        return Ok(());
     }
 
     // 平台目录不存在时自动创建
-    let base_dir = if global {
-        dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"))
-    } else {
-        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
-    };
+    let base_dir = base_dir_for(global);
     let platform_path = base_dir.join(&platform.path);
     if !platform_path.exists() {
         fs::create_dir_all(&platform_path)?;
@@ -163,13 +224,22 @@ fn symlink_to_platform(
             // 回退到文件复制
             fs::create_dir_all(&link_path)?;
             copy_dir_recursive(&canonical_dir, &link_path)?;
-            println!("{}: {} (copy fallback)", "Installed".green(), display_path(&link_path));
+            println!(
+                "{}: {} (copy fallback)",
+                "Installed".green(),
+                display_path(&link_path)
+            );
         }
         Err(e) => {
             // 回退到文件复制
             fs::create_dir_all(&link_path)?;
             copy_dir_recursive(&canonical_dir, &link_path)?;
-            println!("{}: {} (copy fallback: {})", "Installed".green(), display_path(&link_path), e);
+            println!(
+                "{}: {} (copy fallback: {})",
+                "Installed".green(),
+                display_path(&link_path),
+                e
+            );
         }
     }
 
@@ -177,18 +247,11 @@ fn symlink_to_platform(
 }
 
 /// 创建到所有已存在平台的 symlink
-fn symlink_to_all_platforms(
-    config: &Config,
-    dest_name: &str,
-    global: bool,
-) -> Result<()> {
-    let base_dir = if global {
-        dirs::home_dir().unwrap_or_else(|| PathBuf::from("~"))
-    } else {
-        std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
-    };
+fn symlink_to_all_platforms(config: &Config, dest_name: &str, global: bool) -> Result<()> {
+    let base_dir = base_dir_for(global);
 
     let canonical_dir = canonical_skills_dir(global).join(dest_name);
+    let canonical_skills = canonical_skills_dir(global);
     let mut linked_platforms = Vec::new();
 
     for name in config.platform_names() {
@@ -210,8 +273,13 @@ fn symlink_to_all_platforms(
             continue;
         }
 
-        let skills_dir = platform_path.join(&platform.skills);
-        let link_path = skills_dir.join(dest_name);
+        // 跳过与规范目录相同的平台（避免自引用链接）
+        let platform_skills_dir = platform_path.join(&platform.skills);
+        if platform_skills_dir == canonical_skills {
+            continue;
+        }
+
+        let link_path = platform_skills_dir.join(dest_name);
 
         match create_relative_symlink(&canonical_dir, &link_path) {
             Ok(true) => {
@@ -230,7 +298,10 @@ fn symlink_to_all_platforms(
     }
 
     if linked_platforms.is_empty() {
-        println!("{}", "No available platform directories found to link".yellow());
+        println!(
+            "{}",
+            "No available platform directories found to link".yellow()
+        );
     } else {
         println!("{}: {}", "Symlinked".green(), linked_platforms.join(", "));
     }
@@ -250,14 +321,15 @@ fn install_all_skills(
     let tmp_dir = git::clone_for_listing(&resolved.url)?;
     let skills_dir = tmp_dir.path().join("skills");
 
-    if !skills_dir.exists() {
-        println!("{}", "No skills directory found in this source".yellow());
-        return Ok(());
-    }
+    let (scan_dir, path_prefix) = if skills_dir.exists() {
+        (skills_dir.as_path(), "skills")
+    } else {
+        (tmp_dir.path(), "")
+    };
 
     // 递归收集所有包含 SKILL.md 的目录
     let mut skill_entries = Vec::new();
-    collect_all_skills(&skills_dir, &mut skill_entries, &mut String::new())?;
+    collect_all_skills(scan_dir, &mut skill_entries, &mut String::new())?;
 
     if skill_entries.is_empty() {
         println!("{}", "No skills available in this source".yellow());
@@ -271,14 +343,11 @@ fn install_all_skills(
     // 加载锁文件
     let mut lock_file = LockFile::load(global)?;
 
-    // 获取 sourceType
-    let source_type = if source.contains('/') {
-        "git".to_string()
-    } else {
-        config.get_source(source)
-            .map(|s| s.effective_type())
-            .unwrap_or_else(|| "git".to_string())
-    };
+    // 获取 sourceType：优先从已配置的源中查找，未找到则默认 git
+    let source_type = config
+        .get_source(source)
+        .map(|s| s.effective_type())
+        .unwrap_or_else(|| "git".to_string());
 
     // 获取当前时间
     let now = chrono::Utc::now();
@@ -287,21 +356,41 @@ fn install_all_skills(
     // 安装每个 skill
     for (skill_path, dest_name) in &skill_entries {
         // 读取 SKILL.md 信息
-        let skill_md_path = skills_dir.join(skill_path);
+        let skill_md_path = scan_dir.join(skill_path);
         let meta = SkillMeta::from_file(&skill_md_path).unwrap_or_default();
 
+        // 构建完整的相对路径（从 repo root）
+        let full_skill_path = if path_prefix.is_empty() {
+            skill_path.clone()
+        } else {
+            format!("{}/{}", path_prefix, skill_path)
+        };
+
         // 显示 skill 信息
-        println!("{}: {}", "Name".cyan().bold(), meta.display_name(dest_name).yellow());
-        println!("{}: {}", "Description".cyan().bold(), meta.display_description());
+        println!(
+            "{}: {}",
+            "Name".cyan().bold(),
+            meta.display_name(dest_name).yellow()
+        );
+        println!(
+            "{}: {}",
+            "Description".cyan().bold(),
+            meta.display_description()
+        );
         if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
             if !version.is_empty() {
                 println!("{}: {}", "Version".cyan().bold(), version);
             }
         }
+        println!(
+            "{}: {}",
+            "Path".cyan().bold(),
+            format!("{}/SKILL.md", full_skill_path)
+        );
 
         // 获取 tree hash
-        let skill_folder_hash = git::get_skill_folder_hash(tmp_dir.path(), skill_path)
-            .unwrap_or_default();
+        let skill_folder_hash =
+            git::get_skill_folder_hash(tmp_dir.path(), &full_skill_path).unwrap_or_default();
 
         // 检查是否已存在，保留原始 installedAt
         let installed_at = if let Some(existing) = lock_file.skills.get(dest_name) {
@@ -311,7 +400,7 @@ fn install_all_skills(
         };
 
         // 构建 skillPath
-        let skill_path_in_repo = format!("skills/{}/SKILL.md", skill_path);
+        let skill_path_in_repo = format!("{}/SKILL.md", full_skill_path);
 
         // 创建锁文件条目
         let lock_entry = LockEntry {
@@ -328,7 +417,7 @@ fn install_all_skills(
         lock_file.upsert_skill(dest_name, lock_entry);
 
         // 源目录
-        let source_dir = skills_dir.join(skill_path);
+        let source_dir = scan_dir.join(skill_path);
 
         // 安装到规范目录
         let canonical_dir = canonical_skills_dir(global).join(dest_name);
@@ -357,10 +446,7 @@ fn install_all_skills(
 }
 
 /// 复制 skill 到目标目录
-fn copy_skill_to_target(
-    source_dir: &Path,
-    dest_dir: &Path,
-) -> Result<()> {
+fn copy_skill_to_target(source_dir: &Path, dest_dir: &Path) -> Result<()> {
     if !source_dir.exists() {
         bail!("Source directory not found: {}", source_dir.display());
     }
@@ -383,27 +469,20 @@ fn update_lock_file(
     skill_path: &str,
     dest_name: &str,
     global: bool,
+    skill_folder_hash: &str,
 ) -> Result<()> {
     let mut lock_file = LockFile::load(global)?;
 
-    // 获取 sourceType
-    let source_type = if source.contains('/') {
-        "git".to_string()
-    } else {
-        // 从配置中查找
-        let config = Config::load()?;
-        config.get_source(source)
-            .map(|s| s.effective_type())
-            .unwrap_or_else(|| "git".to_string())
-    };
+    // 获取 sourceType：优先从已配置的源中查找，未找到则默认 git
+    let config = Config::load()?;
+    let source_type = config
+        .get_source(source)
+        .map(|s| s.effective_type())
+        .unwrap_or_else(|| "git".to_string());
 
+    // skill_path is already the full relative path from repo root (e.g., "skills/name" or "name")
     // 构建 skillPath（相对于 Git 仓库）
-    let skill_path_in_repo = format!("skills/{}/SKILL.md", skill_path);
-
-    // 克隆仓库以获取 tree hash
-    let tmp_dir = git::clone_for_listing(&resolved.url)?;
-    let skill_folder_hash = git::get_skill_folder_hash(tmp_dir.path(), skill_path)
-        .unwrap_or_default();
+    let skill_path_in_repo = format!("{}/SKILL.md", skill_path);
 
     // 获取当前时间（格式化为 ISO 8601 with milliseconds）
     let now = chrono::Utc::now();
@@ -422,7 +501,7 @@ fn update_lock_file(
         source_type,
         source_url: resolved.url.clone(),
         skill_path: skill_path_in_repo,
-        skill_folder_hash,
+        skill_folder_hash: skill_folder_hash.to_string(),
         installed_at,
         updated_at: timestamp.clone(),
     };
@@ -471,7 +550,12 @@ fn find_skill_with_fallback(
         1 => {
             let m = &matches[0];
             let (skill_path, dest_name) = extract_skill_path(&m.skill_path);
-            Ok((m.source_name.clone(), m.source_url.clone(), skill_path, dest_name))
+            Ok((
+                m.source_name.clone(),
+                m.source_url.clone(),
+                skill_path,
+                dest_name,
+            ))
         }
         _ => {
             // Multiple sources have this skill — let the user choose
@@ -491,7 +575,12 @@ fn find_skill_with_fallback(
             }
             let selected = run_source_select_tui(skill_name, &matches)?;
             let (skill_path, dest_name) = extract_skill_path(&selected.skill_path);
-            Ok((selected.source_name, selected.source_url, skill_path, dest_name))
+            Ok((
+                selected.source_name,
+                selected.source_url,
+                skill_path,
+                dest_name,
+            ))
         }
     }
 }
@@ -516,7 +605,11 @@ impl SkimItem for SourceItem {
     fn display(&self, context: DisplayContext) -> Line<'_> {
         let base = context.base_style;
         let is_selected = base.bg.is_some();
-        let name_style = if is_selected { base.fg(Color::Blue) } else { base };
+        let name_style = if is_selected {
+            base.fg(Color::Blue)
+        } else {
+            base
+        };
         let registry_style = if is_selected {
             base.fg(Color::Green)
         } else {
@@ -529,7 +622,10 @@ impl SkimItem for SourceItem {
         // Column 3: url
         let tag = if self.is_registry { "[registry]" } else { "-" };
         let mut spans = vec![Span::styled(format!("{:<12}", tag), registry_style)];
-        spans.push(Span::styled(format!("{:<16}", self.source_name), name_style));
+        spans.push(Span::styled(
+            format!("{:<16}", self.source_name),
+            name_style,
+        ));
         spans.push(Span::styled(self.source_url.clone(), source_style));
         Line::from(spans)
     }
@@ -543,7 +639,12 @@ fn run_source_select_tui(
     let items: Vec<SourceItem> = matches
         .iter()
         .map(|m| SourceItem {
-            display: format!("{} {} {}", if m.is_registry { "[registry]" } else { "" }, m.source_name, m.source_url),
+            display: format!(
+                "{} {} {}",
+                if m.is_registry { "[registry]" } else { "" },
+                m.source_name,
+                m.source_url
+            ),
             source_name: m.source_name.clone(),
             source_url: m.source_url.clone(),
             is_registry: m.is_registry,
@@ -583,39 +684,41 @@ fn run_source_select_tui(
         .ok_or_else(|| anyhow::anyhow!("Selected source not found"))
 }
 
-/// Extract (rel_path, dir_name) from "skills/rel_path/SKILL.md"
+/// Extract (dir_path, dir_name) from "skills/rel_path/SKILL.md" or "rel_path/SKILL.md"
 fn extract_skill_path(full_path: &str) -> (String, String) {
-    let stripped = full_path
-        .strip_prefix("skills/")
-        .unwrap_or(full_path)
-        .strip_suffix("/SKILL.md")
-        .unwrap_or(full_path);
-    let dest_name = stripped
-        .split('/')
-        .last()
-        .unwrap_or(stripped)
-        .to_string();
-    (stripped.to_string(), dest_name)
+    // Remove /SKILL.md suffix to get the directory path
+    let dir_path = full_path.strip_suffix("/SKILL.md").unwrap_or(full_path);
+    // Get the last component as the directory name
+    let dest_name = dir_path.split('/').last().unwrap_or(dir_path).to_string();
+    (dir_path.to_string(), dest_name)
 }
 
 /// 在仓库中查找 skill 的完整路径（递归搜索所有子目录）
 fn find_skill_in_repo(repo_url: &str, skill_name: &str) -> Result<Option<(String, String)>> {
     let tmp_dir = git::clone_for_listing(repo_url)?;
-    let workdir = tmp_dir.path().join("skills");
+    let skills_dir = tmp_dir.path().join("skills");
 
-    if !workdir.exists() {
-        return Ok(None);
-    }
+    let (scan_dir, path_prefix) = if skills_dir.exists() {
+        (skills_dir.as_path(), "skills")
+    } else {
+        (tmp_dir.path(), "")
+    };
 
     // 递归搜索所有子目录
     let mut matches = Vec::new();
-    collect_matching_skills(&workdir, skill_name, &mut matches, &mut String::new())?;
+    collect_matching_skills(scan_dir, skill_name, &mut matches, &mut String::new())?;
 
     match matches.len() {
         0 => Ok(None),
         1 => {
             let (path, dest) = matches.into_iter().next().unwrap();
-            Ok(Some((path, dest)))
+            // Construct full path from repo root
+            let full_path = if path_prefix.is_empty() {
+                path
+            } else {
+                format!("{}/{}", path_prefix, path)
+            };
+            Ok(Some((full_path, dest)))
         }
         _ => {
             let options: Vec<String> = matches.iter().map(|(p, _)| p.clone()).collect();
@@ -641,6 +744,10 @@ fn collect_matching_skills(
 
         if path.is_dir() {
             let dir_name = entry.file_name().to_string_lossy().to_string();
+            // Skip hidden directories (starting with '.')
+            if dir_name.starts_with('.') {
+                continue;
+            }
             let saved = current_path.clone();
 
             let rel_path = if current_path.is_empty() {
@@ -684,6 +791,10 @@ fn collect_all_skills(
 
         if path.is_dir() {
             let dir_name = entry.file_name().to_string_lossy().to_string();
+            // Skip hidden directories (starting with '.')
+            if dir_name.starts_with('.') {
+                continue;
+            }
             let saved = current_path.clone();
 
             let rel_path = if current_path.is_empty() {
@@ -718,8 +829,8 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
     fs::create_dir_all(dst)
         .with_context(|| format!("Failed to create directory: {}", dst.display()))?;
 
-    for entry in fs::read_dir(src)
-        .with_context(|| format!("Failed to read directory: {}", src.display()))?
+    for entry in
+        fs::read_dir(src).with_context(|| format!("Failed to read directory: {}", src.display()))?
     {
         let entry = entry?;
         let src_path = entry.path();
@@ -763,14 +874,14 @@ mod tests {
     #[test]
     fn test_extract_skill_path_simple() {
         let (path, dest) = extract_skill_path("skills/vue/SKILL.md");
-        assert_eq!(path, "vue");
+        assert_eq!(path, "skills/vue");
         assert_eq!(dest, "vue");
     }
 
     #[test]
     fn test_extract_skill_path_nested() {
         let (path, dest) = extract_skill_path("skills/frontend/vue/SKILL.md");
-        assert_eq!(path, "frontend/vue");
+        assert_eq!(path, "skills/frontend/vue");
         assert_eq!(dest, "vue");
     }
 
@@ -801,7 +912,10 @@ mod tests {
 
         copy_dir_recursive(&src, &dst).unwrap();
         assert_eq!(fs::read_to_string(dst.join("a.txt")).unwrap(), "hello");
-        assert_eq!(fs::read_to_string(dst.join("sub").join("b.txt")).unwrap(), "world");
+        assert_eq!(
+            fs::read_to_string(dst.join("sub").join("b.txt")).unwrap(),
+            "world"
+        );
     }
 
     #[test]

@@ -26,6 +26,9 @@ pub struct SourceCache {
     /// Registry URL (set when source comes from a registry)
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub registry_url: Option<String>,
+    /// Latest commit ID (SHA) of the source repository at sync time
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub commit_hash: String,
     /// Skills from this source
     pub skills: Vec<CachedSkill>,
 }
@@ -76,8 +79,7 @@ impl CacheData {
             .with_context(|| format!("Failed to create cache directory: {}", dir.display()))?;
 
         let path = cache_file();
-        let json = serde_json::to_string_pretty(self)
-            .context("Failed to serialize cache")?;
+        let json = serde_json::to_string_pretty(self).context("Failed to serialize cache")?;
         fs::write(&path, json)
             .with_context(|| format!("Failed to write cache file: {}", path.display()))?;
         Ok(())
@@ -102,11 +104,14 @@ pub fn url_cache_filename(url: &str) -> String {
     let normalized = url.strip_suffix(".git").unwrap_or(url);
     let mut hasher = Md5::new();
     hasher.update(normalized.as_bytes());
-    let hash = hasher.finalize().iter().fold(String::with_capacity(32), |mut acc, b| {
-        use std::fmt::Write;
-        write!(acc, "{:02x}", b).unwrap();
-        acc
-    });
+    let hash = hasher
+        .finalize()
+        .iter()
+        .fold(String::with_capacity(32), |mut acc, b| {
+            use std::fmt::Write;
+            write!(acc, "{:02x}", b).unwrap();
+            acc
+        });
     format!("source_{}.json", hash)
 }
 
@@ -133,8 +138,7 @@ pub fn save_url_cache(url: &str, data: &CacheData) -> Result<()> {
         .with_context(|| format!("Failed to create cache directory: {}", dir.display()))?;
 
     let path = dir.join(url_cache_filename(url));
-    let json =
-        serde_json::to_string_pretty(data).context("Failed to serialize URL cache")?;
+    let json = serde_json::to_string_pretty(data).context("Failed to serialize URL cache")?;
     fs::write(&path, json)
         .with_context(|| format!("Failed to write URL cache file: {}", path.display()))?;
     Ok(())
@@ -169,21 +173,18 @@ mod tests {
         // Test serialization/deserialization without touching the filesystem
         let data = CacheData {
             updated_at: "2026-07-17T12:00:00.000Z".to_string(),
-            sources: vec![
-                SourceCache {
-                    source: "test-source".to_string(),
-                    url: None,
-                    registry_url: None,
-                    skills: vec![
-                        CachedSkill {
-                            name: "vue".to_string(),
-                            path: "skills/vue/SKILL.md".to_string(),
-                            description: "Vue.js skills".to_string(),
-                            version: "1.0.0".to_string(),
-                        },
-                    ],
-                },
-            ],
+            sources: vec![SourceCache {
+                source: "test-source".to_string(),
+                url: None,
+                registry_url: None,
+                commit_hash: "abc123".to_string(),
+                skills: vec![CachedSkill {
+                    name: "vue".to_string(),
+                    path: "skills/vue/SKILL.md".to_string(),
+                    description: "Vue.js skills".to_string(),
+                    version: "1.0.0".to_string(),
+                }],
+            }],
         };
 
         // Serialize to JSON string and deserialize back
@@ -191,6 +192,7 @@ mod tests {
         let loaded: CacheData = serde_json::from_str(&json).unwrap();
         assert_eq!(loaded.sources.len(), 1);
         assert_eq!(loaded.sources[0].source, "test-source");
+        assert_eq!(loaded.sources[0].commit_hash, "abc123");
         assert_eq!(loaded.sources[0].skills.len(), 1);
         assert_eq!(loaded.sources[0].skills[0].name, "vue");
         assert_eq!(loaded.updated_at, "2026-07-17T12:00:00.000Z");
@@ -235,6 +237,7 @@ mod tests {
                 source: "test".to_string(),
                 url: None,
                 registry_url: None,
+                commit_hash: "def456".to_string(),
                 skills: vec![CachedSkill {
                     name: "my-skill".to_string(),
                     path: "skills/my-skill/SKILL.md".to_string(),

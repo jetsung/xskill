@@ -1,5 +1,5 @@
 use crate::config::Config;
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use regex::Regex;
 use std::env;
 use std::fs;
@@ -34,7 +34,8 @@ pub fn resolve_source(config: &Config, source: &str) -> Result<ResolvedSource> {
     }
 
     // 3. 原样作为 URL
-    if source.starts_with("http://") || source.starts_with("https://") || source.starts_with("git@") {
+    if source.starts_with("http://") || source.starts_with("https://") || source.starts_with("git@")
+    {
         return Ok(ResolvedSource {
             url: source.to_string(),
             source_type: "git".to_string(),
@@ -99,7 +100,10 @@ pub fn validate_remove_path(skill_path: &str) -> Result<()> {
     let path = PathBuf::from(skill_path);
     // 移除操作不允许嵌套路径
     if path.components().count() > 1 {
-        bail!("Invalid path: only direct subdirectories under skills/ allowed '{}'", skill_path);
+        bail!(
+            "Invalid path: only direct subdirectories under skills/ allowed '{}'",
+            skill_path
+        );
     }
 
     Ok(())
@@ -189,6 +193,15 @@ pub fn canonical_skills_dir(global: bool) -> PathBuf {
 /// - 创建失败 → 返回 false（调用方应回退到文件复制）
 /// - 自动创建父目录
 pub fn create_relative_symlink(target: &Path, link_path: &Path) -> Result<bool> {
+    // 防止自引用/冗余链接：链接路径与目标指向同一目录（或链接位于目标内部）
+    if let Some(canon_link) = canonicalize_light(link_path) {
+        if let Some(canon_target) = canonicalize_light(target) {
+            if canon_link == canon_target || canon_link.starts_with(&canon_target) {
+                return Ok(true); // 自身即目标，无需（也不应）创建链接
+            }
+        }
+    }
+
     // 如果链接已存在
     if link_path.exists() || link_path.is_symlink() {
         // 解析现有链接目标
@@ -198,7 +211,10 @@ pub fn create_relative_symlink(target: &Path, link_path: &Path) -> Result<bool> 
                 let resolved_existing = if existing_target.is_absolute() {
                     existing_target.clone()
                 } else {
-                    link_path.parent().unwrap_or(link_path).join(&existing_target)
+                    link_path
+                        .parent()
+                        .unwrap_or(link_path)
+                        .join(&existing_target)
                 };
                 let resolved_target = if target.is_absolute() {
                     target.to_path_buf()
@@ -207,8 +223,10 @@ pub fn create_relative_symlink(target: &Path, link_path: &Path) -> Result<bool> 
                     std::fs::canonicalize(target).unwrap_or_else(|_| target.to_path_buf())
                 };
                 // 尝试规范化两者
-                let canon_existing = std::fs::canonicalize(&resolved_existing).unwrap_or(resolved_existing);
-                let canon_target = std::fs::canonicalize(&resolved_target).unwrap_or(resolved_target);
+                let canon_existing =
+                    std::fs::canonicalize(&resolved_existing).unwrap_or(resolved_existing);
+                let canon_target =
+                    std::fs::canonicalize(&resolved_target).unwrap_or(resolved_target);
                 if canon_existing == canon_target {
                     return Ok(true); // 相同目标，跳过
                 }
@@ -228,8 +246,8 @@ pub fn create_relative_symlink(target: &Path, link_path: &Path) -> Result<bool> 
 
     // 计算相对路径
     let link_dir = link_path.parent().unwrap_or(Path::new("."));
-    let relative_path = pathdiff::diff_paths(target, link_dir)
-        .unwrap_or_else(|| target.to_path_buf());
+    let relative_path =
+        pathdiff::diff_paths(target, link_dir).unwrap_or_else(|| target.to_path_buf());
 
     // 创建软链接
     #[cfg(unix)]
@@ -247,6 +265,22 @@ pub fn create_relative_symlink(target: &Path, link_path: &Path) -> Result<bool> 
             Err(_) => Ok(false),
         }
     }
+}
+
+/// 轻量规范化路径：解析符号链接并合并绝对路径。
+/// 失败时回退为原路径本身，保证调用方不会因规范化失败而崩溃。
+fn canonicalize_light(path: &Path) -> Option<PathBuf> {
+    std::fs::canonicalize(path).ok().or_else(|| {
+        // 目标/链接尚不存在或无法解析时，尝试基于父目录做相对解析
+        let parent = path.parent()?;
+        let base = if parent.as_os_str().is_empty() {
+            PathBuf::from(".")
+        } else {
+            std::fs::canonicalize(parent).ok()?
+        };
+        let resolved = base.join(path.file_name()?);
+        Some(resolved)
+    })
 }
 
 /// 安全删除软链接（不删除目标内容）
@@ -284,10 +318,13 @@ pub fn validate_agent(config: &Config, agent: &str) -> Result<()> {
         return Ok(());
     }
     let available = config.platform_names();
-    bail!("{}", AgentValidationError {
-        agent: agent.to_string(),
-        available: available.iter().map(|s| s.to_string()).collect(),
-    });
+    bail!(
+        "{}",
+        AgentValidationError {
+            agent: agent.to_string(),
+            available: available.iter().map(|s| s.to_string()).collect(),
+        }
+    );
 }
 
 /// 自定义错误类型，确保 ANSI 颜色码不被 anyhow 截断
@@ -365,9 +402,18 @@ mod tests {
 
     #[test]
     fn test_normalize_url() {
-        assert_eq!(normalize_url("https://example.com/repo"), "https://example.com/repo");
-        assert_eq!(normalize_url("https://example.com/repo/"), "https://example.com/repo");
-        assert_eq!(normalize_url("https://example.com/repo.git"), "https://example.com/repo.git");
+        assert_eq!(
+            normalize_url("https://example.com/repo"),
+            "https://example.com/repo"
+        );
+        assert_eq!(
+            normalize_url("https://example.com/repo/"),
+            "https://example.com/repo"
+        );
+        assert_eq!(
+            normalize_url("https://example.com/repo.git"),
+            "https://example.com/repo.git"
+        );
     }
 
     #[test]
@@ -432,7 +478,10 @@ mod tests {
         assert_eq!(compare_versions("", ""), "Installed");
         assert_eq!(compare_versions("", "1.0.0"), "Installed");
         assert_eq!(compare_versions("1.0.0", "1.0.0"), "No change (1.0.0)");
-        assert_eq!(compare_versions("1.0.0", "2.0.0"), "Updated (1.0.0 → 2.0.0)");
+        assert_eq!(
+            compare_versions("1.0.0", "2.0.0"),
+            "Updated (1.0.0 → 2.0.0)"
+        );
     }
 
     #[test]
@@ -527,6 +576,22 @@ mod tests {
     }
 
     #[test]
+    fn test_create_relative_symlink_self_reference_is_noop() {
+        let tmp = tempfile::tempdir().unwrap();
+        // target 位于 link 的父目录内 → 自引用，应安全跳过而不创建链接
+        let target = tmp.path().join("skills").join("my-skill");
+        fs::create_dir_all(&target).unwrap();
+        fs::write(target.join("SKILL.md"), "x").unwrap();
+
+        let link = tmp.path().join("skills").join("my-skill");
+        let result = create_relative_symlink(&target, &link).unwrap();
+        assert!(result);
+        // 不应创建指向自身的符号链接
+        assert!(!link.is_symlink());
+        assert!(link.exists()); // 目标本身存在，但非链接
+    }
+
+    #[test]
     fn test_create_relative_symlink_uses_relative_path() {
         let tmp = tempfile::tempdir().unwrap();
         let target = tmp.path().join("target");
@@ -606,7 +671,11 @@ mod tests {
         let home = dirs::home_dir().unwrap();
         let path = home.join(".agents").join("skills");
         let displayed = display_path(&path);
-        assert!(displayed.starts_with('~'), "expected ~/... prefix, got: {}", displayed);
+        assert!(
+            displayed.starts_with('~'),
+            "expected ~/... prefix, got: {}",
+            displayed
+        );
         assert!(displayed.contains(".agents"));
         assert!(!displayed.contains(&home.display().to_string()));
     }

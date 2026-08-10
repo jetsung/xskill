@@ -11,6 +11,10 @@ mod utils;
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use colored::Colorize;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+/// 全局 verbose 标志
+pub static VERBOSE: AtomicBool = AtomicBool::new(false);
 
 #[derive(Parser)]
 #[command(
@@ -20,6 +24,10 @@ use colored::Colorize;
     long_about = None
 )]
 struct Cli {
+    /// Show verbose output (including git command stderr)
+    #[arg(short, long, global = true)]
+    verbose: bool,
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -32,11 +40,10 @@ enum Commands {
         action: SourcesAction,
     },
 
-    /// List configured platforms
+    /// Manage configured platforms
     Platforms {
-        /// Show detailed information
-        #[arg(short = 'a', long = "all")]
-        detailed: bool,
+        #[command(subcommand)]
+        action: Option<PlatformsAction>,
     },
 
     /// Install specified skill
@@ -158,6 +165,14 @@ enum Commands {
         /// Set config value (e.g. cache.enabled=true)
         #[arg(short = 's', long = "set")]
         set: Option<String>,
+
+        /// Show the full loaded configuration as pretty JSON
+        #[arg(short = 'w', long = "show")]
+        show: bool,
+
+        /// Validate the configuration against the JSON Schema
+        #[arg(short = 'V', long = "validate")]
+        validate: bool,
     },
 
     /// Find and install a skill interactively
@@ -211,6 +226,19 @@ enum Commands {
 }
 
 #[derive(Subcommand)]
+enum PlatformsAction {
+    /// List configured platforms
+    List {
+        /// Show detailed information
+        #[arg(short = 'a', long = "all")]
+        detailed: bool,
+    },
+
+    /// Reset platforms to defaults
+    Reset,
+}
+
+#[derive(Subcommand)]
 enum SourcesAction {
     /// List configured sources
     List,
@@ -239,10 +267,14 @@ enum SourcesAction {
         /// Source URL to remove
         #[arg(short = 'u', long = "url")]
         url: Option<String>,
+
+        /// Source index (from `sources list`), overridden by --name/--url
+        #[arg(short = 'i', long = "index")]
+        index: Option<usize>,
     },
 
-    /// Edit an existing source (only name can be changed)
-    Edit {
+    /// Rename an existing source
+    Rename {
         /// Source name to identify entry
         #[arg(short = 'n', long = "name")]
         name: Option<String>,
@@ -254,6 +286,10 @@ enum SourcesAction {
         /// New name for the source (required, empty string to clear)
         #[arg(short = 'N', long = "new-name")]
         new_name: String,
+
+        /// Source index (from `sources list`), overridden by --name/--url
+        #[arg(short = 'i', long = "index")]
+        index: Option<usize>,
     },
 }
 
@@ -320,47 +356,75 @@ fn main() {
 fn run() -> Result<()> {
     let cli = Cli::parse();
 
+    // 设置全局 verbose 标志
+    VERBOSE.store(cli.verbose, Ordering::Relaxed);
+
     match cli.command {
         Commands::Sources { action } => match action {
             SourcesAction::List => commands::sources::run(),
-            SourcesAction::Add { name, url, source_type } => {
-                commands::sources::run_add(name.as_deref(), &url, &source_type)
+            SourcesAction::Add {
+                name,
+                url,
+                source_type,
+            } => commands::sources::run_add(name.as_deref(), &url, &source_type),
+            SourcesAction::Remove { name, url, index } => {
+                commands::sources::run_remove(name.as_deref(), url.as_deref(), index)
             }
-            SourcesAction::Remove { name, url } => {
-                commands::sources::run_remove(name.as_deref(), url.as_deref())
-            }
-            SourcesAction::Edit { name, url, new_name } => {
-                commands::sources::run_edit(name.as_deref(), url.as_deref(), &new_name)
-            }
+            SourcesAction::Rename {
+                name,
+                url,
+                new_name,
+                index,
+            } => commands::sources::run_rename(name.as_deref(), url.as_deref(), &new_name, index),
         },
-        Commands::Platforms { detailed } => commands::platforms::run(detailed),
-        Commands::Add { source, skill, global, agent, all } => {
+        Commands::Platforms { action } => match action {
+            Some(PlatformsAction::List { detailed }) => commands::platforms::run(detailed),
+            Some(PlatformsAction::Reset) => commands::platforms::run_reset(),
+            None => commands::platforms::run(false),
+        },
+        Commands::Add {
+            source,
+            skill,
+            global,
+            agent,
+            all,
+        } => {
             // --all is shorthand for --skill '*' --agent '*'
             let (final_skill, final_agent) = if all {
                 ("*".to_string(), Some("*".to_string()))
             } else {
-                let skill = skill.ok_or_else(|| anyhow::anyhow!("--skill option is required (or use --all)"))?;
+                let skill = skill
+                    .ok_or_else(|| anyhow::anyhow!("--skill option is required (or use --all)"))?;
                 (skill, agent)
             };
             // -s '*' + -a '*' 时必须指定 -f
             if final_skill == "*" && final_agent.as_deref() == Some("*") && source.is_none() {
                 anyhow::bail!("--from is required when using --skill '*' --agent '*' (or --all)");
             }
-            commands::add::run(source.as_deref(), &final_skill, global, final_agent.as_deref())
+            commands::add::run(
+                source.as_deref(),
+                &final_skill,
+                global,
+                final_agent.as_deref(),
+            )
         }
-        Commands::Remove { skill, global, agent, all } => {
+        Commands::Remove {
+            skill,
+            global,
+            agent,
+            all,
+        } => {
             // --all is shorthand for --skill '*' --agent '*'
             let (final_skill, final_agent) = if all {
                 ("*".to_string(), Some("*".to_string()))
             } else {
-                let skill = skill.ok_or_else(|| anyhow::anyhow!("--skill option is required (or use --all)"))?;
+                let skill = skill
+                    .ok_or_else(|| anyhow::anyhow!("--skill option is required (or use --all)"))?;
                 (skill, agent)
             };
             commands::remove::run(&final_skill, global, final_agent.as_deref())
         }
-        Commands::Query { source, skill } => {
-            commands::query::run(&skill, source.as_deref())
-        }
+        Commands::Query { source, skill } => commands::query::run(&skill, source.as_deref()),
         Commands::Rec { action } => match action {
             RecAction::List => commands::rec::run(),
             RecAction::Add { name, url, skills } => {
@@ -370,20 +434,25 @@ fn run() -> Result<()> {
                 commands::rec::run_remove(name.as_deref(), url.as_deref(), skills.as_deref())
             }
         },
-        Commands::Update { global, skill } => {
-            commands::update::run(global, skill.as_deref())
-        }
-        Commands::Restore { global, agent, dry_run } => {
-            commands::restore::run(global, agent.as_deref(), dry_run)
-        }
-        Commands::List { global, agent } => {
-            commands::list::run(global, agent.as_deref())
-        }
+        Commands::Update { global, skill } => commands::update::run(global, skill.as_deref()),
+        Commands::Restore {
+            global,
+            agent,
+            dry_run,
+        } => commands::restore::run(global, agent.as_deref(), dry_run),
+        Commands::List { global, agent } => commands::list::run(global, agent.as_deref()),
         Commands::Cache { action } => match action {
             CacheAction::Clear { from } => commands::cache::run_clear(from.as_deref()),
             CacheAction::Update { from } => commands::cache::run_update(from.as_deref()),
         },
-        Commands::Config { init, edit, get, set } => {
+        Commands::Config {
+            init,
+            edit,
+            get,
+            set,
+            show,
+            validate,
+        } => {
             if init {
                 commands::config::run_init()
             } else if edit {
@@ -392,26 +461,45 @@ fn run() -> Result<()> {
                 commands::config::run_get(&key)
             } else if let Some(kv) = set {
                 commands::config::run_set(&kv)
+            } else if show {
+                commands::config::run_show()
+            } else if validate {
+                commands::config::run_validate()
             } else {
-                println!("{}", "Usage: xskill config --init | --edit | --get <key> | --set <key=value>".dimmed());
+                println!(
+                    "{}",
+                    "Usage: xskill config --init | --edit | --get <key> | --set <key=value> | --show | --validate"
+                        .dimmed()
+                );
                 Ok(())
             }
         }
-        Commands::Find { source, skill, global } => {
-            commands::find::run(skill.as_deref(), source.as_deref(), global)
-        }
-        Commands::Link { skill, agent, global, all } => {
+        Commands::Find {
+            source,
+            skill,
+            global,
+        } => commands::find::run(skill.as_deref(), source.as_deref(), global),
+        Commands::Link {
+            skill,
+            agent,
+            global,
+            all,
+        } => {
             let (final_skill, final_agent) = if all {
                 ("*".to_string(), Some("*".to_string()))
             } else {
-                let skill = skill.ok_or_else(|| anyhow::anyhow!("--skill option is required (or use --all)"))?;
+                let skill = skill
+                    .ok_or_else(|| anyhow::anyhow!("--skill option is required (or use --all)"))?;
                 (skill, agent)
             };
-            let agent = final_agent.ok_or_else(|| anyhow::anyhow!("--agent option is required (or use --all)"))?;
+            let agent = final_agent
+                .ok_or_else(|| anyhow::anyhow!("--agent option is required (or use --all)"))?;
             commands::link::run(&final_skill, &agent, global)
         }
-        Commands::New { name, description, template } => {
-            commands::new::run(&name, &description, &template)
-        }
+        Commands::New {
+            name,
+            description,
+            template,
+        } => commands::new::run(&name, &description, &template),
     }
 }
