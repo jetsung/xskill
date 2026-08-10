@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-10T12:46:37.702Z",
+  "updated_at": "2026-08-10T18:43:48.273Z",
   "sources": [
     {
       "source": "jetsung",
@@ -10,6 +10,18 @@
           "path": "skills/git-commit",
           "description": "Generates standardized git commit messages following the Conventional Commits format with Chinese descriptions. Use when committing changes, creating git commits, or writing commit messages.",
           "version": "1.2.0"
+        },
+        {
+          "name": "incremental-translate",
+          "path": "skills/incremental-translate",
+          "description": "对任意使用 aitr 的中文文档项目做「段落级增量翻译」，避免 aitr 整文件重翻浪费 token。当源文档目录相对上次提交只改动了少量内容（尤其 changelog 等超大文件）时使用。通用 skill，不绑定特定项目。",
+          "version": ""
+        },
+        {
+          "name": "incremental-translation",
+          "path": "skills/incremental-translation",
+          "description": "通用中文文档项目的增量更新与 AI 翻译工作流。包含拉取上游最新文档、对比改动、生成待翻译列表以及执行增量翻译。不绑定特定项目，通过环境变量与 deploy.sh 适配任意文档仓库。",
+          "version": ""
         },
         {
           "name": "update-gh-action-version",
