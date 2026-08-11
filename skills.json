@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-11T01:02:03.345Z",
+  "updated_at": "2026-08-11T06:51:02.804Z",
   "sources": [
     {
       "source": "jetsung",
@@ -944,7 +944,7 @@
         {
           "name": "creating-oracle-to-postgres-migration-integration-tests",
           "path": "skills/creating-oracle-to-postgres-migration-integration-tests",
-          "description": "Creates integration test cases for .NET data access artifacts during Oracle-to-PostgreSQL database migrations. Generates DB-agnostic xUnit tests with deterministic seed data that validate behavior consistency across both database systems. Use when creating integration tests for a migrated project, generating test coverage for data access layers, or writing Oracle-to-PostgreSQL migration validation tests.",
+          "description": "Creates integration test cases targeting Oracle for .NET data access artifacts. Tests capture Oracle expected behavior as the authoritative baseline; they are written once and later ported to PostgreSQL by migrating the test project in Phase 6. Use only during Phase 3, before any PostgreSQL migration work has begun. Do not invoke during Phase 6 or against a project that has already been migrated.",
           "version": ""
         },
         {
@@ -1250,7 +1250,7 @@
         {
           "name": "scaffolding-oracle-to-postgres-migration-test-project",
           "path": "skills/scaffolding-oracle-to-postgres-migration-test-project",
-          "description": "Scaffolds an xUnit integration test project for validating Oracle-to-PostgreSQL database migration behavior in .NET solutions. Creates the test project, transaction-rollback base class, and seed data manager. Use when setting up test infrastructure before writing migration integration tests, or when a test project is needed for Oracle-to-PostgreSQL validation.",
+          "description": "Scaffolds an xUnit integration test project targeting Oracle in .NET solutions. Creates the test project, transaction-rollback base class, and seed data manager. Use only during Phase 3, before writing Oracle baseline integration tests. Do not invoke during Phase 6 — the PostgreSQL test project is produced by migrating this project, not by running this skill again.",
           "version": ""
         },
         {
@@ -2319,6 +2319,12 @@
           "name": "php-mcp-server-generator",
           "path": "skills/php-mcp-server-generator",
           "description": "Generate a complete PHP Model Context Protocol server project with tools, resources, prompts, and tests using the official PHP SDK",
+          "version": ""
+        },
+        {
+          "name": "migrating-oracle-to-postgres-data-access-code",
+          "path": "skills/migrating-oracle-to-postgres-data-access-code",
+          "description": "Migrates .NET/C# data access code from Oracle to PostgreSQL (Npgsql). Replaces Oracle NuGet packages, rewrites OracleConnection/OracleCommand/OracleDataReader usage, fixes DbType mappings, updates stored procedure invocation patterns, and adapts connection string configuration. Use when migrating the application code layer of a .NET project during an Oracle-to-PostgreSQL database migration.",
           "version": ""
         },
         {
