@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-11T18:49:01.835Z",
+  "updated_at": "2026-08-12T01:09:44.788Z",
   "sources": [
     {
       "source": "jetsung",
@@ -2349,6 +2349,12 @@
           "name": "quasi-coder",
           "path": "skills/quasi-coder",
           "description": "Expert 10x engineer skill for interpreting and implementing code from shorthand, quasi-code, and natural language descriptions. Use when collaborators provide incomplete code snippets, pseudo-code, or descriptions with potential typos or incorrect terminology. Excels at translating non-technical or semi-technical descriptions into production-quality code.",
+          "version": ""
+        },
+        {
+          "name": "bug-receipt",
+          "path": "skills/bug-receipt",
+          "description": "Fix software defects with an auditable proof receipt: reproduce, trace root cause, repair, verify, and report VERIFIED, PARTIAL, or BLOCKED. Use for bug fixes and regressions.",
           "version": ""
         },
         {
