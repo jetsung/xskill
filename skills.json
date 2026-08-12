@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-12T12:46:26.267Z",
+  "updated_at": "2026-08-12T18:49:40.673Z",
   "sources": [
     {
       "source": "jetsung",
@@ -14,7 +14,7 @@
         {
           "name": "incremental-translate",
           "path": "skills/incremental-translate",
-          "description": "对任意使用 aitr 的中文文档项目做「段落级增量翻译」，避免 aitr 整文件重翻浪费 token。当源文档目录相对上次提交只改动了少量内容（尤其 changelog 等超大文件）时使用。通用 skill，不绑定特定项目。",
+          "description": "对中文文档项目做「段落级增量翻译」，先从上游同步英文源文档，再只提取源目录相对上次提交的变更段落交给内置 LLM（本工具）翻译，未改动部分复用已有译文，并自动清理上游已删除文档对应的中文译文，避免整文件重翻浪费 token。当源文档目录相对上次提交只改动了少量内容（尤其 changelog 等超大文件）时使用。通用 skill，不绑定特定项目。",
           "version": ""
         },
         {
