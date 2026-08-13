@@ -86,9 +86,7 @@ fn copy_skill_to_dest(source_dir: &Path, dest_dir: &Path) -> Result<()> {
         anyhow::bail!("Source directory not found: {}", source_dir.display());
     }
 
-    if dest_dir.exists() {
-        fs::remove_dir_all(dest_dir)?;
-    }
+    crate::utils::remove_symlink(dest_dir)?;
     fs::create_dir_all(dest_dir)?;
     copy_dir_recursive(source_dir, dest_dir)?;
 

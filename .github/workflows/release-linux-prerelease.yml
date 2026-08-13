@@ -45,11 +45,15 @@ jobs:
       - name: Package .deb, .rpm and tarball
         run: |
           mkdir ${{ env.RELEASE_DIR }}
+          # Debian/RPM 版本号不允许 '-'（'-' 是 upstream 版本与 revision 的分隔符），
+          # 将 semver 预发布版本 0.3.0-preview.4 转换为 0.3.0~preview.4；
+          # 用 tr 而非 ${VERSION//-/~}，避免 '~' 触发 tilde 展开
+          PKG_VERSION="$(printf '%s' "${{ steps.tag.outputs.VERSION }}" | tr '-' '~')"
           # .deb
-          cargo deb --target x86_64-unknown-linux-gnu --no-build --no-strip
+          cargo deb --target x86_64-unknown-linux-gnu --no-build --no-strip --deb-version "$PKG_VERSION"
           mv target/x86_64-unknown-linux-gnu/debian/*.deb ${{ env.RELEASE_DIR }}/
           # .rpm
-          cargo generate-rpm --target x86_64-unknown-linux-gnu
+          cargo generate-rpm --target x86_64-unknown-linux-gnu -s "version = \"$PKG_VERSION\""
           mv target/x86_64-unknown-linux-gnu/generate-rpm/*.rpm ${{ env.RELEASE_DIR }}/
           # tarball
           tar -cJf "${{ env.RELEASE_DIR }}/xskill-v${{ steps.tag.outputs.VERSION }}-x86_64-unknown-linux-gnu.tar.xz" -C target/x86_64-unknown-linux-gnu/release xskill

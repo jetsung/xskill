@@ -71,7 +71,7 @@
 | 字段 | 必填 | 默认值 | 说明 |
 |------|------|--------|------|
 | `$schema` | 否 | `https://xskill.gcli.cn/xskill.schema.json` | JSON Schema URL，用于编辑器校验和自动补全。`config --init` 自动生成 |
-| `proxy` | 否 | `""`（空字符串） | 代理地址。支持 HTTP 与 SOCKS 协议，协议由地址本身的 scheme 决定，git clone 与 curl/wget 拉取注册中心均自动识别并走代理。设置后导出 `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY`（含小写形式）环境变量，适用于 GitHub 等网络受限场景。为空或未设置时不导出任何变量（沿用系统已有代理设置）。**`config --init` 会补全该键且值为空字符串 `""`** 作为占位，便于用户填值；其余路径（内存默认）为 `None` 时会省略该字段。**协议格式**：`http://host:port`、`https://host:port`、`socks5://host:port`、`socks5h://host:port`、`socks4://host:port`、`socks4a://host:port`。**DNS 解析提示**：`socks5`/`socks4` 在本地解析域名后隧道传输；若本地 DNS 也无法访问目标（如 GitHub），应使用 `socks5h`/`socks4a`（由代理端解析域名），否则会卡在域名解析。示例：`"proxy": "socks5h://127.0.0.1:1080"` |
+| `proxy` | 否 | `""`（空字符串） | 代理地址。支持 HTTP 与 SOCKS 协议，协议由地址本身的 scheme 决定，git clone 与 curl/wget 拉取注册中心均自动识别并走代理。设置后导出 `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY`（含小写形式）环境变量，适用于 GitHub 等网络受限场景。为空或未设置时不导出任何变量（沿用系统已有代理设置）。**协议格式**：`http://host:port`、`https://host:port`、`socks5://host:port`、`socks5h://host:port`、`socks4://host:port`、`socks4a://host:port`。**DNS 解析提示**：`socks5`/`socks4` 在本地解析域名后隧道传输；若本地 DNS 也无法访问目标（如 GitHub），应使用 `socks5h`/`socks4a`（由代理端解析域名），否则会卡在域名解析。示例：`"proxy": "socks5h://127.0.0.1:1080"` |
 
 ### Cache 配置说明
 
@@ -940,7 +940,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 * **行为**：管理 `~/.xskill/settings.json` 配置文件。无参数时输出用法提示。
 * **参数**：
-  * `-i, --init`：初始化配置文件，生成含默认值的完整配置（含默认平台、缓存、注册中心配置；并补全 `proxy` 键且值为空字符串作为占位）。若配置文件已存在则提示，不覆盖。
+  * `-i, --init`：初始化配置文件，生成含默认值的完整配置（含默认平台、缓存、注册中心配置）。若配置文件已存在则提示，不覆盖。
   * `-e, --edit`：在编辑器中打开配置文件（使用 `$EDITOR` 环境变量，默认 `vi`）。
   * `-g, --get <key>`：读取单个配置值，使用点号路径（如 `cache.enabled`、`sources`）。
   * `-s, --set <key=value>`：设置单个配置值，使用点号路径（如 `cache.enabled=true`）。

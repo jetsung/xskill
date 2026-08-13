@@ -4,7 +4,7 @@ use crate::lock::{LockEntry, LockFile};
 use crate::skill_meta::SkillMeta;
 use crate::skill_resolver;
 use crate::utils::{
-    ResolvedSource, canonical_skills_dir, create_relative_symlink, display_path, resolve_source,
+    ResolvedSource, canonical_skills_dir, create_relative_symlink, display_path, remove_symlink, resolve_source,
     validate_agent,
 };
 use anyhow::{Context, Result, bail};
@@ -116,9 +116,7 @@ fn install_to_canonical(
     global: bool,
 ) -> Result<()> {
     // 清理规范目录中的 skill 子目录
-    if dest_dir.exists() || dest_dir.is_symlink() {
-        fs::remove_dir_all(dest_dir)?;
-    }
+    remove_symlink(dest_dir)?;
 
     // 安装
     let result = git::install_skill(&resolved.url, skill_path, dest_name, dest_dir)
@@ -452,9 +450,7 @@ fn copy_skill_to_target(source_dir: &Path, dest_dir: &Path) -> Result<()> {
     }
 
     // 清理目标（包括断裂的 symlink）
-    if dest_dir.exists() || dest_dir.is_symlink() {
-        fs::remove_dir_all(dest_dir)?;
-    }
+    remove_symlink(dest_dir)?;
     fs::create_dir_all(dest_dir)?;
     copy_dir_recursive(source_dir, dest_dir)?;
 

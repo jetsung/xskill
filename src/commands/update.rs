@@ -144,9 +144,7 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
 
             // Copy skill to destination
             let dest_dir = base_dir.join(skill_name);
-            if dest_dir.exists() {
-                fs::remove_dir_all(&dest_dir)?;
-            }
+            crate::utils::remove_symlink(&dest_dir)?;
             fs::create_dir_all(&dest_dir)?;
             crate::commands::restore::copy_dir_recursive(&source_dir, &dest_dir)?;
 

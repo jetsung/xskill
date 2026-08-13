@@ -136,6 +136,7 @@ fn default_schema_url() -> String {
 pub fn default_platforms() -> HashMap<String, Platform> {
     // (name, path, skills, agents, agents_compat)
     let entries: Vec<(&str, &str, &str, &str, bool)> = vec![
+        ("antigravity", ".gemini", "skills", "GEMINI.md", true),
         ("atomcode", ".atomcode", "skills", "ATOMCODE.md", true),
         ("claude", ".claude", "skills", "CLAUDE.md", false),
         ("cline", ".cline", "skills", "CLAUDE.md", true),
@@ -155,6 +156,7 @@ pub fn default_platforms() -> HashMap<String, Platform> {
             "AGENTS.md",
             true,
         ),
+        ("omp", ".omp/agent", "skills", "AGENTS.md", true),
         ("pi", ".pi/agent", "skills", "AGENTS.md", true),
         ("qoder", ".qoder", "skills", "AGENTS.md", true),
         ("qwen", ".qwen", "skills", "AGENTS.md", true),
@@ -668,18 +670,33 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 18);
+        assert_eq!(platforms.len(), 20);
+        assert!(platforms.contains_key("antigravity"));
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
         assert!(platforms.contains_key("gemini"));
         assert!(platforms.contains_key("jcode"));
+        assert!(platforms.contains_key("omp"));
         assert!(platforms.contains_key("pi"));
         assert!(platforms.contains_key("zcode"));
+
+        let antigravity = &platforms["antigravity"];
+        assert_eq!(antigravity.path, ".gemini");
+        assert_eq!(antigravity.skills, "skills");
+        assert_eq!(antigravity.agents, "GEMINI.md");
+        assert!(antigravity.agents_compat);
 
         let claude = &platforms["claude"];
         assert_eq!(claude.path, ".claude");
         assert_eq!(claude.skills, "skills");
         assert_eq!(claude.agents, "CLAUDE.md");
+
+        // omp 渠道默认路径为 .omp/agent（与 pi 一致）
+        let omp = &platforms["omp"];
+        assert_eq!(omp.path, ".omp/agent");
+        assert_eq!(omp.skills, "skills");
+        assert_eq!(omp.agents, "AGENTS.md");
+        assert!(omp.agents_compat);
 
         // pi 渠道默认路径为 .pi/agent（与 PLATFORMS.md 一致）
         let pi = &platforms["pi"];
@@ -701,7 +718,7 @@ mod tests {
         assert_eq!(config.cache.ttl, 86400);
         assert!(!config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 18);
+        assert_eq!(config.platforms.len(), 20);
         // init 时 proxy 键占位为空字符串（不生效，供用户填写）
         assert_eq!(config.proxy, Some(String::new()));
     }

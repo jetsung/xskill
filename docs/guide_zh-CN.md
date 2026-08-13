@@ -237,7 +237,11 @@ xskill sources rename -i <index> -N <new-name>
 
 ### `platforms` — 管理配置平台
 
-列出所有已配置的 AI 编程平台（按字母排序）：
+列出或重置所有已配置的 AI 编程平台。
+
+#### `platforms list`
+
+列出所有已配置的平台（按名称字母排序）：
 
 ```bash
 xskill platforms list
@@ -245,16 +249,57 @@ xskill platforms list
 
 裸命令 `xskill platforms` 等同于 `xskill platforms list`。
 
-显示详细平台信息：
+默认输出格式（`NAME`、`PATH`、`COMPAT` 三列）：
+
+```
+NAME    PATH     COMPAT
+claude  .claude  ✗
+codex   .codex   ✓
+```
+
+`✓` 绿色表示兼容（`agents_compat: true`），`✗` 红色表示不兼容，便于肉眼区分。
+
+显示详细平台信息（`NAME`、`PATH`、`SKILLS`、`AGENTS`、`SOURCE`、`COMPAT` 六列）：
 
 ```bash
 xskill platforms list -a
 ```
 
+输出格式：
+
+```
+NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
+claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
+codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
+```
+
 选项：
 - `-a, --all` — 显示详细信息（路径、技能目录、代理文件、源文件和 agents 兼容性）
 
-默认输出显示名称、路径和 agents 兼容性（`COMPAT`）。详细输出额外显示技能目录、代理文件和源文件。兼容平台（`agents_compat: true`）会在 `add`、`link` 等命令的交互式目标平台选择器中自动预选。
+兼容平台（`agents_compat: true`）会在 `add`、`link` 等命令的交互式目标平台选择器中自动预选。
+
+#### `platforms reset`
+
+将 `platforms` 重置为内置默认平台列表，执行前弹出 skim 单选 TUI（`↑/↓` 选择，`Enter` 确认，`Esc` 取消，回车默认选中第一项）：
+
+- **完全恢复**（第一项，默认）— 所有平台恢复内置默认配置，移除自定义平台
+- **谨慎合并** — 只更新内置平台，自定义平台保留
+- **取消** — 不修改任何配置
+
+若存在自定义平台，会先打印提示。其他配置字段（`sources`、`cache`、`proxy` 等）不受影响。
+
+示例：
+
+```bash
+$ xskill platforms reset
+Custom platforms: my-custom
+# skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
+Platforms reset: 18 platforms, replaced with defaults (custom dropped)
+```
+
+边界情况：
+- 未配置任何平台时输出 "No platforms configured"。
+- 空字段显示 ` - `。
 
 ### `add` — 安装技能
 
@@ -674,6 +719,15 @@ xskill config [OPTIONS]
 - `-e, --edit` — 在 `$EDITOR` 中打开配置（默认 `vi`）
 - `-g, --get <key>` — 通过点号路径获取配置值（如 `cache.enabled`）
 - `-s, --set <key=value>` — 通过点号路径设置配置值（如 `cache.enabled=true`）
+- `-w, --show` — 以美化后的 JSON 打印当前加载的完整配置（合并默认值，如补全缺失的平台）。输出无颜色，便于管道处理
+- `-V, --validate` — 校验配置文件。先做 JSON 语法与强类型结构校验，再对照 JSON Schema 做完整 Schema 校验。优先查找本地 Schema（`$XSKILL_SCHEMA`、`<config_dir>/schemas/xskill.schema.json`、从可执行文件目录向上查找、`<exe_dir>/../share/xskill/xskill.schema.json`）；本地均无则从 `https://xskill.gcli.cn/xskill.schema.json` 拉取（遵循代理配置）。成功输出 `Valid <path> (schema: <source>)`，失败打印每条错误（含 JSON 路径）并以 1 退出
+
+示例 — 读取/设置代理：
+```bash
+xskill config --get proxy
+xskill config --set proxy=socks5h://127.0.0.1:40027
+xskill config --validate
+```
 
 #### 示例
 
@@ -777,7 +831,8 @@ xskill new --name <name> [--description <desc>] [--template <template>]
   "registry": {
     "enabled": false,
     "url": "https://xskill.gcli.cn/skills.json"
-  }
+  },
+  "proxy": ""
 }
 ```
 
@@ -1024,6 +1079,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 | `recommended` | `RecommendedSource[]` | 否 | 按源分组的推荐技能集 |
 | `cache` | `CacheConfig` | 否 | 缓存配置 |
 | `registry` | `RegistryConfig` | 否 | 注册中心配置 |
+| `proxy` | `string` | 否 | 代理地址。设置后导出 `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY`（含小写形式）环境变量，git clone 与 curl/wget 自动生效。协议支持 `http`、`https`、`socks5`、`socks5h`、`socks4`、`socks4a`（`socks5h`/`socks4a` 由代理端解析 DNS）。 |
 
 **Platform**（`platforms.*`）：
 
@@ -1081,7 +1137,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `source` | `string` | 是 | 源名称（如 `org/repo`） |
-| `url` | `string` | 是 | 源仓库 URL |
+| `url` | `string` | 否 | 源仓库 URL |
 | `commit_hash` | `string` | 否 | 同步时源仓库的最新 commit hash（SHA） |
 | `skills` | `SkillEntry[]` | 是 | 该源下可用的技能 |
 

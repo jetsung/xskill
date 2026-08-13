@@ -71,10 +71,8 @@ pub fn install_skill(
     }
 
     // 确保目标目录存在
-    if dest_dir.exists() {
-        fs::remove_dir_all(&dest_dir)
-            .with_context(|| format!("Failed to remove old directory: {}", dest_dir.display()))?;
-    }
+    crate::utils::remove_symlink(dest_dir)
+        .with_context(|| format!("Failed to remove old directory: {}", dest_dir.display()))?;
     fs::create_dir_all(&dest_dir)
         .with_context(|| format!("Failed to create directory: {}", dest_dir.display()))?;
 

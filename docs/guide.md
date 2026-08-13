@@ -231,7 +231,11 @@ Priority: `--name`/`--url` > `--index`. At least one of `--name`, `--url`, or `-
 
 ### `platforms` — Manage configured platforms
 
-List all configured AI coding platforms (sorted alphabetically):
+List or reset all configured AI coding platforms.
+
+#### `platforms list`
+
+List all configured platforms (sorted alphabetically by name):
 
 ```bash
 xskill platforms list
@@ -239,16 +243,57 @@ xskill platforms list
 
 The bare `xskill platforms` command is equivalent to `xskill platforms list`.
 
-Show detailed platform information:
+Default output format (columns `NAME`, `PATH`, `COMPAT`):
+
+```
+NAME    PATH     COMPAT
+claude  .claude  ✗
+codex   .codex   ✓
+```
+
+`✓` in green indicates compatibility (`agents_compat: true`), `✗` in red indicates incompatibility.
+
+Show detailed platform information (columns `NAME`, `PATH`, `SKILLS`, `AGENTS`, `SOURCE`, `COMPAT`):
 
 ```bash
 xskill platforms list -a
 ```
 
+Output format:
+
+```
+NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
+claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
+codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
+```
+
 Options:
 - `-a, --all` — Show detailed information (path, skills directory, agents file, source file, and agents compatibility)
 
-The default output shows name, path, and agents compatibility (`COMPAT`). Detailed output additionally shows skills directory, agents file, and source file. Compatible platforms (`agents_compat: true`) are pre-selected in the interactive target-platform picker used by `add`, `link`, and related commands.
+Compatible platforms (`agents_compat: true`) are pre-selected in the interactive target-platform picker used by `add`, `link`, and related commands.
+
+#### `platforms reset`
+
+Reset `platforms` to the built-in default platform list. A skim single-select TUI is shown before applying (`↑/↓` to navigate, `Enter` to confirm, `Esc` to cancel; pressing Enter selects the first item by default):
+
+- **Full restore** (first item, default) — Restore all platforms to built-in defaults, dropping custom platforms
+- **Careful merge** — Update built-in platforms only, keep custom platforms
+- **Cancel** — Make no changes
+
+If custom platforms exist, a prompt is printed first. Other configuration fields (`sources`, `cache`, `proxy`, etc.) are not affected.
+
+Example:
+
+```bash
+$ xskill platforms reset
+Custom platforms: my-custom
+# skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
+Platforms reset: 18 platforms, replaced with defaults (custom dropped)
+```
+
+Edge cases:
+- "No platforms configured" is printed when no platforms are configured.
+- Empty fields are displayed as ` - `.
 
 ### `add` — Install a skill
 
@@ -664,7 +709,7 @@ xskill config [OPTIONS]
 ```
 
 Options:
-- `-i, --init` — Initialize config file with default values (default platforms, cache, registry). Also writes a `proxy` key with an empty string as a placeholder.
+- `-i, --init` — Initialize config file with default values (default platforms, cache, registry).
 - `-e, --edit` — Open config in `$EDITOR` (defaults to `vi`)
 - `-g, --get <key>` — Get a config value by dot path (e.g., `cache.enabled`)
 - `-s, --set <key=value>` — Set a config value by dot path (e.g., `cache.enabled=true`)
@@ -1028,7 +1073,7 @@ For `~/.xskill/settings.json`. Defines the full configuration structure.
 | `recommended` | `RecommendedSource[]` | No | Recommended skill sets grouped by source |
 | `cache` | `CacheConfig` | No | Cache settings for skills list caching |
 | `registry` | `RegistryConfig` | No | Registry settings for skill discovery |
-| `proxy` | `string` | No | Proxy URL for network access (e.g. `http://127.0.0.1:7890`, `socks5h://127.0.0.1:1080`). When set, `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY` are exported so `git clone` and `curl`/`wget` use the proxy. Scheme may be `http`, `https`, `socks5`, `socks5h`, `socks4`, `socks4a`. Note: `socks5h`/`socks4a` resolve DNS at the proxy. `config --init` writes this key as an empty string placeholder |
+| `proxy` | `string` | No | Proxy URL for network access (e.g. `http://127.0.0.1:7890`, `socks5h://127.0.0.1:1080`). When set, `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY` are exported so `git clone` and `curl`/`wget` use the proxy. Scheme may be `http`, `https`, `socks5`, `socks5h`, `socks4`, `socks4a`. Note: `socks5h`/`socks4a` resolve DNS at the proxy. |
 
 **Platform** (`platforms.*`):
 
@@ -1086,7 +1131,7 @@ For the registry API response (`skills.json`). Defines the skills index data str
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `source` | `string` | Yes | Source name (e.g. `org/repo`) |
-| `url` | `string` | Yes | Source repository URL |
+| `url` | `string` | No | Source repository URL |
 | `commit_hash` | `string` | No | Latest commit hash (SHA) of the source repository at sync time |
 | `skills` | `SkillEntry[]` | Yes | Skills available from this source |
 

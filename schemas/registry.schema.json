@@ -47,7 +47,7 @@
           }
         }
       },
-      "required": ["source", "url", "skills"],
+      "required": ["source", "skills"],
       "additionalProperties": false
     },
     "SkillEntry": {

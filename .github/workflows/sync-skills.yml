@@ -10,29 +10,13 @@ on:
 # 技能源列表 —— 在此添加 / 删除 / 修改即可
 # ---------------------------------------------------------------
 env:
+  # 每行一条源：<名称> <地址>；名称可省略，只写地址
   SOURCES: |
-    [
-      {
-        "name": "anthropics",
-        "url": "https://github.com/anthropics/skills"
-      },
-      {
-        "name": "github",
-        "url": "https://github.com/github/awesome-copilot"
-      },
-      {
-        "name": "antfu",
-        "url": "https://github.com/antfu/skills"
-      },
-      {
-        "name": "addyosmani",
-        "url": "https://github.com/addyosmani/agent-skills"
-      },
-      {
-        "name": "mattpocock",
-        "url": "https://github.com/mattpocock/skills"
-      }
-    ]
+    anthropics https://github.com/anthropics/skills
+    github https://github.com/github/awesome-copilot
+    antfu https://github.com/antfu/skills
+    addyosmani https://github.com/addyosmani/agent-skills
+    mattpocock https://github.com/mattpocock/skills
 
 permissions:
   contents: write
@@ -64,14 +48,12 @@ jobs:
         env:
           SOURCES: ${{ vars.SOURCES || env.SOURCES }}
         run: |
-          # 添加源
-          echo "$SOURCES" | jq -c '.[]' | while read -r src; do
-            name=$(echo "$src" | jq -r '.name // empty')
-            url=$(echo "$src" | jq -r '.url')
-            if [ -n "$name" ]; then
+          # 添加源（每行一条：<名称> <地址>；名称可省略，只写地址；# 开头为注释）
+          echo "$SOURCES" | sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' | while read -r name url _; do
+            if [ -n "$url" ]; then
               xskill sources add --name "$name" --url "$url"
             else
-              xskill sources add --url "$url"
+              xskill sources add --url "$name"
             fi
           done
           # 启用缓存

@@ -243,13 +243,7 @@ fn install_skills(
             }
             .join(&dest_name);
 
-            if let Err(e) = fs::create_dir_all(&canonical_dir) {
-                all_failed.push(format!("{} ({})", skill_name, e));
-                continue;
-            }
-            if canonical_dir.exists() {
-                let _ = fs::remove_dir_all(&canonical_dir);
-            }
+            let _ = crate::utils::remove_symlink(&canonical_dir);
             if let Err(e) = git::copy_dir_recursive(&source_dir, &canonical_dir) {
                 all_failed.push(format!("{} ({})", skill_name, e));
                 continue;
@@ -285,9 +279,7 @@ fn install_skills(
                     continue;
                 }
 
-                if dest_dir.exists() || dest_dir.is_symlink() {
-                    let _ = fs::remove_dir_all(&dest_dir);
-                }
+                let _ = crate::utils::remove_symlink(&dest_dir);
 
                 match crate::utils::create_relative_symlink(&canonical_dir, &dest_dir) {
                     Ok(true) => linked.push(platform.to_string()),
@@ -1123,5 +1115,24 @@ mod tests {
 
         let result = resolve_platform_dest(&config, "minimal", "my-skill", false);
         assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_symlink_cleanup_does_not_delete_canonical_dir() {
+        let temp = tempfile::tempdir().unwrap();
+        let canonical_dir = temp.path().join("canonical").join("my-skill");
+        let platform_dest = temp.path().join("platform").join("my-skill");
+
+        fs::create_dir_all(&canonical_dir).unwrap();
+        fs::write(canonical_dir.join("SKILL.md"), "content").unwrap();
+
+        fs::create_dir_all(platform_dest.parent().unwrap()).unwrap();
+        crate::utils::create_relative_symlink(&canonical_dir, &platform_dest).unwrap();
+
+        // Remove using remove_symlink on platform_dest (simulating reinstall/re-symlink)
+        crate::utils::remove_symlink(&platform_dest).unwrap();
+
+        // Verify canonical_dir and its file were NOT deleted
+        assert!(canonical_dir.join("SKILL.md").exists());
     }
 }
