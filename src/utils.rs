@@ -708,6 +708,8 @@ mod tests {
         config.platforms.insert(
             "claude".to_string(),
             crate::config::Platform {
+                name: None,
+                enabled: true,
                 path: ".claude".to_string(),
                 skills: "skills".to_string(),
                 agents: "CLAUDE.md".to_string(),

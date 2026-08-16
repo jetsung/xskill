@@ -257,6 +257,10 @@ fn symlink_to_all_platforms(config: &Config, dest_name: &str, global: bool) -> R
             Some(p) => p,
             None => continue,
         };
+        // 跳过禁用的渠道（批量安装不参与，显式指定单个平台不受限）
+        if !platform.enabled {
+            continue;
+        }
         // 仅链接已存在的平台目录
         let platform_path = base_dir.join(&platform.path);
         if !platform_path.exists() {

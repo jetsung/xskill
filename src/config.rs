@@ -74,6 +74,12 @@ pub struct RegistryConfig {
 /// 平台配置
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Platform {
+    /// 渠道显示名称（缺失时回退到配置 key）
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// 是否启用：false（默认）时不出现在交互选择与批量操作，显式指定仍可操作
+    #[serde(default)]
+    pub enabled: bool,
     /// 工具配置目录
     pub path: String,
     /// skills 子目录名（相对于 path），为空则不安装
@@ -133,42 +139,40 @@ fn default_schema_url() -> String {
 }
 
 /// 构建默认平台列表（来自 PLATFORMS.md）
+/// 元组：(key, display_name, enabled, path, skills, agents, agents_compat)
 pub fn default_platforms() -> HashMap<String, Platform> {
-    // (name, path, skills, agents, agents_compat)
-    let entries: Vec<(&str, &str, &str, &str, bool)> = vec![
-        ("antigravity", ".gemini", "skills", "GEMINI.md", true),
-        ("atomcode", ".atomcode", "skills", "ATOMCODE.md", true),
-        ("claude", ".claude", "skills", "CLAUDE.md", false),
-        ("cline", ".cline", "skills", "CLAUDE.md", true),
-        ("codebuddy", ".codebuddy", "skills", "CODEBUDDY.md", false),
-        ("codex", ".codex", "skills", "AGENTS.md", true),
-        ("factory", ".factory", "skills", "AGENTS.md", true),
-        ("gemini", ".gemini", "skills", "GEMINI.md", false),
-        ("jcode", ".jcode", "skills", "AGENTS.md", true),
-        ("kilo", ".kilocode", "skills", "AGENTS.md", true),
-        ("langcli", ".langcli", "skills", "LANGCLI.md", false),
-        ("opencode", ".opencode", "skills", "AGENTS.md", true),
-        ("openclaude", ".openclaude", "skills", "CLAUDE.md", false),
-        (
-            "openinterpreter",
-            ".openinterpreter",
-            "skills",
-            "AGENTS.md",
-            true,
-        ),
-        ("omp", ".omp/agent", "skills", "AGENTS.md", true),
-        ("pi", ".pi/agent", "skills", "AGENTS.md", true),
-        ("qoder", ".qoder", "skills", "AGENTS.md", true),
-        ("qwen", ".qwen", "skills", "AGENTS.md", true),
-        ("roo", ".roo", "skills", "AGENTS.md", true),
-        ("zcode", ".zcode", "skills", "AGENTS.md", true),
+    let entries: Vec<(&str, &str, bool, &str, &str, &str, bool)> = vec![
+        // 常用渠道（默认启用）
+        ("antigravity", "Antigravity", true, ".gemini", "skills", "GEMINI.md", true),
+        ("claude", "Claude Code", true, ".claude", "skills", "CLAUDE.md", false),
+        ("codebuddy", "CodeBuddy", true, ".codebuddy", "skills", "CODEBUDDY.md", false),
+        ("codex", "Codex", true, ".codex", "skills", "AGENTS.md", true),
+        ("omp", "Oh My Pi", true, ".omp/agent", "skills", "AGENTS.md", true),
+        ("opencode", "OpenCode", true, ".opencode", "skills", "AGENTS.md", true),
+        ("pi", "Pi", true, ".pi/agent", "skills", "AGENTS.md", true),
+        ("qoder", "Qoder", true, ".qoder", "skills", "AGENTS.md", true),
+        ("zcode", "ZCode", true, ".zcode", "skills", "AGENTS.md", true),
+        // 非常用渠道（默认禁用，可在 settings.json 中启用）
+        ("atomcode", "AtomCode", false, ".atomcode", "skills", "ATOMCODE.md", true),
+        ("cline", "Cline", false, ".cline", "skills", "CLAUDE.md", true),
+        ("factory", "Factory", false, ".factory", "skills", "AGENTS.md", true),
+        ("jcode", "JCode", false, ".jcode", "skills", "AGENTS.md", true),
+        ("kilo", "Kilo Code", false, ".kilocode", "skills", "AGENTS.md", true),
+        ("langcli", "LangCLI", false, ".langcli", "skills", "LANGCLI.md", false),
+        ("openclaude", "OpenClaude", false, ".openclaude", "skills", "CLAUDE.md", false),
+        ("openinterpreter", "Open Interpreter", false, ".openinterpreter", "skills", "AGENTS.md", true),
+        ("qwen", "Qwen", false, ".qwen", "skills", "AGENTS.md", true),
+        // Zoo Code 接手已停服的 Roo Code，配置目录沿用 .roo
+        ("zoo", "Zoo Code", false, ".roo", "skills", "AGENTS.md", true),
     ];
 
     let mut map = HashMap::new();
-    for (name, path, skills, agents, agents_compat) in entries {
+    for (key, name, enabled, path, skills, agents, agents_compat) in entries {
         map.insert(
-            name.to_string(),
+            key.to_string(),
             Platform {
+                name: Some(name.to_string()),
+                enabled,
                 path: path.to_string(),
                 skills: skills.to_string(),
                 agents: agents.to_string(),
@@ -438,6 +442,11 @@ impl Source {
 }
 
 impl Platform {
+    /// 渠道显示名称：优先 name，缺失时回退到配置 key
+    pub fn display_name(&self, key: &str) -> String {
+        self.name.clone().unwrap_or_else(|| key.to_string())
+    }
+
     /// 解析平台路径：支持相对路径、绝对路径和 ~ 开头的路径
     fn resolve_path(&self) -> PathBuf {
         if self.path.starts_with('/') {
@@ -494,6 +503,8 @@ mod tests {
 
     fn make_platform(path: &str, skills: &str, agents: &str) -> Platform {
         Platform {
+            name: None,
+            enabled: true,
             path: path.to_string(),
             skills: skills.to_string(),
             agents: agents.to_string(),
@@ -670,29 +681,51 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 20);
+        assert_eq!(platforms.len(), 19);
         assert!(platforms.contains_key("antigravity"));
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
-        assert!(platforms.contains_key("gemini"));
+        // gemini 已合并入 antigravity（同一平台）
+        assert!(!platforms.contains_key("gemini"));
         assert!(platforms.contains_key("jcode"));
         assert!(platforms.contains_key("omp"));
         assert!(platforms.contains_key("pi"));
         assert!(platforms.contains_key("zcode"));
+        // roo 已停服，由 zoo（Zoo Code）接手，配置目录沿用 .roo
+        assert!(!platforms.contains_key("roo"));
+        assert!(platforms.contains_key("zoo"));
+
+        // 默认启用 9 个常用渠道
+        let enabled: Vec<_> = platforms
+            .iter()
+            .filter(|(_, p)| p.enabled)
+            .map(|(k, _)| k.as_str())
+            .collect();
+        assert_eq!(enabled.len(), 9);
+        for key in ["claude", "codex", "antigravity", "zcode", "opencode", "codebuddy", "qoder", "pi", "omp"] {
+            assert!(
+                platforms[key].enabled,
+                "expected {} to be enabled by default",
+                key
+            );
+        }
 
         let antigravity = &platforms["antigravity"];
+        assert_eq!(antigravity.name.as_deref(), Some("Antigravity"));
         assert_eq!(antigravity.path, ".gemini");
         assert_eq!(antigravity.skills, "skills");
         assert_eq!(antigravity.agents, "GEMINI.md");
         assert!(antigravity.agents_compat);
 
         let claude = &platforms["claude"];
+        assert_eq!(claude.name.as_deref(), Some("Claude Code"));
         assert_eq!(claude.path, ".claude");
         assert_eq!(claude.skills, "skills");
         assert_eq!(claude.agents, "CLAUDE.md");
 
         // omp 渠道默认路径为 .omp/agent（与 pi 一致）
         let omp = &platforms["omp"];
+        assert_eq!(omp.name.as_deref(), Some("Oh My Pi"));
         assert_eq!(omp.path, ".omp/agent");
         assert_eq!(omp.skills, "skills");
         assert_eq!(omp.agents, "AGENTS.md");
@@ -700,9 +733,17 @@ mod tests {
 
         // pi 渠道默认路径为 .pi/agent（与 PLATFORMS.md 一致）
         let pi = &platforms["pi"];
+        assert_eq!(pi.name.as_deref(), Some("Pi"));
         assert_eq!(pi.path, ".pi/agent");
         assert_eq!(pi.skills, "skills");
         assert_eq!(pi.agents, "AGENTS.md");
+
+        // zoo 渠道沿用 roo 的配置目录
+        let zoo = &platforms["zoo"];
+        assert_eq!(zoo.name.as_deref(), Some("Zoo Code"));
+        assert_eq!(zoo.path, ".roo");
+        assert_eq!(zoo.skills, "skills");
+        assert!(zoo.agents_compat);
 
         // 兼容性标记与 PLATFORMS.md 一致：atomcode ✓、cline ✅、claude ❌
         assert!(platforms["atomcode"].agents_compat);
@@ -712,13 +753,23 @@ mod tests {
     }
 
     #[test]
+    fn test_platform_display_name() {
+        let mut platform = default_platforms()["claude"].clone();
+        assert_eq!(platform.display_name("claude"), "Claude Code");
+
+        // name 缺失时回退到 key
+        platform.name = None;
+        assert_eq!(platform.display_name("claude"), "claude");
+    }
+
+    #[test]
     fn test_default_config() {
         let config = default_config();
         assert!(!config.cache.enabled);
         assert_eq!(config.cache.ttl, 86400);
         assert!(!config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 20);
+        assert_eq!(config.platforms.len(), 19);
         // init 时 proxy 键占位为空字符串（不生效，供用户填写）
         assert_eq!(config.proxy, Some(String::new()));
     }

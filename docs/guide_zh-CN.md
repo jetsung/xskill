@@ -241,7 +241,7 @@ xskill sources rename -i <index> -N <new-name>
 
 #### `platforms list`
 
-列出所有已配置的平台（按名称字母排序）：
+列出已配置的平台。默认只显示启用（`enabled: true`）的渠道,按显示名称排序;`NAME` 列为渠道显示名称（缺失时回退到配置 key）:
 
 ```bash
 xskill platforms list
@@ -249,32 +249,33 @@ xskill platforms list
 
 裸命令 `xskill platforms` 等同于 `xskill platforms list`。
 
-默认输出格式（`NAME`、`PATH`、`COMPAT` 三列）：
+默认输出格式（`NAME`、`PATH`、`COMPAT` 三列）:
 
 ```
-NAME    PATH     COMPAT
-claude  .claude  ✗
-codex   .codex   ✓
+NAME         PATH      COMPAT
+Claude Code  .claude   ✗
+Codex        .codex    ✓
 ```
 
 `✓` 绿色表示兼容（`agents_compat: true`），`✗` 红色表示不兼容，便于肉眼区分。
 
-显示详细平台信息（`NAME`、`PATH`、`SKILLS`、`AGENTS`、`SOURCE`、`COMPAT` 六列）：
+显示详细平台信息,包含禁用渠道及其 `ENABLED` 状态（`NAME`、`PATH`、`SKILLS`、`AGENTS`、`SOURCE`、`COMPAT`、`ENABLED` 七列）:
 
 ```bash
 xskill platforms list -a
 ```
 
-输出格式：
+输出格式:
 
 ```
-NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
-claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
-codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
+NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
+Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
+Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
+Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 ```
 
 选项：
-- `-a, --all` — 显示详细信息（路径、技能目录、代理文件、源文件和 agents 兼容性）
+- `-a, --all` — 显示详细信息（路径、技能目录、代理文件、源文件、agents 兼容性和启用状态），包含全部渠道（含禁用）
 
 兼容平台（`agents_compat: true`）会在 `add`、`link` 等命令的交互式目标平台选择器中自动预选。
 

@@ -36,7 +36,7 @@ impl SkillMeta {
         let meta = match re.captures(content) {
             Some(caps) => {
                 let yaml_str = caps.get(1).unwrap().as_str();
-                serde_yaml::from_str(yaml_str).unwrap_or_default()
+                serde_yaml_ng::from_str(yaml_str).unwrap_or_default()
             }
             None => Self::default(),
         };

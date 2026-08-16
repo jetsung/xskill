@@ -201,6 +201,10 @@ fn remove_from_all_platforms(config: &Config, skill: &str, global: bool) -> Resu
             Some(p) => p,
             None => continue,
         };
+        // 跳过禁用的渠道（批量移除不参与，显式指定单个平台不受限）
+        if !platform.enabled {
+            continue;
+        }
         if platform.agents_compat {
             continue;
         }
@@ -265,6 +269,10 @@ fn remove_platform_symlinks(config: &Config, skill: &str, global: bool) -> Resul
             Some(p) => p,
             None => continue,
         };
+        // 跳过禁用的渠道（批量移除不参与，显式指定单个平台不受限）
+        if !platform.enabled {
+            continue;
+        }
         if platform.agents_compat {
             continue;
         }
@@ -311,6 +319,10 @@ fn remove_all_platform_symlinks(config: &Config, global: bool) -> Result<usize> 
             Some(p) => p,
             None => continue,
         };
+        // 跳过禁用的渠道（批量移除不参与，显式指定单个平台不受限）
+        if !platform.enabled {
+            continue;
+        }
         if platform.agents_compat {
             continue;
         }
@@ -356,6 +368,10 @@ fn remove_all_from_all_platforms(config: &Config, global: bool) -> Result<usize>
             Some(p) => p,
             None => continue,
         };
+        // 跳过禁用的渠道（批量移除不参与，显式指定单个平台不受限）
+        if !platform.enabled {
+            continue;
+        }
         if platform.agents_compat {
             continue;
         }

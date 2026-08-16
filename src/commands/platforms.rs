@@ -1,4 +1,4 @@
-use crate::config::{Config, default_platforms};
+use crate::config::{Config, Platform, default_platforms};
 use crate::output::print_table;
 use anyhow::{Result, bail};
 use colored::Colorize;
@@ -22,11 +22,17 @@ pub fn run(detailed: bool) -> Result<()> {
         return Ok(());
     }
 
-    let mut sorted: Vec<_> = config.platforms.iter().collect();
-    sorted.sort_by_key(|(name, _)| name.to_lowercase());
+    // 默认视图只显示启用渠道；--detailed 显示全部（含 ENABLED 列）
+    let shown: Vec<(&String, &Platform)> = config
+        .platforms
+        .iter()
+        .filter(|(_, p)| detailed || p.enabled)
+        .collect();
+    let mut sorted = shown;
+    sorted.sort_by_key(|(name, p)| (p.display_name(name).to_lowercase(), name.to_lowercase()));
 
     if detailed {
-        let headers = &["NAME", "PATH", "SKILLS", "AGENTS", "SOURCE", "COMPAT"];
+        let headers = &["NAME", "PATH", "SKILLS", "AGENTS", "SOURCE", "COMPAT", "ENABLED"];
         let rows: Vec<Vec<String>> = sorted
             .iter()
             .map(|(name, platform)| {
@@ -40,13 +46,19 @@ pub fn run(detailed: bool) -> Result<()> {
                     .unwrap_or_default();
                 let source_file = platform.source_file().to_string_lossy().into_owned();
                 let compat = compat_str(platform.agents_compat);
+                let enabled = if platform.enabled {
+                    "✓".green().to_string()
+                } else {
+                    "✗".red().to_string()
+                };
                 vec![
-                    name.to_string(),
+                    platform.display_name(name),
                     platform.path.clone(),
                     skills_dir,
                     agents_file,
                     source_file,
                     compat,
+                    enabled,
                 ]
             })
             .collect();
@@ -57,7 +69,7 @@ pub fn run(detailed: bool) -> Result<()> {
             .iter()
             .map(|(name, platform)| {
                 vec![
-                    name.to_string(),
+                    platform.display_name(name),
                     platform.path.clone(),
                     compat_str(platform.agents_compat),
                 ]
@@ -253,6 +265,8 @@ mod tests {
     #[test]
     fn test_platform_config_fields() {
         let platform = Platform {
+            name: None,
+            enabled: true,
             path: ".claude".to_string(),
             skills: "skills".to_string(),
             agents: "CLAUDE.md".to_string(),
@@ -271,6 +285,8 @@ mod tests {
     #[test]
     fn test_platform_agents_compat() {
         let platform = Platform {
+            name: None,
+            enabled: true,
             path: ".opencode".to_string(),
             skills: "skills".to_string(),
             agents: "AGENTS.md".to_string(),
@@ -283,6 +299,8 @@ mod tests {
     #[test]
     fn test_platform_no_skills_no_agents() {
         let platform = Platform {
+            name: None,
+            enabled: true,
             path: ".gemini".to_string(),
             skills: String::new(),
             agents: String::new(),
@@ -296,6 +314,8 @@ mod tests {
 
     fn platform(name: &str) -> Platform {
         Platform {
+            name: None,
+            enabled: true,
             path: format!(".{}", name),
             skills: "skills".to_string(),
             agents: "AGENTS.md".to_string(),

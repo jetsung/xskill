@@ -191,6 +191,11 @@ fn symlink_skill_to_all_platforms(config: &Config, skill_name: &str, global: boo
             None => continue,
         };
 
+        // 跳过禁用的渠道（批量链接不参与，显式指定单个平台不受限）
+        if !platform.enabled {
+            continue;
+        }
+
         // 跳过 agents_compat 平台
         if platform.agents_compat {
             skipped_platforms.push(name.to_string());
@@ -371,6 +376,8 @@ mod tests {
         config.platforms.insert(
             "claude".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: tmp.path().join(".claude").to_string_lossy().to_string(),
                 skills: "skills".to_string(),
                 agents: "CLAUDE.md".to_string(),
@@ -399,6 +406,8 @@ mod tests {
         config.platforms.insert(
             "zcode".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: tmp.path().join(".zcode").to_string_lossy().to_string(),
                 skills: "skills".to_string(),
                 agents: "AGENTS.md".to_string(),
@@ -432,6 +441,8 @@ mod tests {
         config.platforms.insert(
             "claude".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: tmp.path().join(".claude").to_string_lossy().to_string(),
                 skills: "skills".to_string(),
                 agents: "CLAUDE.md".to_string(),
@@ -442,6 +453,8 @@ mod tests {
         config.platforms.insert(
             "codebuddy".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: tmp.path().join(".codebuddy").to_string_lossy().to_string(),
                 skills: "skills".to_string(),
                 agents: "CODEBUDDY.md".to_string(),
@@ -453,6 +466,8 @@ mod tests {
         config.platforms.insert(
             "zcode".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: tmp.path().join(".zcode").to_string_lossy().to_string(),
                 skills: "skills".to_string(),
                 agents: "AGENTS.md".to_string(),
@@ -487,6 +502,8 @@ mod tests {
         config.platforms.insert(
             "newplatform".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: tmp
                     .path()
                     .join(".newplatform")
