@@ -138,7 +138,7 @@ fn default_schema_url() -> String {
     CONFIG_SCHEMA_URL.to_string()
 }
 
-/// 构建默认平台列表（来自 PLATFORMS.md）
+/// 构建默认平台列表（来自 docs/PLATFORMS.md）
 /// 元组：(key, display_name, enabled, path, skills, agents, agents_compat)
 pub fn default_platforms() -> HashMap<String, Platform> {
     let entries: Vec<(&str, &str, bool, &str, &str, &str, bool)> = vec![
@@ -147,6 +147,7 @@ pub fn default_platforms() -> HashMap<String, Platform> {
         ("claude", "Claude Code", true, ".claude", "skills", "CLAUDE.md", false),
         ("codebuddy", "CodeBuddy", true, ".codebuddy", "skills", "CODEBUDDY.md", false),
         ("codex", "Codex", true, ".codex", "skills", "AGENTS.md", true),
+        ("commandcode", "Command Code", false, ".commandcode", "skills", "AGENTS.md", true),
         ("omp", "Oh My Pi", true, ".omp/agent", "skills", "AGENTS.md", true),
         ("opencode", "OpenCode", true, ".opencode", "skills", "AGENTS.md", true),
         ("pi", "Pi", true, ".pi/agent", "skills", "AGENTS.md", true),
@@ -681,7 +682,7 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 19);
+        assert_eq!(platforms.len(), 20);
         assert!(platforms.contains_key("antigravity"));
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
@@ -731,7 +732,7 @@ mod tests {
         assert_eq!(omp.agents, "AGENTS.md");
         assert!(omp.agents_compat);
 
-        // pi 渠道默认路径为 .pi/agent（与 PLATFORMS.md 一致）
+        // pi 渠道默认路径为 .pi/agent（与 docs/PLATFORMS.md 一致）
         let pi = &platforms["pi"];
         assert_eq!(pi.name.as_deref(), Some("Pi"));
         assert_eq!(pi.path, ".pi/agent");
@@ -745,7 +746,16 @@ mod tests {
         assert_eq!(zoo.skills, "skills");
         assert!(zoo.agents_compat);
 
-        // 兼容性标记与 PLATFORMS.md 一致：atomcode ✓、cline ✅、claude ❌
+        // commandcode 渠道：AGENTS.md 兼容，默认禁用
+        let commandcode = &platforms["commandcode"];
+        assert_eq!(commandcode.name.as_deref(), Some("Command Code"));
+        assert_eq!(commandcode.path, ".commandcode");
+        assert_eq!(commandcode.skills, "skills");
+        assert_eq!(commandcode.agents, "AGENTS.md");
+        assert!(commandcode.agents_compat);
+        assert!(!commandcode.enabled);
+
+        // 兼容性标记与 docs/PLATFORMS.md 一致：atomcode ✓、cline ✅、claude ❌
         assert!(platforms["atomcode"].agents_compat);
         assert!(platforms["cline"].agents_compat);
         assert!(!platforms["claude"].agents_compat);
@@ -769,7 +779,7 @@ mod tests {
         assert_eq!(config.cache.ttl, 86400);
         assert!(!config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 19);
+        assert_eq!(config.platforms.len(), 20);
         // init 时 proxy 键占位为空字符串（不生效，供用户填写）
         assert_eq!(config.proxy, Some(String::new()));
     }
