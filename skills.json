@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-21T06:30:01.851Z",
+  "updated_at": "2026-08-21T12:28:11.285Z",
   "sources": [
     {
       "source": "https://github.com/jetsung/skills",
@@ -3057,6 +3057,12 @@
           "name": "loop-me",
           "path": "skills/in-progress/loop-me",
           "description": "Grill me about specs for the workflows I want to build, within this workspace.",
+          "version": ""
+        },
+        {
+          "name": "implement-spec",
+          "path": "skills/in-progress/implement-spec",
+          "description": "Implement a specification in code.",
           "version": ""
         },
         {
