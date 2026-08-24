@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-24T00:44:11.210Z",
+  "updated_at": "2026-08-24T06:38:15.182Z",
   "sources": [
     {
       "source": "https://github.com/jetsung/skills",
@@ -1076,8 +1076,8 @@
         {
           "name": "anti-ui-slop",
           "path": "skills/anti-ui-slop",
-          "description": "Stop Codex, GitHub Copilot, Claude Code, and Cursor from shipping generic UI. Use UIZZE’s public catalogue of 800,000+ real web and iOS screens to extract product-specific design decisions and enforce a hard finish gate for web and iOS interfaces.",
-          "version": ""
+          "description": "Stop coding agents from shipping generic UI. Use UIZZE's 800,000+ real web and iOS screens to build product-specific interfaces, define a design contract, cover required states, and run a hard finish gate. Use when designing, implementing, redesigning, critiquing, or pre-ship reviewing a web or iOS interface in Codex, Claude Code, Cursor, Copilot, or another coding agent. Trigger with \"anti-ui-slop\", \"stop UI slop\", \"ground this UI in real screens\", or \"run the UI finish gate\".",
+          "version": "1.2.13"
         },
         {
           "name": "mvvm-toolkit",
