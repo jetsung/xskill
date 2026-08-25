@@ -49,6 +49,15 @@
       "description": "Configuration for a single tool platform.",
       "type": "object",
       "properties": {
+        "name": {
+          "description": "Display name of the platform channel. Falls back to the config key when absent.",
+          "type": "string"
+        },
+        "enabled": {
+          "description": "Whether this platform is enabled. Disabled platforms (default false) are hidden from interactive selection and batch operations, but can still be used when explicitly specified.",
+          "type": "boolean",
+          "default": false
+        },
         "path": {
           "description": "Tool configuration directory (relative, absolute, or ~/... path).",
           "type": "string",

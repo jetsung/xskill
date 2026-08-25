@@ -125,8 +125,9 @@ Config file: `~/.xskill/settings.json` (override with `XSKILL_CONFIG` env var).
 {
   "$schema": "https://xskill.gcli.cn/xskill.schema.json",
   "platforms": {
-    "claude": { "path": ".claude", "skills": "skills", "agents": "CLAUDE.md", "agents_compat": false },
-    "codex": { "path": ".codex", "skills": "skills", "agents": "AGENTS.md", "agents_compat": true }
+    "claude": { "name": "Claude Code", "enabled": true, "path": ".claude", "skills": "skills", "agents": "CLAUDE.md", "agents_compat": false },
+    "codex": { "name": "Codex", "enabled": true, "path": ".codex", "skills": "skills", "agents": "AGENTS.md", "agents_compat": true },
+    "cline": { "name": "Cline", "enabled": false, "path": ".cline", "skills": "skills", "agents": "CLAUDE.md", "agents_compat": true }
   },
   "sources": [
     { "name": "antfu", "type": "git", "url": "https://github.com/antfu/skills" }

@@ -11,8 +11,8 @@
 ## 输出规范
 
 * **语言**：所有回显信息（包括帮助文档、错误信息、状态输出等）统一使用英文。
-* **平台排序**：所有涉及平台列表的输出（`platforms`、`list`、`add`、`remove`、`find` 等），均按平台名称字母顺序（a-zA-Z0-9）排序，不受 `settings.json` 中的配置顺序影响。
-* **列表输出**：部分子命令（如 `sources`、`platforms`）使用列对齐的表格形式，首行为表头（大写标签），数据行按列对齐。空值使用 `" - "` 替代。条件字段（如 VERSION）仅在至少一条数据包含该值时才显示该列。`list` 子命令显示标题（"Project Skills" 或 "Global Skills"），后接空行，然后以单行列对齐形式展示（skill 名称褐色、路径黑灰色），按路径排序，路径以 `~/` 开头。不带 `-a` 时额外显示 Agents 列（`Agents:` 标签黑灰色、平台名默认白色）；带 `-a <agent>` 时仅列出该平台实际可用的 skill（名称 + 路径两列，无 Agents 列），agents_compat 平台合并规范目录与其自身 skills 目录（同名去重、规范目录优先），`-a '*'` 不受支持。`query` 子命令使用垂直键值对形式展示，标签使用 cyan bold，`Name` 值使用黄色显示。
+* **平台排序**：`platforms` 列表按渠道显示名称（`name`，缺失时回退 key）字母顺序排序；`list`/`add`/`remove`/`find` 等涉及平台遍历的输出按平台 key 字母顺序（a-zA-Z0-9）排序，均不受 `settings.json` 中的配置顺序影响。
+* **列表输出**：部分子命令（如 `sources`、`platforms`）使用列对齐的表格形式，首行为表头（大写标签），数据行按列对齐。空值使用 `" - "` 替代。条件字段（如 VERSION）仅在至少一条数据包含该值时才显示该列。`list` 子命令显示标题（"Project Skills" 或 "Global Skills"），后接空行，然后以单行列对齐形式展示（skill 名称褐色、路径黑灰色），按路径排序，路径以 `~/` 开头。不带 `-a` 时额外显示 Agents 列（`Agents:` 标签黑灰色、平台显示名称默认白色，跳过禁用渠道）；带 `-a <agent>` 时仅列出该平台实际可用的 skill（名称 + 路径两列，无 Agents 列），agents_compat 平台合并规范目录与其自身 skills 目录（同名去重、规范目录优先），`-a '*'` 不受支持。`query` 子命令使用垂直键值对形式展示，标签使用 cyan bold，`Name` 值使用黄色显示。
   ```
   NAME   TYPE URL
   antfu  git  https://github.com/antfu/skills
@@ -52,6 +52,8 @@
 
 | 字段 | 必填 | 默认值 | 说明 |
 |------|------|--------|------|
+| `name` | 否 | — | 渠道显示名称，缺失时回退到配置 key。`platforms`/`find`/`list` 等展示型输出显示该名称 |
+| `enabled` | 否 | `false` | 是否启用。禁用渠道不出现在 `platforms` 默认视图、find TUI 可选列表与 `add`/`remove`/`link` 的批量（`-a '*'`）操作中，显式指定渠道名（如 `xskill link claude <skill>`）不受影响；`platforms -a`（详细）视图会显示全部渠道及 ENABLED 状态 |
 | `path` | 是 | — | 工具配置目录（相对路径、绝对路径或 `~/...`） |
 | `skills` | 否 | — | skills 子目录名（相对于 path），为空则不安装 |
 | `agents` | 否 | — | agents 配置文件名（相对于 path），为空则不安装 |
@@ -139,18 +141,23 @@ URL 解析规则：
   "$schema": "https://xskill.gcli.cn/xskill.schema.json",
   "platforms": {
     "claude": {
+      "name": "Claude Code",
+      "enabled": true,
       "path": ".claude",
       "skills": "skills",
       "agents": "CLAUDE.md",
       "agents_compat": false
     },
     "codex": {
+      "name": "Codex",
+      "enabled": true,
       "path": ".codex",
       "skills": "skills",
       "agents": "AGENTS.md",
       "agents_compat": true
     },
     "pi": {
+      "name": "Pi",
       "path": ".pi/agent",
       "skills": "skills",
       "agents": "AGENTS.md",
@@ -265,7 +272,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 ### agents_compat 兼容平台
 
-`agents_compat` 为 `true` 的平台直接读取规范目录（`.agents/skills/`），无需创建 symlink 或复制文件。add、remove、link、restore 均跳过该平台的 symlink 操作。单平台指定（`-a <name>`）时输出 `Skipped: <name> (agents_compat)`（暗灰色）；多平台（`-a '*'`）时静默跳过。find TUI 正常列出和选择，安装时静默跳过 symlink（仍显示在 `Symlinked` 列表中）。list `-a` 过滤时合并列出规范目录与其自身 skills 目录下的 skill（同名去重、规范目录优先）。
+`agents_compat` 为 `true` 的平台直接读取规范目录（`.agents/skills/`），无需创建 symlink 或复制文件。add、remove、link、restore 均跳过该平台的 symlink 操作。单平台指定（`-a <name>`）时输出 `Skipped: <name> (agents_compat)`（暗灰色）；多平台（`-a '*'`）时静默跳过。`enabled: false` 的渠道不参与 `-a '*'` 批量遍历（显式指定不受限）。find TUI 正常列出和选择，安装时静默跳过 symlink（仍显示在 `Symlinked` 列表中）。list `-a` 过滤时合并列出规范目录与其自身 skills 目录下的 skill（同名去重、规范目录优先）。
 
 ### 规范目录清理
 
@@ -366,7 +373,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 当子命令使用 `-a` / `--agent` 指定目标平台时：
 
 * 支持传入具体平台名称（如 `codebuddy`）定位单个平台。
-* 支持传入通配符 `*`（如 `-a '*'`）代表**所有已配置平台**。
+* 支持传入通配符 `*`（如 `-a '*'`）代表**所有已启用平台**（跳过 `enabled: false` 的渠道；显式指定单个禁用渠道名仍可操作）。
 * **验证**：当值为具体名称（非 `*`）时，必须存在于配置文件的 `platforms` 中。不存在则报错，格式如下：
 
   ```
@@ -510,21 +517,24 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 * **行为**：以表格形式打印配置中的平台，并提供 `list`、`reset` 子命令。
 * **子命令**：
-  * `xskill platforms list`：列出配置平台（裸命令 `xskill platforms` 等同 `xskill platforms list`）。
-    * `-a, --all`：显示各平台的详细信息（路径、关联的 agent 指导文件等）。
+  * `xskill platforms list`：列出配置平台（裸命令 `xskill platforms` 等同 `xskill platforms list`）。默认只显示启用（`enabled: true`）的渠道，NAME 列为渠道显示名称（缺失时回退 key），按名称排序。
+    * `-a, --all`：显示各平台的详细信息（路径、关联的 agent 指导文件等），并显示全部渠道（含禁用）及 ENABLED 状态。
+    * `-e, --enabled`：详细视图仅显示启用（`enabled: true`）的渠道，隐藏禁用渠道；与 `-a` 同时指定时按启用过滤优先。
     * **输出格式（简单）**：
       ```
-      NAME    PATH     COMPAT
-      claude  .claude  ✗
-      codex   .codex   ✓
+      NAME         PATH      COMPAT
+      Claude Code  .claude   ✗
+      Codex        .codex    ✓
       ```
       > `✓` 绿色表示兼容，`✗` 红色表示不兼容，便于肉眼区分。
     * **输出格式（详细）**：
       ```
-      NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
-      claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
-      codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
+      NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
+      Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
+      Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
+      Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
       ```
+      > ENABLED 列 `✓` 绿色表示启用，`✗` 红色表示禁用（仅在 `-a`/`-e` 详细视图出现）。
   * `xskill platforms reset`：重置 `platforms` 为内置默认渠道列表。
     * 执行前弹出一个 skim 单选 TUI（`↑/↓` 选择，`Enter` 确认，`Esc` 取消），回车默认选中第一项：
       * **完全恢复**（第一项，默认）：所有平台恢复内置默认配置，移除自定义平台。
@@ -537,7 +547,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
       $ xskill platforms reset
       Custom platforms: my-custom
       # skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
-      Platforms reset: 18 platforms, replaced with defaults (custom dropped)
+      Platforms reset: 19 platforms, replaced with defaults (custom dropped)
       ```
 * **边界情况**：platforms 为空时输出 "No platforms configured"。空字段显示 ` - `。
 
@@ -558,7 +568,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
   | `add -s s1 -g` | `~/.agents/skills/s1` | 无 |
   | `add -s s1 -a codebuddy` | `.agents/skills/s1` | `.codebuddy/skills/s1` → 规范目录（平台目录不存在时自动创建） |
   | `add -s s1 -a codebuddy -g` | `~/.agents/skills/s1` | `~/.codebuddy/skills/s1` → 规范目录（同上） |
-  | `add -s s1 -a '*'` | `.agents/skills/s1` | 各已存在平台目录（跳过不存在的） |
+  | `add -s s1 -a '*'` | `.agents/skills/s1` | 各已启用平台目录（跳过禁用渠道与不存在的） |
   | `add -s '*' -a '*' -f source1` | 所有 skills（来自 source1） | 各已存在平台目录 |
   | `add -s '*' -a '*'`（无 `-f`） | 报错：必须指定 `-f` | — |
   | `add -A`（等同 `-s '*' -a '*'`） | 报错：必须指定 `-f` | — |
@@ -576,7 +586,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 * **前置条件**：
   * `-a <name>` 时，该平台必须存在于配置文件的 `platforms` 中（遵循 [通用参数 -a 验证规则]）。
   * `-a <name>` 时，平台目录不要求预先存在，不存在则自动创建。
-  * `-a '*'` 时，仅链接平台根目录已存在的平台。
+  * `-a '*'` 时，仅链接平台根目录已存在且启用的平台（跳过 `enabled: false` 的渠道）。
 * **agents_compat 兼容**：当目标平台 `agents_compat` 为 `true` 时，跳过 symlink/copy 创建（该平台直接读取规范目录）。单平台指定时输出 `Skipped: <name> (agents_compat)`（暗灰色）；`-a '*'` 时静默跳过。
 * **输出样式**：
   * 标签（`Name`、`Description`、`Version`、`Path`）使用 cyan bold 显示。
@@ -600,9 +610,9 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
   |------|------|
   | `link -s s1 -a codebuddy` | 将 `.agents/skills/s1` 软链接到 `.codebuddy/skills/s1`（平台目录不存在时自动创建） |
   | `link -s s1 -a codebuddy -g` | 将 `~/.agents/skills/s1` 软链接到 `~/.codebuddy/skills/s1` |
-  | `link -s s1 -a '*'` | 将 s1 链接到各已存在平台目录（跳过不存在的） |
+  | `link -s s1 -a '*'` | 将 s1 链接到各已启用平台目录（跳过禁用渠道与不存在的） |
   | `link -s '*' -a claude` | 将所有已有 skill 链接到 claude 平台 |
-  | `link -s '*' -a '*'` | 将所有已有 skill 链接到各已存在平台目录 |
+  | `link -s '*' -a '*'` | 将所有已有 skill 链接到各已启用平台目录 |
   | `link -A` | 等同于 `link -s '*' -a '*'` |
 
 * **关键规则**：
@@ -615,7 +625,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 * **前置条件**：
   * `-a <name>` 时，该平台必须存在于配置文件的 `platforms` 中（遵循 [通用参数 -a 验证规则]）。
   * `-a <name>` 时，平台目录不要求预先存在，不存在则自动创建。
-  * `-a '*'` 时，仅链接平台根目录已存在的平台。
+  * `-a '*'` 时，仅链接平台根目录已存在且启用的平台（跳过 `enabled: false` 的渠道）。
 * **agents_compat 兼容**：当目标平台 `agents_compat` 为 `true` 时，跳过 symlink 创建（该平台直接读取规范目录）。单平台指定时输出 `Skipped: <name> (agents_compat)`（暗灰色）；`-a '*'` 时静默跳过并汇总输出。
 * **输出样式**：
   * `Symlinked`（green）后接 skill 名称（yellow）和箭头指向平台目录路径。
@@ -643,15 +653,15 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
   | `remove -s s1 -g` | `~/.agents/skills/s1` | 各平台 symlink（悬空文件夹清理） |
   | `remove -s s1 -a codebuddy` | — | 仅删除 `.codebuddy/skills/s1` symlink |
   | `remove -s s1 -a codebuddy -g` | — | 仅删除 `~/.codebuddy/skills/s1` symlink |
-  | `remove -s s1 -a '*'` | `.agents/skills/s1` | 删除各平台 symlink + 规范目录 |
-  | `remove -s s1 -a '*' -g` | `~/.agents/skills/s1` | 删除各平台 symlink + 规范目录 |
+  | `remove -s s1 -a '*'` | `.agents/skills/s1` | 删除各已启用平台 symlink + 规范目录 |
+  | `remove -s s1 -a '*' -g` | `~/.agents/skills/s1` | 删除各已启用平台 symlink + 规范目录 |
   | `remove -s '*'` | `.agents/skills/` 下所有 skill | 各平台 symlink（悬空文件夹清理） |
-  | `remove -s '*' -a '*'` | 删除规范目录 | 删除各平台 symlink |
+  | `remove -s '*' -a '*'` | 删除规范目录 | 删除各已启用平台 symlink |
 
 * **关键规则**：
   * `remove` **不需要** `-f` 参数（与 add 不同）。
   * 不指定 `-a` 时：移除规范目录 + 清理各平台中指向该 skill 的 symlink（悬空文件夹），避免规范目录删除后留下断裂链接。
-  * `-a '*'` 时：移除各平台 symlink **及规范目录**。
+  * `-a '*'` 时：移除各已启用平台 symlink **及规范目录**（跳过 `enabled: false` 的渠道）。
   * `-a <具体平台>` 时：仅移除该平台的 symlink，保留规范目录。
   * 删除 symlink 时使用 `fs::remove_file`（非 `remove_dir_all`），避免误删规范目录内容。
   * 删除规范目录时仅 `rm -rf` 单个 skill 子目录。
@@ -738,7 +748,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
   * `updated_at`（条目级）：更新为当前时间戳。
   * `updated_at`（顶层）：更新为当前时间戳。
   * 项目级与全局级锁文件遵循相同的更新逻辑。
-* **agents_compat 兼容**：当目标平台 `agents_compat` 为 `true` 时，跳过 symlink 创建（`-a '*'` 静默跳过，`-a <name>` 时返回空目标列表）。
+* **agents_compat 兼容**：当目标平台 `agents_compat` 为 `true` 时，跳过 symlink 创建（`-a '*'` 静默跳过，`-a <name>` 时返回空目标列表）。`-a '*'` 时仅恢复至已启用平台（跳过 `enabled: false` 的渠道，显式指定不受限）。
 * **边界情况**：
   * 锁文件不存在或无 skill 条目时输出 "No skills to restore"。
   * 单个 skill 安装失败时记录错误，继续处理其余 skill，最终汇总报告。
@@ -771,10 +781,10 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 * **输出列**：
   * **第 1 列**：skill 名称（左对齐，褐色/yellow 显示）。
   * **第 2 列**：路径（以 `~/` 开头，黑灰色/bright black 显示）。
-  * **第 3 列**（仅不带 `-a` 时显示）：`Agents:` 前缀（黑灰色/bright black）+ 逗号分隔的平台名列表（默认白色显示）。
+  * **第 3 列**（仅不带 `-a` 时显示）：`Agents:` 前缀（黑灰色/bright black）+ 逗号分隔的平台显示名称列表（默认白色显示，跳过 `enabled: false` 的渠道）。
 * **排序**：按路径字母顺序排序。
 * **扫描逻辑**（不带 `-a`）：
-  * 始终扫描规范目录和**所有**平台目录，以收集完整的 agent 列表。
+  * 始终扫描规范目录和所有**启用**平台目录，以收集完整的 agent 列表（跳过 `enabled: false` 的渠道；显式 `-a <platform>` 查询不受限）。
   * 按 skill 名称去重（symlink 指向同一目录，内容相同）。
   * 跳过断裂的 symlink。
   * 路径显示使用 `~/` 前缀代替 home 目录绝对路径。
@@ -913,7 +923,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
   * **已知问题**：skim 库的列表行号从 0 开始（0-based），而非从 1 开始（1-based）。这是 skim 自身行为（skim 5.2.0），非本项目可控。
 * **交互流程**：
   1. **选择 Skill**：启动 TUI 子串搜索（exact 模式，支持多选）。显示格式为 `name [source]`（非选中行 name 默认色，选中行 name 蓝色，source 暗灰色），来自注册中心的条目显示为 `name [registry] [source]`（选中时 `[registry]` 绿色）。TAB 多选技能，Enter 确认。未 TAB 选中时直接 Enter，使用光标所在项。输入进行子串匹配，选中行有深色背景高亮。
-  2. **选择目标平台**：TUI 多选，列表首项为 `Default`（不可选中），后续为配置中所有非 `agents_compat` 平台。`agents_compat` 平台不在可选列表中显示，而是在 header 中以 `SELECTED: <platform1>, <platform2>, ...` 形式列出（位于 `TAB: multi-select` 提示上方）。选中行文字使用蓝色（`Blue`），深色背景高亮。TAB 选中平台后按 Enter 确认；未选中任何平台直接按 Enter（光标在 `Default` 处），则不创建任何平台符号链接。
+  2. **选择目标平台**：TUI 多选，列表首项为 `Default`（不可选中），后续为配置中所有**启用**且非 `agents_compat` 的平台（`enabled: false` 的渠道不显示），条目显示渠道显示名称（`name`，缺失时回退 key）。`agents_compat` 平台不在可选列表中显示，而是在 header 中以 `SELECTED: <platform1>, <platform2>, ...` 形式列出（位于 `TAB: multi-select` 提示上方）。选中行文字使用蓝色（`Blue`），深色背景高亮。TAB 选中平台后按 Enter 确认；未选中任何平台直接按 Enter（光标在 `Default` 处），则不创建任何平台符号链接。
   3. **安装**：按 source URL 分组，每组仅 clone 一次仓库。对每个 skill：
      * 由 `CachedSkill.path` 提取**叶子路径**：先剥离 `skills/` 前缀，再剥离可选的 `/SKILL.md` 后缀（两者独立处理，缺失任一项都不影响另一项），得到 `skill_path`（如 `skills/engineering/grill/SKILL.md` → `grill`，`skills/vue` → `vue`）。安装名 `<name>` 即 `skill_path` 的最后一段。
      * **定位 skill 源目录**：使用 `workdir/skills/<skill_path>`（仓库无顶层 `skills/` 目录时回退为 `workdir/<skill_path>`）。**严禁**直接对 `CachedSkill.path` 取 `.parent()` 推导源目录——当 `path` 不含 `/SKILL.md` 后缀时，`.parent()` 会多退一层而指向整个 `skills/` 目录，导致把整个仓库复制进单个 skill 文件夹（已知缺陷，已修复）。

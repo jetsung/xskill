@@ -377,7 +377,7 @@ fn run_skill_tui(items: Vec<FindItem>, initial_query: Option<&str>) -> Result<Ve
 
 /// Step 2: Select target platforms (multi-select).
 fn run_platform_tui(config: &Config) -> Result<Vec<String>> {
-    // Collect agents_compat platform names
+    // Collect enabled agents_compat platform names
     let compat_names: Vec<String> = config
         .platform_names()
         .iter()
@@ -385,7 +385,7 @@ fn run_platform_tui(config: &Config) -> Result<Vec<String>> {
             config
                 .platforms
                 .get(**name)
-                .map_or(false, |p| p.agents_compat)
+                .map_or(false, |p| p.agents_compat && p.enabled)
         })
         .map(|s| s.to_string())
         .collect();
@@ -397,17 +397,16 @@ fn run_platform_tui(config: &Config) -> Result<Vec<String>> {
         label: None,
     }];
 
-    // Add non-compat platforms as selectable items
+    // Add enabled non-compat platforms as selectable items
     for name in config.platform_names() {
-        if config
-            .platforms
-            .get(name)
-            .map_or(false, |p| p.agents_compat)
-        {
+        let Some(platform) = config.platforms.get(name) else {
+            continue;
+        };
+        if platform.agents_compat || !platform.enabled {
             continue;
         }
         items.push(SelectItem {
-            display: name.to_string(),
+            display: platform.display_name(name),
             value: name.to_string(),
             disabled: false,
             label: None,
@@ -1067,6 +1066,8 @@ mod tests {
         platforms.insert(
             "claude".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: ".claude".to_string(),
                 skills: "skills".to_string(),
                 agents: "CLAUDE.md".to_string(),
@@ -1101,6 +1102,8 @@ mod tests {
         platforms.insert(
             "minimal".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: ".minimal".to_string(),
                 skills: String::new(),
                 agents: String::new(),

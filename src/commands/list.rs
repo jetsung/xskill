@@ -111,15 +111,22 @@ fn scan_all_skills(config: &Config, global: bool) -> Result<BTreeMap<String, Ins
     }
 
     // 扫描各平台目录（始终扫描所有平台，以收集完整的 agent 列表）
+    // 跳过禁用的渠道：不出现在 Agents 列，显式 --agent 查询不受限
     for pname in config.platform_names() {
-        let platform = config.platforms.get(pname);
-        let is_agents_compat = platform.map(|p| p.agents_compat).unwrap_or(false);
+        let Some(platform) = config.platforms.get(pname) else {
+            continue;
+        };
+        if !platform.enabled {
+            continue;
+        }
+        let is_agents_compat = platform.agents_compat;
+        let display_name = platform.display_name(pname);
 
         if is_agents_compat {
             // agents_compat 平台直接读取规范目录，视为已链接所有规范目录中的 skill
             for entry in skills.values_mut() {
-                if entry.in_canonical && !entry.platforms.contains(&pname.to_string()) {
-                    entry.platforms.push(pname.to_string());
+                if entry.in_canonical && !entry.platforms.contains(&display_name) {
+                    entry.platforms.push(display_name.clone());
                 }
             }
         } else {
@@ -136,8 +143,8 @@ fn scan_all_skills(config: &Config, global: bool) -> Result<BTreeMap<String, Ins
                 if !entry.in_canonical {
                     entry.display_path = platform_path;
                 }
-                if !entry.platforms.contains(&pname.to_string()) {
-                    entry.platforms.push(pname.to_string());
+                if !entry.platforms.contains(&display_name) {
+                    entry.platforms.push(display_name.clone());
                 }
             }
         }
@@ -318,6 +325,8 @@ mod tests {
         config.platforms.insert(
             "claude".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: ".claude".to_string(),
                 skills: "skills".to_string(),
                 agents: "CLAUDE.md".to_string(),
@@ -452,6 +461,8 @@ mod tests {
         config.platforms.insert(
             "test-platform".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: tmp
                     .path()
                     .join(".test-platform")
@@ -494,6 +505,8 @@ mod tests {
         config.platforms.insert(
             "custom-plain".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: ".custom-plain".to_string(),
                 skills: "skills".to_string(),
                 agents: "CUSTOM.md".to_string(),
@@ -514,6 +527,8 @@ mod tests {
         config.platforms.insert(
             "custom-plain".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: ".custom-plain".to_string(),
                 skills: "skills".to_string(),
                 agents: "CUSTOM.md".to_string(),
@@ -534,6 +549,8 @@ mod tests {
         config.platforms.insert(
             "custom-compat".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: ".custom-compat".to_string(),
                 skills: "skills".to_string(),
                 agents: "CUSTOM.md".to_string(),
@@ -556,6 +573,8 @@ mod tests {
         config.platforms.insert(
             "custom-compat".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: ".custom-compat".to_string(),
                 skills: "skills".to_string(),
                 agents: "CUSTOM.md".to_string(),
@@ -584,6 +603,8 @@ mod tests {
         config.platforms.insert(
             "custom-empty".to_string(),
             Platform {
+                name: None,
+                enabled: true,
                 path: ".custom-empty".to_string(),
                 skills: String::new(),
                 agents: "CUSTOM.md".to_string(),

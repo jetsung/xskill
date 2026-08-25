@@ -229,9 +229,12 @@ enum Commands {
 enum PlatformsAction {
     /// List configured platforms
     List {
-        /// Show detailed information
+        /// Show all platforms, including disabled ones
         #[arg(short = 'a', long = "all")]
-        detailed: bool,
+        all: bool,
+        /// Show only enabled platforms (detailed view)
+        #[arg(short = 'e', long = "enabled")]
+        enabled: bool,
     },
 
     /// Reset platforms to defaults
@@ -378,9 +381,9 @@ fn run() -> Result<()> {
             } => commands::sources::run_rename(name.as_deref(), url.as_deref(), &new_name, index),
         },
         Commands::Platforms { action } => match action {
-            Some(PlatformsAction::List { detailed }) => commands::platforms::run(detailed),
+            Some(PlatformsAction::List { all, enabled }) => commands::platforms::run(all, enabled),
             Some(PlatformsAction::Reset) => commands::platforms::run_reset(),
-            None => commands::platforms::run(false),
+            None => commands::platforms::run(false, false),
         },
         Commands::Add {
             source,

@@ -91,7 +91,7 @@ pub fn run_validate() -> Result<()> {
     // 2. JSON Schema 校验（本地优先，缺失时回退云端）
     let (schema, schema_source) = load_schema()?;
 
-    let compiled = jsonschema::JSONSchema::compile(&schema)
+    let compiled = jsonschema::validator_for(&schema)
         .map_err(|e| anyhow::anyhow!("Failed to compile schema: {}", e))?;
 
     let result = compiled.validate(&instance);
@@ -105,17 +105,17 @@ pub fn run_validate() -> Result<()> {
             );
             Ok(())
         }
-        Err(errors) => {
-            let count = errors.count();
+        Err(_) => {
+            // 收集全部校验错误
+            let errors: Vec<_> = compiled.iter_errors(&instance).collect();
             eprintln!(
                 "{} {} — {} validation error(s):",
                 "Invalid".red(),
                 config_path.display(),
-                count
+                errors.len()
             );
-            // 重新遍历以打印每条错误（上一次 .count() 已消耗迭代器）
-            for err in compiled.validate(&instance).expect_err("schema errors") {
-                eprintln!("  - {}: {}", err.instance_path, err);
+            for err in errors {
+                eprintln!("  - {}: {}", err.instance_path(), err);
             }
             std::process::exit(1);
         }

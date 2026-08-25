@@ -49,10 +49,11 @@ jobs:
           SOURCES: ${{ vars.SOURCES || env.SOURCES }}
         run: |
           # 添加源（每行一条：<名称> <地址>；名称可省略，只写地址；# 开头为注释）
-          echo "$SOURCES" | sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' | while read -r name url _; do
+          # tr -d '\r'：GitHub 变量中多行值可能带 CR（\r），会残留到 URL 里导致 git ls-remote 失败
+          echo "$SOURCES" | tr -d '\r' | sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' | while read -r name url _; do
             if [ -n "$url" ]; then
               xskill sources add --name "$name" --url "$url"
-            else
+            elif [ -n "$name" ]; then
               xskill sources add --url "$name"
             fi
           done

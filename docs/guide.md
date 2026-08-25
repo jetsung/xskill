@@ -235,7 +235,7 @@ List or reset all configured AI coding platforms.
 
 #### `platforms list`
 
-List all configured platforms (sorted alphabetically by name):
+List all configured platforms. By default only enabled platforms (`enabled: true`) are shown, sorted by display name; the `NAME` column shows the display name (falls back to the config key when absent):
 
 ```bash
 xskill platforms list
@@ -246,14 +246,14 @@ The bare `xskill platforms` command is equivalent to `xskill platforms list`.
 Default output format (columns `NAME`, `PATH`, `COMPAT`):
 
 ```
-NAME    PATH     COMPAT
-claude  .claude  ✗
-codex   .codex   ✓
+NAME         PATH      COMPAT
+Claude Code  .claude   ✗
+Codex        .codex    ✓
 ```
 
 `✓` in green indicates compatibility (`agents_compat: true`), `✗` in red indicates incompatibility.
 
-Show detailed platform information (columns `NAME`, `PATH`, `SKILLS`, `AGENTS`, `SOURCE`, `COMPAT`):
+Show detailed platform information, including disabled platforms and their `ENABLED` status (columns `NAME`, `PATH`, `SKILLS`, `AGENTS`, `SOURCE`, `COMPAT`, `ENABLED`):
 
 ```bash
 xskill platforms list -a
@@ -262,13 +262,21 @@ xskill platforms list -a
 Output format:
 
 ```
-NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
-claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
-codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
+NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
+Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
+Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
+Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
+```
+
+Show detailed information for enabled platforms only (disabled platforms are hidden):
+
+```bash
+xskill platforms list -e
 ```
 
 Options:
-- `-a, --all` — Show detailed information (path, skills directory, agents file, source file, and agents compatibility)
+- `-a, --all` — Show detailed information (path, skills directory, agents file, source file, agents compatibility, and enabled status) for all platforms, including disabled ones
+- `-e, --enabled` — Show the detailed view for enabled platforms only (`enabled: true`); disabled platforms are hidden. When combined with `-a`, the enabled filter takes precedence
 
 Compatible platforms (`agents_compat: true`) are pre-selected in the interactive target-platform picker used by `add`, `link`, and related commands.
 
