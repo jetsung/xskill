@@ -149,27 +149,32 @@
                         <h3 id="platforms--manage-configured-platforms"><a class="header" href="#platforms--manage-configured-platforms"><code>platforms</code> — Manage configured platforms</a></h3>
 <p>List or reset all configured AI coding platforms.</p>
 <h4 id="platforms-list"><a class="header" href="#platforms-list"><code>platforms list</code></a></h4>
-<p>List all configured platforms (sorted alphabetically by name):</p>
+<p>List all configured platforms. By default only enabled platforms (<code>enabled: true</code>) are shown, sorted by display name; the <code>NAME</code> column shows the display name (falls back to the config key when absent):</p>
 <pre><code class="language-bash">xskill platforms list
 </code></pre>
 <p>The bare <code>xskill platforms</code> command is equivalent to <code>xskill platforms list</code>.</p>
 <p>Default output format (columns <code>NAME</code>, <code>PATH</code>, <code>COMPAT</code>):</p>
-<pre><code>NAME    PATH     COMPAT
-claude  .claude  ✗
-codex   .codex   ✓
+<pre><code>NAME         PATH      COMPAT
+Claude Code  .claude   ✗
+Codex        .codex    ✓
 </code></pre>
 <p><code>✓</code> in green indicates compatibility (<code>agents_compat: true</code>), <code>✗</code> in red indicates incompatibility.</p>
-<p>Show detailed platform information (columns <code>NAME</code>, <code>PATH</code>, <code>SKILLS</code>, <code>AGENTS</code>, <code>SOURCE</code>, <code>COMPAT</code>):</p>
+<p>Show detailed platform information, including disabled platforms and their <code>ENABLED</code> status (columns <code>NAME</code>, <code>PATH</code>, <code>SKILLS</code>, <code>AGENTS</code>, <code>SOURCE</code>, <code>COMPAT</code>, <code>ENABLED</code>):</p>
 <pre><code class="language-bash">xskill platforms list -a
 </code></pre>
 <p>Output format:</p>
-<pre><code>NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
-claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
-codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
+<pre><code>NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
+Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
+Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
+Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
+</code></pre>
+<p>Show detailed information for enabled platforms only (disabled platforms are hidden):</p>
+<pre><code class="language-bash">xskill platforms list -e
 </code></pre>
 <p>Options:</p>
 <ul>
-<li><code>-a, --all</code> — Show detailed information (path, skills directory, agents file, source file, and agents compatibility)</li>
+<li><code>-a, --all</code> — Show detailed information (path, skills directory, agents file, source file, agents compatibility, and enabled status) for all platforms, including disabled ones</li>
+<li><code>-e, --enabled</code> — Show the detailed view for enabled platforms only (<code>enabled: true</code>); disabled platforms are hidden. When combined with <code>-a</code>, the enabled filter takes precedence</li>
 </ul>
 <p>Compatible platforms (<code>agents_compat: true</code>) are pre-selected in the interactive target-platform picker used by <code>add</code>, <code>link</code>, and related commands.</p>
 <h4 id="platforms-reset"><a class="header" href="#platforms-reset"><code>platforms reset</code></a></h4>

@@ -300,27 +300,32 @@ xskill sources rename -i &lt;index&gt; -N &lt;new-name&gt;
 <div style="break-before: page; page-break-before: always;"></div><h3 id="platforms--管理配置平台"><a class="header" href="#platforms--管理配置平台"><code>platforms</code> — 管理配置平台</a></h3>
 <p>列出或重置所有已配置的 AI 编程平台。</p>
 <h4 id="platforms-list"><a class="header" href="#platforms-list"><code>platforms list</code></a></h4>
-<p>列出所有已配置的平台（按名称字母排序）：</p>
+<p>列出已配置的平台。默认只显示启用（<code>enabled: true</code>）的渠道,按显示名称排序;<code>NAME</code> 列为渠道显示名称（缺失时回退到配置 key）:</p>
 <pre><code class="language-bash">xskill platforms list
 </code></pre>
 <p>裸命令 <code>xskill platforms</code> 等同于 <code>xskill platforms list</code>。</p>
-<p>默认输出格式（<code>NAME</code>、<code>PATH</code>、<code>COMPAT</code> 三列）：</p>
-<pre><code>NAME    PATH     COMPAT
-claude  .claude  ✗
-codex   .codex   ✓
+<p>默认输出格式（<code>NAME</code>、<code>PATH</code>、<code>COMPAT</code> 三列）:</p>
+<pre><code>NAME         PATH      COMPAT
+Claude Code  .claude   ✗
+Codex        .codex    ✓
 </code></pre>
 <p><code>✓</code> 绿色表示兼容（<code>agents_compat: true</code>），<code>✗</code> 红色表示不兼容，便于肉眼区分。</p>
-<p>显示详细平台信息（<code>NAME</code>、<code>PATH</code>、<code>SKILLS</code>、<code>AGENTS</code>、<code>SOURCE</code>、<code>COMPAT</code> 六列）：</p>
+<p>显示详细平台信息,包含禁用渠道及其 <code>ENABLED</code> 状态（<code>NAME</code>、<code>PATH</code>、<code>SKILLS</code>、<code>AGENTS</code>、<code>SOURCE</code>、<code>COMPAT</code>、<code>ENABLED</code> 七列）:</p>
 <pre><code class="language-bash">xskill platforms list -a
 </code></pre>
-<p>输出格式：</p>
-<pre><code>NAME    PATH    SKILLS  AGENTS      SOURCE     COMPAT
-claude  .claude skills  CLAUDE.md   AGENTS.md  ✗
-codex   .codex  skills  AGENTS.md   AGENTS.md  ✓
+<p>输出格式:</p>
+<pre><code>NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
+Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
+Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
+Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
+</code></pre>
+<p>只显示已启用渠道的详细信息(隐藏禁用渠道):</p>
+<pre><code class="language-bash">xskill platforms list -e
 </code></pre>
 <p>选项：</p>
 <ul>
-<li><code>-a, --all</code> — 显示详细信息（路径、技能目录、代理文件、源文件和 agents 兼容性）</li>
+<li><code>-a, --all</code> — 显示详细信息（路径、技能目录、代理文件、源文件、agents 兼容性和启用状态），包含全部渠道（含禁用）</li>
+<li><code>-e, --enabled</code> — 详细视图仅显示已启用（<code>enabled: true</code>）的渠道；与 <code>-a</code> 同时指定时按启用过滤优先</li>
 </ul>
 <p>兼容平台（<code>agents_compat: true</code>）会在 <code>add</code>、<code>link</code> 等命令的交互式目标平台选择器中自动预选。</p>
 <h4 id="platforms-reset"><a class="header" href="#platforms-reset"><code>platforms reset</code></a></h4>
