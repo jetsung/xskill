@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25T00:43:41.425Z",
+  "updated_at": "2026-08-25T06:30:18.125Z",
   "sources": [
     {
       "source": "https://github.com/jetsung/skills",
@@ -213,12 +213,6 @@
           "name": "openapi-to-application-code",
           "path": "skills/openapi-to-application-code",
           "description": "Generate a complete, production-ready application from an OpenAPI specification",
-          "version": ""
-        },
-        {
-          "name": "gem-design-md-guidelines",
-          "path": "skills/gem-design-md-guidelines",
-          "description": "Create or review accessible web, desktop, iOS, Android, and cross-platform UI/UX. Use for layouts, themes, components, design systems, DESIGN.md tokens, responsive behavior, dark mode, motion, and WCAG validation.",
           "version": ""
         },
         {
