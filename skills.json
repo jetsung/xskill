@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-25T18:25:57.533Z",
+  "updated_at": "2026-08-26T00:44:25.897Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -168,7 +168,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "d0d9d9f014abb27bf0d8321851867500a3a46bba",
+      "commit_hash": "71f7c9b1dc5044287b62fc700efc034da4065f87",
       "skills": [
         {
           "name": "azure-static-web-apps",
@@ -477,6 +477,12 @@
           "version": ""
         },
         {
+          "name": "roslyn-analyzers",
+          "path": "skills/roslyn-analyzers/SKILL.md",
+          "description": "Build, review, debug, package, and test Roslyn diagnostic analyzers, code fix providers, and incremental source generators. Use for DiagnosticAnalyzer, CodeFixProvider, IIncrementalGenerator, IOperation analysis, Microsoft.CodeAnalysis dependency pinning, Roslyn test harnesses, C#/VB tests, and analyzer NuGet packaging.",
+          "version": ""
+        },
+        {
           "name": "copilot-spaces",
           "path": "skills/copilot-spaces/SKILL.md",
           "description": "Use Copilot Spaces to provide project-specific context to conversations. Use this skill when users mention a \"Copilot space\", want to load context from a shared knowledge base, discover available spaces, or ask questions grounded in curated project documentation, code, and instructions.",
@@ -528,6 +534,12 @@
           "name": "arize-annotation",
           "path": "skills/arize-annotation/SKILL.md",
           "description": "Creates and manages annotation configs (categorical, continuous, freeform label schemas) and annotation queues (human review workflows) on Arize. Applies human annotations to project spans via the Python SDK. Use when the user mentions annotation config, annotation queue, label schema, human feedback, bulk annotate spans, update_annotations, labeling queue, annotate record, or human review.",
+          "version": "1.0"
+        },
+        {
+          "name": "poka-yoke",
+          "path": "skills/poka-yoke/SKILL.md",
+          "description": "Mistake-proof code so misuse cannot be expressed, rather than warning against it. Use when designing an interface, schema, or state machine and the user wants it hard to get wrong (\"make invalid states unrepresentable\", \"so callers cannot screw it up\", \"type-safe API\", \"pit of success\"); when auditing existing code for footguns (\"what could bite us here\", \"what is easy to misuse\", \"poka-yoke this repo\", \"review this diff for ways to get it wrong\"); or when a bug has recurred and the fix must close the class rather than the case (\"make sure this never happens again\", \"this is the third time\"). Especially for money, auth, permissions, deletion, migrations, and pipelines where failure is silent. Classifies every finding by what happens when the mistake occurs and how the device notices, which is what keeps it from collapsing into generic code review.",
           "version": "1.0"
         },
         {
@@ -918,6 +930,12 @@
           "name": "refactor-plan",
           "path": "skills/refactor-plan/SKILL.md",
           "description": "Create a concrete plan before starting a multi-file refactor. Use when the user asks to plan, sequence, scope, or safely execute a refactor across multiple files; always investigate first, output the plan, and wait for confirmation before making code changes.",
+          "version": ""
+        },
+        {
+          "name": "tugboat",
+          "path": "skills/tugboat/SKILL.md",
+          "description": "Anxiety-aware, evidence-driven collaboration for stalled or high-stakes work when a user says uncertainty, repeated setbacks, or lack of visible progress is causing significant anxiety or distress. Use immediately when explicitly invoked; when this fit is only inferred from the user's own account, ask permission before applying it. Preserve the user's ideal and turn grounded perspective-taking into persistent, bounded problem solving. Do not use to diagnose, provide therapy, manufacture certainty, or lower goals for reassurance.",
           "version": ""
         },
         {
