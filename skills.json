@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-08-26T06:32:30.943Z",
+  "updated_at": "2026-08-26T12:32:56.709Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "cd82d0441163b1e8f0f1c3dba8b9eebe8d2b366b",
+      "commit_hash": "986eda67de81020186913c7926de62f685e031c3",
       "skills": [
         {
           "name": "free-models-extract",
           "path": "skills/free-models-extract/SKILL.md",
-          "description": "从任意 AI 模型渠道（provider）提取真正可用的免费/零价模型清单，并可更新到多个 agent 工具（pi、omp、opencode 等）的配置文件。 凡是用户提到\"获取/提取/列出/查看 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、 \"有哪些免费模型可用\"、\"给 XX 渠道加免费模型\"、\"这个免费模型能用吗\"、\"把模型更新到 pi/omp/opencode\"时，都应使用此技能。 技能通用性强：支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。 使用前需用户指定：①目标渠道，②筛选方式（按价格=0 / free 标签 / 关键词等）。技能会抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论并可写入多工具配置。",
+          "description": "从任意 AI 模型渠道（provider）提取真正可用的免费/零价模型清单，并可更新到多个 agent 工具（pi、omp、opencode、dsh 等）的配置文件。 凡是用户提到\"获取/提取/列出/查看 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、 \"有哪些免费模型可用\"、\"给 XX 渠道加免费模型\"、\"这个免费模型能用吗\"、\"把模型更新到 pi/omp/opencode/dsh\"时，都应使用此技能。 技能通用性强：支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。 使用前需用户指定：①目标渠道，②筛选方式（按价格=0 / free 标签 / 关键词等）。技能会抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论并可写入多工具配置。",
           "version": ""
         },
         {
