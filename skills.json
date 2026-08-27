@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-27T05:53:55.503Z",
+  "updated_at": "2026-08-27T17:08:20.765Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -2876,7 +2876,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "5a5ea45e806f82273549fd85e60adb95d55f510d",
+      "commit_hash": "7cb7a20bb38b199728d456999c725a0488490ab6",
       "skills": [
         {
           "name": "security-and-hardening",
