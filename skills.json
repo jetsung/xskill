@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-26T19:39:35.830Z",
+  "updated_at": "2026-08-27T05:53:55.503Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -168,7 +168,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "71f7c9b1dc5044287b62fc700efc034da4065f87",
+      "commit_hash": "634b92f887487fc61cddc2f61d77830e09e8f589",
       "skills": [
         {
           "name": "azure-static-web-apps",
@@ -1134,6 +1134,12 @@
           "name": "transloadit-media-processing",
           "path": "skills/transloadit-media-processing/SKILL.md",
           "description": "Process media files (video, audio, images, documents) using Transloadit. Use when asked to encode video to HLS/MP4, generate thumbnails, resize or watermark images, extract audio, concatenate clips, add subtitles, OCR documents, or run any media processing pipeline. Covers 86+ processing robots for file transformation at scale.",
+          "version": ""
+        },
+        {
+          "name": "speak-summary",
+          "path": "skills/speak-summary/SKILL.md",
+          "description": "Convert text, markdown, or a summary produced by another skill into a listenable MP3 using local CPU-only neural text-to-speech. Rewrites written prose for the ear before synthesising. Use when the user asks to \"read this out\", \"turn this into audio\", \"make an MP3\", \"I want to listen to this\", \"podcast version\", or wants a spoken digest for a commute or breakfast.",
           "version": ""
         },
         {
@@ -3250,7 +3256,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "ab81a4b43a7bd769b1d2a33457b7b708b8c52516",
+      "commit_hash": "a0ddb60d040c61f4907436a9d91310934b1dda63",
       "skills": [
         {
           "name": "openspec-new-change",
