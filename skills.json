@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-27T17:08:20.765Z",
+  "updated_at": "2026-08-28T01:56:22.425Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -168,7 +168,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "634b92f887487fc61cddc2f61d77830e09e8f589",
+      "commit_hash": "797cf9f830cc216aa66bb509543c8c93b3ba47d1",
       "skills": [
         {
           "name": "azure-static-web-apps",
@@ -2876,7 +2876,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "7cb7a20bb38b199728d456999c725a0488490ab6",
+      "commit_hash": "f63ec56a3cc936408d792956ae583c3c96a825bd",
       "skills": [
         {
           "name": "security-and-hardening",
@@ -2989,7 +2989,7 @@
         {
           "name": "git-workflow-and-versioning",
           "path": "skills/git-workflow-and-versioning/SKILL.md",
-          "description": "Structures git workflow practices. Use when making any code change. Use when committing, branching, resolving conflicts, or when you need to organize work across multiple parallel streams. Use when cutting a release, choosing a semantic version bump, tagging, or writing a changelog.",
+          "description": "Structures git workflow practices. Use when making any code change. Use when committing, branching, resolving conflicts, opening or reviewing a pull request (PR), pushing to a remote, or when you need to organize work across multiple parallel streams. Use when cutting a release, choosing a semantic version bump, tagging, or writing a changelog.",
           "version": ""
         },
         {
