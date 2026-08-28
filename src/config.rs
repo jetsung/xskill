@@ -148,6 +148,7 @@ pub fn default_platforms() -> HashMap<String, Platform> {
         ("codebuddy", "CodeBuddy", true, ".codebuddy", "skills", "CODEBUDDY.md", false),
         ("codex", "Codex", true, ".codex", "skills", "AGENTS.md", true),
         ("commandcode", "Command Code", false, ".commandcode", "skills", "AGENTS.md", true),
+        ("dsh", "DeepSeek Harness", true, ".dsh", "skills", "AGENTS.md", true),
         ("omp", "Oh My Pi", true, ".omp/agent", "skills", "AGENTS.md", true),
         ("opencode", "OpenCode", true, ".opencode", "skills", "AGENTS.md", true),
         ("pi", "Pi", true, ".pi/agent", "skills", "AGENTS.md", true),
@@ -683,7 +684,7 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 21);
+        assert_eq!(platforms.len(), 22);
         assert!(platforms.contains_key("antigravity"));
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
@@ -698,14 +699,14 @@ mod tests {
         assert!(!platforms.contains_key("roo"));
         assert!(platforms.contains_key("zoo"));
 
-        // 默认启用 9 个常用渠道
+        // 默认启用 10 个常用渠道
         let enabled: Vec<_> = platforms
             .iter()
             .filter(|(_, p)| p.enabled)
             .map(|(k, _)| k.as_str())
             .collect();
-        assert_eq!(enabled.len(), 9);
-        for key in ["claude", "codex", "antigravity", "zcode", "opencode", "codebuddy", "qoder", "pi", "omp"] {
+        assert_eq!(enabled.len(), 10);
+        for key in ["claude", "codex", "antigravity", "zcode", "opencode", "codebuddy", "qoder", "pi", "omp", "dsh"] {
             assert!(
                 platforms[key].enabled,
                 "expected {} to be enabled by default",
@@ -757,6 +758,16 @@ mod tests {
         assert_eq!(zoo.skills, "skills");
         assert!(zoo.agents_compat);
 
+        // dsh（DeepSeek Harness）渠道：AGENTS.md 兼容，默认启用
+        let dsh = &platforms["dsh"];
+        assert_eq!(dsh.name.as_deref(), Some("DeepSeek Harness"));
+        assert_eq!(dsh.path, ".dsh");
+        assert_eq!(dsh.skills, "skills");
+        assert_eq!(dsh.agents, "AGENTS.md");
+        assert_eq!(dsh.source, "AGENTS.md");
+        assert!(dsh.agents_compat);
+        assert!(dsh.enabled);
+
         // commandcode 渠道：AGENTS.md 兼容，默认禁用
         let commandcode = &platforms["commandcode"];
         assert_eq!(commandcode.name.as_deref(), Some("Command Code"));
@@ -790,7 +801,7 @@ mod tests {
         assert_eq!(config.cache.ttl, 86400);
         assert!(!config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 21);
+        assert_eq!(config.platforms.len(), 22);
         // init 时 proxy 键占位为空字符串（不生效，供用户填写）
         assert_eq!(config.proxy, Some(String::new()));
     }
