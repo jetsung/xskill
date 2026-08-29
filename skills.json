@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-28T17:55:17.612Z",
+  "updated_at": "2026-08-29T01:20:49.165Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -2876,7 +2876,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "f63ec56a3cc936408d792956ae583c3c96a825bd",
+      "commit_hash": "d2c37ef6225dd8726cdd369a8030307f48592d26",
       "skills": [
         {
           "name": "security-and-hardening",
@@ -2924,6 +2924,12 @@
           "name": "source-driven-development",
           "path": "skills/source-driven-development/SKILL.md",
           "description": "Grounds every implementation decision in official documentation. Use when you want authoritative, source-cited code free from outdated patterns. Use when building with any framework or library where correctness matters.",
+          "version": ""
+        },
+        {
+          "name": "constraint-driven-development",
+          "path": "skills/constraint-driven-development/SKILL.md",
+          "description": "Establishes a project's quality bar as a written contract and stops agents quietly lowering it. Interviews the user on which dimensions matter, supplies sane default thresholds when they have no number in mind, records everything in CONSTRAINTS.md, and watches the diff for a weakened bar — new @ts-ignore or eslint-disable suppressions, skipped or deleted tests, assertions stripped out, unimplemented stubs, thresholds edited down. Use when no quality bar is written down, when the user says \"set up constraints\" or \"define our standards\", when an agent keeps silencing checks or skipping tests to get to green, when you need a coverage or performance threshold and don't know what number to pick, or when an agent writes more code than anyone will read.",
           "version": ""
         },
         {
