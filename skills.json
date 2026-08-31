@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-30T20:19:12.493Z",
+  "updated_at": "2026-08-31T02:29:53.240Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -168,7 +168,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "f11a4e441c5ff061b4f8ae37952be8c602e4034e",
+      "commit_hash": "3a4b532cdc16854e3313b5e8a53f6a83a9dd64c0",
       "skills": [
         {
           "name": "azure-static-web-apps",
@@ -2687,7 +2687,7 @@
         {
           "name": "github-issues",
           "path": "skills/github-issues/SKILL.md",
-          "description": "Create, update, and manage GitHub issues using MCP tools. Use this skill when users want to create bug reports, feature requests, or task issues, update existing issues, add labels/assignees/milestones, set issue fields (dates, priority, custom fields), set issue types, manage issue workflows, link issues, add dependencies, or track blocked-by/blocking relationships. Triggers on requests like \"create an issue\", \"file a bug\", \"request a feature\", \"update issue X\", \"set the priority\", \"set the start date\", \"link issues\", \"add dependency\", \"blocked by\", \"blocking\", or any GitHub issue management task.",
+          "description": "Create, update, and manage GitHub issues using MCP tools. Use this skill when users want to create bug reports, feature requests, or task issues, update existing issues, add labels/assignees/milestones, manage repository labels, set issue fields (dates, priority, custom fields), set issue types, manage issue workflows, link issues, add dependencies, or track blocked-by/blocking relationships. Triggers on requests like \"create an issue\", \"file a bug\", \"request a feature\", \"update issue X\", \"set the priority\", \"set the start date\", \"create a label\", \"rename a label\", \"list repo labels\", \"link issues\", \"add dependency\", \"blocked by\", \"blocking\", or any GitHub issue management task.",
           "version": ""
         },
         {
