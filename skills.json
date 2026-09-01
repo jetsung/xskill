@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-01T02:44:41.343Z",
+  "updated_at": "2026-09-01T10:49:27.987Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -168,7 +168,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "33484438eb2373a6cd456cf03d4f41b4307859a7",
+      "commit_hash": "5eaae7e2cde26b5cf86682fb31e758da0288aef7",
       "skills": [
         {
           "name": "azure-static-web-apps",
