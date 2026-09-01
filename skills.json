@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-31T22:12:45.291Z",
+  "updated_at": "2026-09-01T02:44:41.343Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -168,7 +168,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "c956566a35c3c2e635f019e7a1bfa59d9497e8b1",
+      "commit_hash": "33484438eb2373a6cd456cf03d4f41b4307859a7",
       "skills": [
         {
           "name": "azure-static-web-apps",
@@ -3262,7 +3262,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "a0ddb60d040c61f4907436a9d91310934b1dda63",
+      "commit_hash": "d0071d7326689a0269332a500c8f56b3f2218ba9",
       "skills": [
         {
           "name": "openspec-new-change",
