@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-02T02:05:16.302Z",
+  "updated_at": "2026-09-02T10:14:09.110Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -168,7 +168,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "c835373ab01633f23e67e1a5713acc9b783915f8",
+      "commit_hash": "6a8fa297b0fe652bd3d7c8946554dc146846b20e",
       "skills": [
         {
           "name": "azure-static-web-apps",
@@ -1080,6 +1080,12 @@
           "name": "sql-server-table-reconciliation",
           "path": "skills/sql-server-table-reconciliation/SKILL.md",
           "description": "Use when: comparing SQL Server tables across instances, data migration validation, ETL verification, row mismatch detection, schema drift, reconciliation report, production vs staging comparison. Uses mssql-python driver with Apache Arrow for fast columnar data transfer and comparison.",
+          "version": ""
+        },
+        {
+          "name": "upstash-redis",
+          "path": "skills/upstash-redis/SKILL.md",
+          "description": "Use Redis over HTTP from serverless and edge runtimes with @upstash/redis, and add rate limiting with @upstash/ratelimit. Use when the user mentions Upstash Redis, needs Redis from a Next.js route handler or middleware, Vercel, Cloudflare Workers, Deno, or Bun without TCP connection pooling, or wants cache-aside with TTLs, a session store, counters, or a 429 rate limiter using fixed window, sliding window, or token bucket. DO NOT use for self-hosted or TCP Redis clients (ioredis, node-redis), Redis Cluster administration, or vector similarity search.\n",
           "version": ""
         },
         {
