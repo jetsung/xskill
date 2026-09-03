@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-03T15:30:56.668Z",
+  "updated_at": "2026-09-03T20:19:40.589Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -47,7 +47,7 @@
     {
       "source": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
-      "commit_hash": "53048666b05b4799081517d00e09e0a2dd688678",
+      "commit_hash": "41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f",
       "skills": [
         {
           "name": "skill-creator",
