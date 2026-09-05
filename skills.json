@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-05T14:16:45.434Z",
+  "updated_at": "2026-09-05T19:44:09.169Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -2882,7 +2882,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "84ee50673804b95c287d1e4eb4f1c1dad7c5188a",
+      "commit_hash": "469d00f4e67ff4a21eb6e6e467a086c9a1f1deb8",
       "skills": [
         {
           "name": "using-agent-skills",
