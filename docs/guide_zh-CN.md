@@ -249,23 +249,7 @@ xskill platforms list
 
 裸命令 `xskill platforms` 等同于 `xskill platforms list`。
 
-默认输出格式（`NAME`、`PATH`、`COMPAT` 三列）:
-
-```
-NAME         PATH      COMPAT
-Claude Code  .claude   ✗
-Codex        .codex    ✓
-```
-
-`✓` 绿色表示兼容（`agents_compat: true`），`✗` 红色表示不兼容，便于肉眼区分。
-
-显示详细平台信息,包含禁用渠道及其 `ENABLED` 状态（`NAME`、`PATH`、`SKILLS`、`AGENTS`、`SOURCE`、`COMPAT`、`ENABLED` 七列）:
-
-```bash
-xskill platforms list -a
-```
-
-输出格式:
+输出格式（`NAME`、`PATH`、`SKILLS`、`AGENTS`、`SOURCE`、`COMPAT`、`ENABLED` 七列）:
 
 ```
 NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
@@ -274,15 +258,27 @@ Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
 Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 ```
 
-只显示已启用渠道的详细信息(隐藏禁用渠道):
+`✓` 绿色表示兼容/启用（`agents_compat: true` / `enabled: true`），`✗` 红色表示不兼容/禁用，便于肉眼区分。
+
+显示全部平台信息,包含禁用渠道:
 
 ```bash
-xskill platforms list -e
+xskill platforms list -a
+```
+
+输出格式同默认视图（`NAME`、`PATH`、`SKILLS`、`AGENTS`、`SOURCE`、`COMPAT`、`ENABLED` 七列），禁用渠道以 `ENABLED` 列 `✗` 标识:
+
+```
+NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
+Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
+Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
+Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 ```
 
 选项：
-- `-a, --all` — 显示详细信息（路径、技能目录、代理文件、源文件、agents 兼容性和启用状态），包含全部渠道（含禁用）
-- `-e, --enabled` — 详细视图仅显示已启用（`enabled: true`）的渠道；与 `-a` 同时指定时按启用过滤优先
+- `-a, --all` — 包含全部渠道（含禁用），以 `ENABLED` 列标注启用状态
+
+所有视图均输出完整列信息（`NAME`、`PATH`、`SKILLS`、`AGENTS`、`SOURCE`、`COMPAT`、`ENABLED`）。
 
 兼容平台（`agents_compat: true`）会在 `add`、`link` 等命令的交互式目标平台选择器中自动预选。
 

@@ -53,7 +53,7 @@
 | 字段 | 必填 | 默认值 | 说明 |
 |------|------|--------|------|
 | `name` | 否 | — | 渠道显示名称，缺失时回退到配置 key。`platforms`/`find`/`list` 等展示型输出显示该名称 |
-| `enabled` | 否 | `false` | 是否启用。禁用渠道不出现在 `platforms` 默认视图、find TUI 可选列表与 `add`/`remove`/`link` 的批量（`-a '*'`）操作中，显式指定渠道名（如 `xskill link claude <skill>`）不受影响；`platforms -a`（详细）视图会显示全部渠道及 ENABLED 状态 |
+| `enabled` | 否 | `false` | 是否启用。禁用渠道不出现在 `platforms` 默认视图、find TUI 可选列表与 `add`/`remove`/`link` 的批量（`-a '*'`）操作中，显式指定渠道名（如 `xskill link claude <skill>`）不受影响；`platforms -a` 视图会显示全部渠道及 ENABLED 状态 |
 | `path` | 是 | — | 工具配置目录（相对路径、绝对路径或 `~/...`） |
 | `skills` | 否 | — | skills 子目录名（相对于 path），为空则不安装 |
 | `agents` | 否 | — | agents 配置文件名（相对于 path），为空则不安装 |
@@ -518,23 +518,15 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 * **行为**：以表格形式打印配置中的平台，并提供 `list`、`reset` 子命令。
 * **子命令**：
   * `xskill platforms list`：列出配置平台（裸命令 `xskill platforms` 等同 `xskill platforms list`）。默认只显示启用（`enabled: true`）的渠道，NAME 列为渠道显示名称（缺失时回退 key），按名称排序。
-    * `-a, --all`：显示各平台的详细信息（路径、关联的 agent 指导文件等），并显示全部渠道（含禁用）及 ENABLED 状态。
-    * `-e, --enabled`：详细视图仅显示启用（`enabled: true`）的渠道，隐藏禁用渠道；与 `-a` 同时指定时按启用过滤优先。
-    * **输出格式（简单）**：
-      ```
-      NAME         PATH      COMPAT
-      Claude Code  .claude   ✗
-      Codex        .codex    ✓
-      ```
-      > `✓` 绿色表示兼容，`✗` 红色表示不兼容，便于肉眼区分。
-    * **输出格式（详细）**：
+    * `-a, --all`：显示全部渠道（含禁用），以 ENABLED 列标注启用状态。
+    * **输出格式**（所有视图一致，共七列 `NAME`、`PATH`、`SKILLS`、`AGENTS`、`SOURCE`、`COMPAT`、`ENABLED`）：
       ```
       NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
       Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
       Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
       Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
       ```
-      > ENABLED 列 `✓` 绿色表示启用，`✗` 红色表示禁用（仅在 `-a`/`-e` 详细视图出现）。
+      > COMPAT 列 `✓` 绿色表示兼容，`✗` 红色表示不兼容；ENABLED 列 `✓` 绿色表示启用，`✗` 红色表示禁用，便于肉眼区分。
   * `xskill platforms reset`：重置 `platforms` 为内置默认渠道列表。
     * 执行前弹出一个 skim 单选 TUI（`↑/↓` 选择，`Enter` 确认，`Esc` 取消），回车默认选中第一项：
       * **完全恢复**（第一项，默认）：所有平台恢复内置默认配置，移除自定义平台。

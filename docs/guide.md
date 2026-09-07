@@ -243,23 +243,7 @@ xskill platforms list
 
 The bare `xskill platforms` command is equivalent to `xskill platforms list`.
 
-Default output format (columns `NAME`, `PATH`, `COMPAT`):
-
-```
-NAME         PATH      COMPAT
-Claude Code  .claude   ✗
-Codex        .codex    ✓
-```
-
-`✓` in green indicates compatibility (`agents_compat: true`), `✗` in red indicates incompatibility.
-
-Show detailed platform information, including disabled platforms and their `ENABLED` status (columns `NAME`, `PATH`, `SKILLS`, `AGENTS`, `SOURCE`, `COMPAT`, `ENABLED`):
-
-```bash
-xskill platforms list -a
-```
-
-Output format:
+Output format (columns `NAME`, `PATH`, `SKILLS`, `AGENTS`, `SOURCE`, `COMPAT`, `ENABLED`):
 
 ```
 NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
@@ -268,15 +252,27 @@ Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
 Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 ```
 
-Show detailed information for enabled platforms only (disabled platforms are hidden):
+`✓` in green indicates compatibility/enabled (`agents_compat: true` / `enabled: true`), `✗` in red indicates incompatibility/disabled.
+
+Show all platforms, including disabled ones (columns `NAME`, `PATH`, `SKILLS`, `AGENTS`, `SOURCE`, `COMPAT`, `ENABLED`):
 
 ```bash
-xskill platforms list -e
+xskill platforms list -a
+```
+
+The output format is the same as the default view, with disabled platforms marked by `✗` in the `ENABLED` column:
+
+```
+NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
+Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
+Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
+Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 ```
 
 Options:
-- `-a, --all` — Show detailed information (path, skills directory, agents file, source file, agents compatibility, and enabled status) for all platforms, including disabled ones
-- `-e, --enabled` — Show the detailed view for enabled platforms only (`enabled: true`); disabled platforms are hidden. When combined with `-a`, the enabled filter takes precedence
+- `-a, --all` — Show all platforms, including disabled ones, marked by the `ENABLED` column
+
+All views output the full column set (`NAME`, `PATH`, `SKILLS`, `AGENTS`, `SOURCE`, `COMPAT`, `ENABLED`).
 
 Compatible platforms (`agents_compat: true`) are pre-selected in the interactive target-platform picker used by `add`, `link`, and related commands.
 

@@ -14,7 +14,7 @@ fn compat_str(agents_compat: bool) -> String {
     }
 }
 
-pub fn run(all: bool, enabled_only: bool) -> Result<()> {
+pub fn run(all: bool) -> Result<()> {
     let config = Config::load()?;
 
     if config.platforms.is_empty() {
@@ -22,63 +22,47 @@ pub fn run(all: bool, enabled_only: bool) -> Result<()> {
         return Ok(());
     }
 
-    let detailed = all || enabled_only;
-    // 默认与 --enabled 只显示启用渠道；--all 显示全部（含 ENABLED 列）；同时指定时 --enabled 过滤优先
-    let show_disabled = all && !enabled_only;
+    // 默认只显示启用渠道；--all 显示全部（含禁用渠道）
+    // 所有视图均输出完整列信息（NAME/PATH/SKILLS/AGENTS/SOURCE/COMPAT/ENABLED）
     let shown: Vec<(&String, &Platform)> = config
         .platforms
         .iter()
-        .filter(|(_, p)| show_disabled || p.enabled)
+        .filter(|(_, p)| all || p.enabled)
         .collect();
     let mut sorted = shown;
     sorted.sort_by_key(|(name, p)| (p.display_name(name).to_lowercase(), name.to_lowercase()));
 
-    if detailed {
-        let headers = &["NAME", "PATH", "SKILLS", "AGENTS", "SOURCE", "COMPAT", "ENABLED"];
-        let rows: Vec<Vec<String>> = sorted
-            .iter()
-            .map(|(name, platform)| {
-                let skills_dir = platform
-                    .skills_dir()
-                    .map(|p| p.to_string_lossy().into_owned())
-                    .unwrap_or_default();
-                let agents_file = platform
-                    .agents_file()
-                    .map(|p| p.to_string_lossy().into_owned())
-                    .unwrap_or_default();
-                let source_file = platform.source_file().to_string_lossy().into_owned();
-                let compat = compat_str(platform.agents_compat);
-                let enabled = if platform.enabled {
-                    "✓".green().to_string()
-                } else {
-                    "✗".red().to_string()
-                };
-                vec![
-                    platform.display_name(name),
-                    platform.path.clone(),
-                    skills_dir,
-                    agents_file,
-                    source_file,
-                    compat,
-                    enabled,
-                ]
-            })
-            .collect();
-        print_table(headers, &rows);
-    } else {
-        let headers = &["NAME", "PATH", "COMPAT"];
-        let rows: Vec<Vec<String>> = sorted
-            .iter()
-            .map(|(name, platform)| {
-                vec![
-                    platform.display_name(name),
-                    platform.path.clone(),
-                    compat_str(platform.agents_compat),
-                ]
-            })
-            .collect();
-        print_table(headers, &rows);
-    }
+    let headers = &["NAME", "PATH", "SKILLS", "AGENTS", "SOURCE", "COMPAT", "ENABLED"];
+    let rows: Vec<Vec<String>> = sorted
+        .iter()
+        .map(|(name, platform)| {
+            let skills_dir = platform
+                .skills_dir()
+                .map(|p| p.to_string_lossy().into_owned())
+                .unwrap_or_default();
+            let agents_file = platform
+                .agents_file()
+                .map(|p| p.to_string_lossy().into_owned())
+                .unwrap_or_default();
+            let source_file = platform.source_file().to_string_lossy().into_owned();
+            let compat = compat_str(platform.agents_compat);
+            let enabled = if platform.enabled {
+                "✓".green().to_string()
+            } else {
+                "✗".red().to_string()
+            };
+            vec![
+                platform.display_name(name),
+                platform.path.clone(),
+                skills_dir,
+                agents_file,
+                source_file,
+                compat,
+                enabled,
+            ]
+        })
+        .collect();
+    print_table(headers, &rows);
 
     Ok(())
 }

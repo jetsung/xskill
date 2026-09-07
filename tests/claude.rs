@@ -2,7 +2,7 @@
 //!
 //! commandcode 集成测试已覆盖 `agents_compat=true`（链接被跳过）分支；
 //! 本文件覆盖 `agents_compat=false` 分支：link 应真正创建 skills 软链并处理 agents 文件。
-//! 仅选取 claude 作为代表渠道，避免 21 个渠道重复测试。
+//! 仅选取 claude 作为代表渠道，避免 22 个渠道重复测试。
 
 use std::fs;
 use std::path::Path;

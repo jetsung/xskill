@@ -148,10 +148,13 @@ pub fn default_platforms() -> HashMap<String, Platform> {
         ("codebuddy", "CodeBuddy", true, ".codebuddy", "skills", "CODEBUDDY.md", false),
         ("codex", "Codex", true, ".codex", "skills", "AGENTS.md", true),
         ("commandcode", "Command Code", false, ".commandcode", "skills", "AGENTS.md", true),
+        ("dsh", "DeepSeek Harness", true, ".dsh", "skills", "AGENTS.md", true),
         ("omp", "Oh My Pi", true, ".omp/agent", "skills", "AGENTS.md", true),
         ("opencode", "OpenCode", true, ".opencode", "skills", "AGENTS.md", true),
         ("pi", "Pi", true, ".pi/agent", "skills", "AGENTS.md", true),
         ("qoder", "Qoder", true, ".qoder", "skills", "AGENTS.md", true),
+        ("qoder-cn", "Qoder CN", true, ".qoder-cn", "skills", "AGENTS.md", true),
+        ("workbuddy", "WorkBuddy", true, ".workbuddy", "skills", "CODEBUDDY.md", false),
         ("zcode", "ZCode", true, ".zcode", "skills", "AGENTS.md", true),
         // 非常用渠道（默认禁用，可在 settings.json 中启用）
         ("atomcode", "AtomCode", false, ".atomcode", "skills", "ATOMCODE.md", true),
@@ -163,6 +166,7 @@ pub fn default_platforms() -> HashMap<String, Platform> {
         ("langcli", "LangCLI", false, ".langcli", "skills", "LANGCLI.md", false),
         ("openclaude", "OpenClaude", false, ".openclaude", "skills", "CLAUDE.md", false),
         ("openinterpreter", "Open Interpreter", false, ".openinterpreter", "skills", "AGENTS.md", true),
+        ("grok", "Grok Build CLI", false, ".grok", "skills", "AGENTS.md", true),
         ("qwen", "Qwen", false, ".qwen", "skills", "AGENTS.md", true),
         // Zoo Code 接手已停服的 Roo Code，配置目录沿用 .roo
         ("zoo", "Zoo Code", false, ".roo", "skills", "AGENTS.md", true),
@@ -683,7 +687,7 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 21);
+        assert_eq!(platforms.len(), 25);
         assert!(platforms.contains_key("antigravity"));
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
@@ -698,14 +702,14 @@ mod tests {
         assert!(!platforms.contains_key("roo"));
         assert!(platforms.contains_key("zoo"));
 
-        // 默认启用 9 个常用渠道
+        // 默认启用 12 个常用渠道
         let enabled: Vec<_> = platforms
             .iter()
             .filter(|(_, p)| p.enabled)
             .map(|(k, _)| k.as_str())
             .collect();
-        assert_eq!(enabled.len(), 9);
-        for key in ["claude", "codex", "antigravity", "zcode", "opencode", "codebuddy", "qoder", "pi", "omp"] {
+        assert_eq!(enabled.len(), 12);
+        for key in ["claude", "codex", "antigravity", "zcode", "opencode", "codebuddy", "qoder", "qoder-cn", "pi", "omp", "dsh", "workbuddy"] {
             assert!(
                 platforms[key].enabled,
                 "expected {} to be enabled by default",
@@ -757,6 +761,36 @@ mod tests {
         assert_eq!(zoo.skills, "skills");
         assert!(zoo.agents_compat);
 
+        // dsh（DeepSeek Harness）渠道：AGENTS.md 兼容，默认启用
+        let dsh = &platforms["dsh"];
+        assert_eq!(dsh.name.as_deref(), Some("DeepSeek Harness"));
+        assert_eq!(dsh.path, ".dsh");
+        assert_eq!(dsh.skills, "skills");
+        assert_eq!(dsh.agents, "AGENTS.md");
+        assert_eq!(dsh.source, "AGENTS.md");
+        assert!(dsh.agents_compat);
+        assert!(dsh.enabled);
+
+        // workbuddy（WorkBuddy）渠道：沿用 codebuddy 约定，agents 文件为 CODEBUDDY.md，默认启用
+        let workbuddy = &platforms["workbuddy"];
+        assert_eq!(workbuddy.name.as_deref(), Some("WorkBuddy"));
+        assert_eq!(workbuddy.path, ".workbuddy");
+        assert_eq!(workbuddy.skills, "skills");
+        assert_eq!(workbuddy.agents, "CODEBUDDY.md");
+        assert_eq!(workbuddy.source, "AGENTS.md");
+        assert!(!workbuddy.agents_compat);
+        assert!(workbuddy.enabled);
+
+        // qoder-cn（Qoder 中国版）渠道：与 qoder 国际版配置一致，仅路径为 .qoder-cn，默认启用
+        let qoder_cn = &platforms["qoder-cn"];
+        assert_eq!(qoder_cn.name.as_deref(), Some("Qoder CN"));
+        assert_eq!(qoder_cn.path, ".qoder-cn");
+        assert_eq!(qoder_cn.skills, "skills");
+        assert_eq!(qoder_cn.agents, "AGENTS.md");
+        assert_eq!(qoder_cn.source, "AGENTS.md");
+        assert!(qoder_cn.agents_compat);
+        assert!(qoder_cn.enabled);
+
         // commandcode 渠道：AGENTS.md 兼容，默认禁用
         let commandcode = &platforms["commandcode"];
         assert_eq!(commandcode.name.as_deref(), Some("Command Code"));
@@ -790,7 +824,7 @@ mod tests {
         assert_eq!(config.cache.ttl, 86400);
         assert!(!config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 21);
+        assert_eq!(config.platforms.len(), 25);
         // init 时 proxy 键占位为空字符串（不生效，供用户填写）
         assert_eq!(config.proxy, Some(String::new()));
     }

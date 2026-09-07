@@ -1,9 +1,9 @@
-//! 集成测试：验证 `xskill platforms list` 的 `--enabled` 过滤参数
+//! 集成测试：验证 `xskill platforms list` 默认只显示可用（启用）渠道
 //!
 //! 覆盖：
-//! - `platforms list --enabled` 以详细视图（含 SKILLS/AGENTS/SOURCE/ENABLED 列）只显示启用渠道
+//! - `platforms list` 以详细视图（含 SKILLS/AGENTS/SOURCE/ENABLED 列）只显示启用渠道
 //! - 默认禁用渠道（如 kiro、commandcode）不出现
-//! - `--all` 仍显示全部渠道（含禁用）
+//! - `--all` 显示全部渠道（含禁用）
 
 use std::path::Path;
 use std::process::Command;
@@ -37,15 +37,15 @@ fn as_refs(env: &[(&str, String)]) -> Vec<(String, String)> {
 }
 
 #[test]
-fn test_platforms_list_enabled_shows_only_enabled_detailed() {
+fn test_platforms_list_shows_only_enabled_detailed() {
     let tmp = tempfile::tempdir().unwrap();
     let workdir = tmp.path();
     let env = isolated_config_env(workdir);
 
-    let out = run_xskill(workdir, &["platforms", "list", "--enabled"], &as_refs(&env));
+    let out = run_xskill(workdir, &["platforms", "list"], &as_refs(&env));
     assert!(
         out.status.success(),
-        "xskill platforms list --enabled failed: {}",
+        "xskill platforms list failed: {}",
         String::from_utf8_lossy(&out.stderr)
     );
 
@@ -53,7 +53,7 @@ fn test_platforms_list_enabled_shows_only_enabled_detailed() {
     // 详细视图：应包含详细表头
     assert!(
         stdout.contains("SKILLS") && stdout.contains("ENABLED"),
-        "platforms list --enabled should use detailed view, got:\n{}",
+        "platforms list should use detailed view, got:\n{}",
         stdout
     );
     // 启用渠道应出现
@@ -66,7 +66,7 @@ fn test_platforms_list_enabled_shows_only_enabled_detailed() {
     for disabled in ["Kiro", "Command Code", "Kilo Code", "LangCLI"] {
         assert!(
             !stdout.contains(disabled),
-            "disabled platform ({}) should NOT appear in `platforms list --enabled`, got:\n{}",
+            "disabled platform ({}) should NOT appear in `platforms list`, got:\n{}",
             disabled,
             stdout
         );
