@@ -63,10 +63,6 @@
           "type": "string",
           "minLength": 1
         },
-        "local_path": {
-          "description": "Project-level configuration directory (optional). Used when global and project-level paths differ (e.g. omp global .omp/agent vs project .omp). Falls back to path when absent.",
-          "type": "string"
-        },
         "skills": {
           "description": "Skills subdirectory name relative to path. Empty string to skip skill installation.",
           "type": "string",

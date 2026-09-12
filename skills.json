@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-09-12T16:59:07.522Z",
+  "updated_at": "2026-09-12T19:54:01.353Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "8117331796dbc25c67d670dd2405bd8eea1b4109",
+      "commit_hash": "89a874f259356f5dae8d4459428d39bb39d6d709",
       "skills": [
         {
           "name": "model-channel-sync",
@@ -23,6 +23,12 @@
           "path": "skills/update-gh-action-version/SKILL.md",
           "description": "自动更新 GitHub Actions 工作流文件中使用的 Action 版本。使用场景：用户需要更新 GitHub Actions workflow 文件中的 action 版本，或者要求升级到最新版本。",
           "version": ""
+        },
+        {
+          "name": "flarum-publish",
+          "path": "skills/flarum-publish/SKILL.md",
+          "description": "发布文章（主题）到 Flarum 论坛，支持通过 REST API 创建讨论、按名称匹配标签；也可将 GitHub 项目链接整理为中文文章后发布。当用户要求发布/投稿文章到 Flarum 论坛、同步内容到论坛，或要求把 GitHub 项目整理成论坛文章时使用。",
+          "version": "1.4.0"
         },
         {
           "name": "huawei-deveco-studio-fetch",
