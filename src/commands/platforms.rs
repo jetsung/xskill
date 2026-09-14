@@ -14,6 +14,15 @@ fn compat_str(agents_compat: bool) -> String {
     }
 }
 
+/// 路径类单元格着色：非空值显示为暗灰色（空值由 print_table 统一输出 dimmed " - "）
+fn path_str(path: &str) -> String {
+    if path.is_empty() {
+        String::new()
+    } else {
+        path.dimmed().to_string()
+    }
+}
+
 pub fn run(all: bool) -> Result<()> {
     let config = Config::load()?;
 
@@ -23,7 +32,7 @@ pub fn run(all: bool) -> Result<()> {
     }
 
     // 默认只显示启用渠道；--all 显示全部（含禁用渠道）
-    // 所有视图均输出完整列信息（NAME/PATH/SKILLS/AGENTS/SOURCE/COMPAT/ENABLED）
+    // 所有视图均输出完整列信息（NAME/KEY/PATH/SKILLS/AGENTS/COMPAT/BUILTIN/ENABLED）
     let shown: Vec<(&String, &Platform)> = config
         .platforms
         .iter()
@@ -32,7 +41,7 @@ pub fn run(all: bool) -> Result<()> {
     let mut sorted = shown;
     sorted.sort_by_key(|(name, p)| (p.display_name(name).to_lowercase(), name.to_lowercase()));
 
-    let headers = &["NAME", "PATH", "SKILLS", "AGENTS", "SOURCE", "COMPAT", "ENABLED"];
+    let headers = &["NAME", "KEY", "PATH", "SKILLS", "AGENTS", "COMPAT", "BUILTIN", "ENABLED"];
     let rows: Vec<Vec<String>> = sorted
         .iter()
         .map(|(name, platform)| {
@@ -44,8 +53,8 @@ pub fn run(all: bool) -> Result<()> {
                 .agents_file()
                 .map(|p| p.to_string_lossy().into_owned())
                 .unwrap_or_default();
-            let source_file = platform.source_file().to_string_lossy().into_owned();
             let compat = compat_str(platform.agents_compat);
+            let builtin = compat_str(platform.builtin);
             let enabled = if platform.enabled {
                 "✓".green().to_string()
             } else {
@@ -53,11 +62,12 @@ pub fn run(all: bool) -> Result<()> {
             };
             vec![
                 platform.display_name(name),
-                platform.path.clone(),
-                skills_dir,
-                agents_file,
-                source_file,
+                name.to_string(),
+                path_str(&platform.path),
+                path_str(&skills_dir),
+                path_str(&agents_file),
                 compat,
+                builtin,
                 enabled,
             ]
         })
@@ -129,6 +139,8 @@ pub fn run_reset() -> Result<()> {
     }
 
     apply_reset_mode(&mut config, mode);
+    // 保存前规范化：内置渠道精简为 name/enabled/builtin，自定义渠道 builtin 恒 false
+    config.normalize_platforms_for_save();
     config.save()?;
 
     let desc = match mode {
@@ -143,6 +155,196 @@ pub fn run_reset() -> Result<()> {
         desc
     );
     Ok(())
+}
+
+/// 校验并切换指定渠道的 enabled 状态，返回已切换的 key 列表
+fn apply_toggle(config: &mut Config, keys: &[String]) -> Result<Vec<String>> {
+    let mut toggled: Vec<String> = Vec::new();
+    for key in keys {
+        let Some(platform) = config.platforms.get_mut(key) else {
+            bail!(
+                "Invalid platform: {}\nValid platforms: {}",
+                key,
+                config.platform_names().join(", ")
+            );
+        };
+        platform.enabled = !platform.enabled;
+        toggled.push(key.clone());
+    }
+    Ok(toggled)
+}
+
+/// 按勾选状态设置指定渠道的 enabled（set 语义，非翻转），返回状态发生变化的 key 列表
+fn apply_enabled_state(config: &mut Config, states: &[(String, bool)]) -> Result<Vec<String>> {
+    let mut changed: Vec<String> = Vec::new();
+    for (key, enabled) in states {
+        let Some(platform) = config.platforms.get_mut(key) else {
+            bail!(
+                "Invalid platform: {}\nValid platforms: {}",
+                key,
+                config.platform_names().join(", ")
+            );
+        };
+        if platform.enabled != *enabled {
+            platform.enabled = *enabled;
+            changed.push(key.clone());
+        }
+    }
+    Ok(changed)
+}
+
+/// 切换渠道启用状态：无参数时弹出 TUI 多选，指定 key 时直接切换
+pub fn run_toggle(keys: &[String]) -> Result<()> {
+    let mut config = Config::load()?;
+
+    // 无参数：交互式 TUI（按当前 enabled 预勾选，确认后按勾选状态设置）
+    let changed: Vec<String> = if keys.is_empty() {
+        if !std::io::stdin().is_terminal() {
+            bail!("'platforms toggle' requires an interactive terminal or platform keys.");
+        }
+        let Some(states) = select_toggle_platforms(&config)? else {
+            println!("{}", "Cancelled.".yellow());
+            return Ok(());
+        };
+        apply_enabled_state(&mut config, &states)?
+    } else {
+        apply_toggle(&mut config, keys)?
+    };
+
+    if changed.is_empty() {
+        println!("{}", "No changes.".yellow());
+        return Ok(());
+    }
+
+    // 保存前规范化（内置渠道精简保存，自定义渠道 builtin 恒 false）
+    config.normalize_platforms_for_save();
+    config.save()?;
+
+    for key in &changed {
+        let platform = &config.platforms[key];
+        let state = if platform.enabled {
+            "enabled".green().to_string()
+        } else {
+            "disabled".red().to_string()
+        };
+        println!("{}: {}", platform.display_name(key), state);
+    }
+    Ok(())
+}
+
+/// TUI 多选渠道：列出全部渠道并按当前 enabled 状态预勾选，确认后按勾选状态设置
+///
+/// 使用 crossterm 自绘而非 skim：skim 的未选中勾选位硬编码为等宽空格，
+/// 无法显示 `[ ]`；自绘可完全控制勾选框、颜色与按键行为。
+///
+/// 返回 `None` 表示用户取消（Esc/Ctrl-C）；`Some` 为确认后的 (key, 勾选状态) 列表。
+fn select_toggle_platforms(config: &Config) -> Result<Option<Vec<(String, bool)>>> {
+    use crossterm::event::{self, Event, KeyCode, KeyModifiers, KeyEventKind};
+    use crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
+    use crossterm::{execute, style::Print};
+    use std::io::{stdout, Write};
+
+    // 按显示名称排序的 (key, name)
+    let mut entries: Vec<(String, String)> = config
+        .platforms
+        .iter()
+        .map(|(key, p)| (key.clone(), p.display_name(key)))
+        .collect();
+    entries.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()));
+    let total = entries.len();
+
+    terminal::enable_raw_mode()?;
+    let mut out = stdout();
+    execute!(out, EnterAlternateScreen)?;
+
+    let result = (|| -> Result<Option<Vec<(String, bool)>>> {
+        // 初始勾选 = 当前 enabled 状态（与排序后的 entries 一一对应）
+        let mut checked: Vec<bool> = entries
+            .iter()
+            .map(|(key, _)| config.platforms[key].enabled)
+            .collect();
+        let mut cursor = 0usize;
+
+        let draw = |out: &mut std::io::Stdout, cursor: usize, checked: &[bool]| -> Result<()> {
+            execute!(out, Print("\x1b[2J\x1b[1;1H"))?;
+            // raw mode 下 \n 只换行不回车（CR），行尾必须用 \r\n，否则逐行累积缩进
+            write!(out, "Toggle platforms:\r\n")?;
+            // 列表完全铺满：全部渠道一次性显示，无窗口滚动
+            for i in 0..total {
+                let (key, name) = &entries[i];
+                let checkbox = if checked[i] { "[x]" } else { "[ ]" };
+                // 已勾选（启用）的行名称用绿色；未勾选用默认色
+                let name_text = if checked[i] {
+                    name.green().to_string()
+                } else {
+                    name.to_string()
+                };
+                let line = if i == cursor {
+                    format!(
+                        "❯ {} {}  [{}]",
+                        checkbox,
+                        name_text.bold(),
+                        key.dimmed()
+                    )
+                } else {
+                    format!("  {} {}  [{}]", checkbox, name_text, key.dimmed())
+                };
+                write!(out, "{}\r\n", line)?;
+            }
+            write!(out, "\r\n")?;
+            write!(
+                out,
+                "{}\r\n",
+                "SPACE: toggle | ↑/↓: move | enter confirm | esc cancel".dimmed()
+            )?;
+            out.flush()?;
+            Ok(())
+        };
+
+        draw(&mut out, cursor, &checked)?;
+        loop {
+            let Event::Key(key) = event::read()? else {
+                continue;
+            };
+            if key.kind != KeyEventKind::Press {
+                continue;
+            }
+            match key.code {
+                KeyCode::Char(' ') | KeyCode::Tab => {
+                    checked[cursor] = !checked[cursor];
+                }
+                KeyCode::Up | KeyCode::Char('k') => {
+                    if cursor > 0 {
+                        cursor -= 1;
+                    }
+                }
+                KeyCode::Down | KeyCode::Char('j') => {
+                    if cursor + 1 < total {
+                        cursor += 1;
+                    }
+                }
+                KeyCode::Enter => {
+                    return Ok(Some(
+                        entries
+                            .iter()
+                            .zip(checked.iter())
+                            .map(|((key, _), c)| (key.clone(), *c))
+                            .collect(),
+                    ));
+                }
+                KeyCode::Esc => return Ok(None),
+                KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
+                    return Ok(None)
+                }
+                _ => continue,
+            }
+            draw(&mut out, cursor, &checked)?;
+        }
+    })();
+
+    execute!(out, LeaveAlternateScreen)?;
+    terminal::disable_raw_mode()?;
+    result
 }
 
 /// 显示 skim 单选 TUI，返回选中的模式
@@ -161,7 +363,6 @@ fn select_reset_mode() -> Result<ResetMode> {
         .prompt("Reset platforms: ".to_string())
         .exact(true)
         .highlight_line(true)
-        .multiline(Some("\n".to_string()))
         .reverse(true)
         .color("current:bg:236,current_match:fg:151:bg:236".to_string())
         .header(" \nup/down navigate | enter select | esc cancel\n ".to_string())
@@ -185,7 +386,10 @@ fn select_reset_mode() -> Result<ResetMode> {
         .ok_or_else(|| anyhow::anyhow!("Failed to retrieve selected mode"))
 }
 
-/// 单选 TUI 的可选择项（两行式：第一行操作名，第二行效果说明）
+/// 单选 TUI 的可选择项（单行式：操作名 + 暗灰色效果说明）
+///
+/// 不使用 multiline 模式：skim 的续行渲染不经过自定义 display()（样式不可控），
+/// 且首行会被裁剪到 text() 第一子行长度（短标题会被前缀挤掉）。
 struct ResetItem {
     title: String,
     desc: String,
@@ -207,7 +411,7 @@ impl ResetMode {
 
 impl SkimItem for ResetItem {
     fn text(&self) -> Cow<'_, str> {
-        Cow::Owned(format!("{}\n{}", self.title, self.desc))
+        Cow::Owned(format!("{} — {}", self.title, self.desc))
     }
 
     fn output(&self) -> Cow<'_, str> {
@@ -219,18 +423,22 @@ impl SkimItem for ResetItem {
     }
 
     fn display(&self, context: DisplayContext) -> TuiLine<'_> {
-        use ratatui::style::Color;
+        use ratatui::style::{Color, Modifier};
         let base = context.base_style;
         let is_selected = base.bg.is_some();
+        // 选中项加 "❯ " 前缀并高亮加粗；未选中项用空格占位对齐
+        let prefix = if is_selected { "❯ " } else { "  " };
         let title_style = if is_selected {
-            base.fg(Color::Blue)
+            base.fg(Color::Blue).add_modifier(Modifier::BOLD)
         } else {
             base
         };
+        // 说明文字暗灰色，与操作名区分层级
         let desc_style = base.fg(Color::DarkGray);
+        // 单行模式：skim 的匹配裁剪基于 text()，display 内容须与之保持一致
         TuiLine::from(vec![
-            TuiSpan::styled(self.title.clone(), title_style),
-            TuiSpan::raw("\n"),
+            TuiSpan::styled(format!("{}{}", prefix, self.title), title_style),
+            TuiSpan::styled(" — ", desc_style),
             TuiSpan::styled(self.desc.clone(), desc_style),
         ])
     }
@@ -239,7 +447,7 @@ impl SkimItem for ResetItem {
 #[cfg(test)]
 mod tests {
     use super::{ResetMode, compat_str, default_platforms};
-    use crate::config::{Config, Platform};
+    use crate::config::{Config, Platform, default_config};
     use colored::Colorize;
 
     #[test]
@@ -249,65 +457,110 @@ mod tests {
     }
 
     #[test]
+    fn test_apply_enabled_state() {
+        use super::apply_enabled_state;
+        use crate::config::default_config;
+
+        // 按勾选状态设置：相同状态不记录变更，不同状态被设置并记录
+        let mut config = default_config();
+        // claude 当前 enabled=true：设为 true 不变，设为 false 变更
+        // kiro 当前 enabled=false：设为 true 变更
+        let states = vec![
+            ("claude".to_string(), true),
+            ("claude".to_string(), false),
+            ("kiro".to_string(), true),
+        ];
+        let changed = apply_enabled_state(&mut config, &states).unwrap();
+        assert_eq!(changed, vec!["claude", "kiro"]);
+        assert!(!config.platforms["claude"].enabled);
+        assert!(config.platforms["kiro"].enabled);
+
+        // 全部相同状态：无变更
+        let mut config = default_config();
+        let states: Vec<(String, bool)> = config
+            .platforms
+            .iter()
+            .map(|(k, p)| (k.clone(), p.enabled))
+            .collect();
+        let changed = apply_enabled_state(&mut config, &states).unwrap();
+        assert!(changed.is_empty());
+
+        // 不存在的渠道报错
+        let mut config = default_config();
+        let err = apply_enabled_state(
+            &mut config,
+            &[("nonexistent".to_string(), true)],
+        )
+        .unwrap_err();
+        let msg = format!("{}", err);
+        assert!(msg.contains("Invalid platform: nonexistent"));
+        assert!(msg.contains("Valid platforms:"));
+    }
+
+    #[test]
+    fn test_apply_toggle() {
+        use super::apply_toggle;
+
+        // 切换单个渠道：enabled 翻转
+        let mut config = default_config();
+        assert!(config.platforms["claude"].enabled);
+        let toggled = apply_toggle(&mut config, &["claude".to_string()]).unwrap();
+        assert_eq!(toggled, vec!["claude"]);
+        assert!(!config.platforms["claude"].enabled);
+
+        // 再次切换恢复原状
+        apply_toggle(&mut config, &["claude".to_string()]).unwrap();
+        assert!(config.platforms["claude"].enabled);
+
+        // 批量切换：禁用渠道被启用
+        let mut config = default_config();
+        assert!(!config.platforms["kiro"].enabled);
+        assert!(!config.platforms["agentty"].enabled);
+        apply_toggle(&mut config, &["kiro".to_string(), "agentty".to_string()]).unwrap();
+        assert!(config.platforms["kiro"].enabled);
+        assert!(config.platforms["agentty"].enabled);
+
+        // 不存在的渠道报错并列出有效渠道
+        let mut config = default_config();
+        let err = apply_toggle(&mut config, &["nonexistent".to_string()]).unwrap_err();
+        let msg = format!("{}", err);
+        assert!(msg.contains("Invalid platform: nonexistent"));
+        assert!(msg.contains("Valid platforms:"));
+
+        // 自定义渠道也可切换
+        let mut config = default_config();
+        config.platforms.insert(
+            "my-custom".to_string(),
+            Platform { name: None, enabled: false, path: ".my-custom".to_string(), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
+        );
+        apply_toggle(&mut config, &["my-custom".to_string()]).unwrap();
+        assert!(config.platforms["my-custom"].enabled);
+    }
+
+    #[test]
     fn test_platform_config_fields() {
-        let platform = Platform {
-            name: None,
-            enabled: true,
-            path: ".claude".to_string(),
-            skills: "skills".to_string(),
-            agents: "CLAUDE.md".to_string(),
-            source: "AGENTS.md".to_string(),
-            agents_compat: false,
-        };
+        let platform = Platform { name: None, enabled: true, path: ".claude".to_string(), local_path: None, skills: "skills".to_string(), agents: "CLAUDE.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false };
         assert!(platform.skills_dir().is_some());
         assert!(platform.agents_file().is_some());
         assert!(!platform.agents_compat);
-        assert_eq!(
-            platform.source_file(),
-            std::path::PathBuf::from(".agents/AGENTS.md")
-        );
     }
 
     #[test]
     fn test_platform_agents_compat() {
-        let platform = Platform {
-            name: None,
-            enabled: true,
-            path: ".opencode".to_string(),
-            skills: "skills".to_string(),
-            agents: "AGENTS.md".to_string(),
-            source: "AGENTS.md".to_string(),
-            agents_compat: true,
-        };
+        let platform = Platform { name: None, enabled: true, path: ".opencode".to_string(), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: true, builtin: false };
         assert!(platform.agents_compat);
     }
 
     #[test]
     fn test_platform_no_skills_no_agents() {
-        let platform = Platform {
-            name: None,
-            enabled: true,
-            path: ".gemini".to_string(),
-            skills: String::new(),
-            agents: String::new(),
-            source: "AGENTS.md".to_string(),
-            agents_compat: false,
-        };
+        let platform = Platform { name: None, enabled: true, path: ".gemini".to_string(), local_path: None, skills: String::new(), agents: String::new(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false };
         assert!(platform.skills_dir().is_none());
         assert!(platform.agents_file().is_none());
         assert!(!platform.agents_compat);
     }
 
     fn platform(name: &str) -> Platform {
-        Platform {
-            name: None,
-            enabled: true,
-            path: format!(".{}", name),
-            skills: "skills".to_string(),
-            agents: "AGENTS.md".to_string(),
-            source: "AGENTS.md".to_string(),
-            agents_compat: true,
-        }
+        Platform { name: None, enabled: true, path: format!(".{}", name), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: true, builtin: false }
     }
 
     fn config_with(extra: &[(&str, Platform)]) -> Config {

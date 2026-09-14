@@ -9,9 +9,12 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-/// Extract skill directory name from skillPath (e.g. "skills/vue/SKILL.md" -> "vue")
+/// Extract skill directory path from skillPath (e.g. "skills/vue/SKILL.md" -> "skills/vue").
+/// Root-level skill ("SKILL.md") -> "" (the repo root itself is the skill).
 fn extract_skill_name(skill_path: &str) -> String {
-    // Extract directory path from skillPath (e.g., "skills/name/SKILL.md" -> "skills/name")
+    if crate::utils::is_root_skill(skill_path) {
+        return String::new();
+    }
     skill_path.replace("/SKILL.md", "")
 }
 
@@ -50,7 +53,7 @@ fn resolve_restore_target(global: bool, agent: Option<&str>) -> Result<Vec<PathB
                     if platform.agents_compat {
                         continue;
                     }
-                    if let Some(skills_dir) = platform.skills_dir_with_base(&base_dir) {
+                    if let Some(skills_dir) = platform.skills_dir_with_base(&base_dir, global) {
                         targets.push(skills_dir);
                     }
                 }
@@ -63,7 +66,7 @@ fn resolve_restore_target(global: bool, agent: Option<&str>) -> Result<Vec<PathB
                 // agents_compat 平台直接读取规范目录，无需 restore symlink
                 return Ok(targets);
             }
-            let skills_dir = platform.skills_dir_with_base(&base_dir).ok_or_else(|| {
+            let skills_dir = platform.skills_dir_with_base(&base_dir, global).ok_or_else(|| {
                     anyhow::anyhow!(
                         "Platform {} has no skills directory configured",
                         agent_value
@@ -80,15 +83,20 @@ fn resolve_restore_target(global: bool, agent: Option<&str>) -> Result<Vec<PathB
     Ok(targets)
 }
 
-/// Copy skill directory to destination
-fn copy_skill_to_dest(source_dir: &Path, dest_dir: &Path) -> Result<()> {
+/// Copy skill directory to destination.
+/// `is_root`：根级 skill 时排除 .git 等隐藏目录（源目录是仓库根）
+fn copy_skill_to_dest(source_dir: &Path, dest_dir: &Path, is_root: bool) -> Result<()> {
     if !source_dir.exists() {
         anyhow::bail!("Source directory not found: {}", source_dir.display());
     }
 
     crate::utils::remove_symlink(dest_dir)?;
     fs::create_dir_all(dest_dir)?;
-    copy_dir_recursive(source_dir, dest_dir)?;
+    if is_root {
+        git::copy_dir_excluding_hidden(source_dir, dest_dir)?;
+    } else {
+        copy_dir_recursive(source_dir, dest_dir)?;
+    }
 
     println!("{}: {}", "Installed".green(), dest_dir.display());
     Ok(())
@@ -290,7 +298,8 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
             let mut any_target_ok = false;
             for target_dir in &targets {
                 let dest_dir = target_dir.join(skill_name);
-                match copy_skill_to_dest(&source_dir, &dest_dir) {
+                let is_root = skill_dir_path.is_empty();
+                match copy_skill_to_dest(&source_dir, &dest_dir, is_root) {
                     Ok(_) => {
                         any_target_ok = true;
                     }
@@ -397,6 +406,8 @@ mod tests {
             "skills/antfu-design"
         );
         assert_eq!(extract_skill_name("vue/SKILL.md"), "vue");
+        // 根级 skill：仓库本身就是一个 skill
+        assert_eq!(extract_skill_name("SKILL.md"), "");
     }
 
     #[test]
@@ -455,7 +466,7 @@ mod tests {
         fs::write(src_dir.join("SKILL.md"), "# Vue").unwrap();
 
         let dest_dir = dst.path().join("vue");
-        copy_skill_to_dest(&src_dir, &dest_dir).unwrap();
+        copy_skill_to_dest(&src_dir, &dest_dir, false).unwrap();
 
         assert!(dest_dir.join("SKILL.md").exists());
     }
@@ -474,7 +485,7 @@ mod tests {
         fs::write(dest_dir.join("SKILL.md"), "old content").unwrap();
         fs::write(dest_dir.join("old-file.txt"), "to be removed").unwrap();
 
-        copy_skill_to_dest(&src_dir, &dest_dir).unwrap();
+        copy_skill_to_dest(&src_dir, &dest_dir, false).unwrap();
 
         assert_eq!(
             fs::read_to_string(dest_dir.join("SKILL.md")).unwrap(),
@@ -487,7 +498,7 @@ mod tests {
     fn test_copy_skill_to_dest_missing_source() {
         let dst = tempfile::tempdir().unwrap();
         let result =
-            copy_skill_to_dest(&PathBuf::from("/nonexistent/path"), &dst.path().join("vue"));
+            copy_skill_to_dest(&PathBuf::from("/nonexistent/path"), &dst.path().join("vue"), false);
         assert!(result.is_err());
     }
 

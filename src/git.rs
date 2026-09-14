@@ -32,10 +32,12 @@ pub struct InstallResult {
 ///
 /// 流程：
 /// 1. 归一化 URL
-/// 2. sparse-checkout 仅检出 skills/<skill_path>
+/// 2. sparse-checkout 仅检出 skills/<skill_path>（根级 skill 时检出整个仓库）
 /// 3. 检测默认分支
-/// 4. 迁移到本地 dest_dir/
+/// 4. 迁移到本地 dest_dir/（排除 .git 等隐藏目录）
 /// 5. 清理临时目录
+///
+/// `skill_path` 为空表示仓库本身就是一个 skill（SKILL.md 位于仓库根目录）。
 pub fn install_skill(
     repo_url: &str,
     skill_path: &str,
@@ -61,11 +63,17 @@ pub fn install_skill(
     let tmp_path = tmp_dir.path().to_path_buf();
 
     // 使用 git CLI 进行 sparse checkout
+    // 根级 skill：skill_path 为空，检出整个仓库
     clone_sparse(repo_url, skill_path, &tmp_path)?;
 
     // 将子树内容迁移到目标目录
-    // skill_path is already the full relative path (e.g., "skills/name" or "name")
-    let sparse_checkout_dir = tmp_path.join(skill_path);
+    // skill_path is already the full relative path (e.g., "skills/name" or "name");
+    // empty means the repo root itself is the skill
+    let sparse_checkout_dir = if skill_path.is_empty() {
+        tmp_path.clone()
+    } else {
+        tmp_path.join(skill_path)
+    };
     if !sparse_checkout_dir.exists() {
         bail!("Skill not found in repo {}: {}", repo_url, skill_path);
     }
@@ -76,8 +84,8 @@ pub fn install_skill(
     fs::create_dir_all(&dest_dir)
         .with_context(|| format!("Failed to create directory: {}", dest_dir.display()))?;
 
-    // 复制文件
-    copy_dir_recursive(&sparse_checkout_dir, &dest_dir)?;
+    // 复制文件（排除 .git 等隐藏目录/文件，避免把仓库元数据装进 skill）
+    copy_dir_excluding_hidden(&sparse_checkout_dir, &dest_dir)?;
 
     // 在 tmp_dir 存活时计算 tree hash（避免后续再次克隆）
     let skill_folder_hash = get_skill_folder_hash(&tmp_path, skill_path).unwrap_or_default();
@@ -100,8 +108,12 @@ pub fn install_skill(
 }
 
 /// 使用 git CLI 进行 sparse checkout 克隆（静默模式）
+///
+/// `skill_path` 为仓库相对路径（如 "skills/name" 或 "name"）。当仓库本身
+/// 就是一个 skill（`skill_path` 为空）时，禁用 sparse checkout 检出整个
+/// 仓库内容（skill 资源可能位于任意子目录，如 tools/、gallery/ 等）。
 fn clone_sparse(repo_url: &str, skill_path: &str, dest: &Path) -> Result<()> {
-    // skill_path is already the full relative path (e.g., "skills/name" or "name")
+    let is_root = skill_path.is_empty();
 
     // 1. 检测默认分支
     let default_branch = detect_default_branch(repo_url)?;
@@ -160,6 +172,31 @@ fn clone_sparse(repo_url: &str, skill_path: &str, dest: &Path) -> Result<()> {
     }
 
     // 4. Set sparse checkout path (silent mode)
+    //    根级 skill：禁用 sparse checkout，检出全部子目录（skill 资源可在任意位置）
+    if is_root {
+        if is_verbose() {
+            eprintln!(
+                "[verbose] git sparse-checkout disable (root-level skill, in {})",
+                dest.display()
+            );
+        }
+        let status = Command::new("git")
+            .current_dir(dest)
+            .args(["sparse-checkout", "disable"])
+            .stdout(std::process::Stdio::null())
+            .stderr(stderr_stdio())
+            .status()
+            .with_context(|| "Failed to run git sparse-checkout disable")?;
+
+        if !status.success() {
+            bail!(
+                "git sparse-checkout disable failed (exit code: {})",
+                status.code().unwrap_or(-1)
+            );
+        }
+        return Ok(());
+    }
+
     if is_verbose() {
         eprintln!(
             "[verbose] git sparse-checkout set {} (in {})",
@@ -227,6 +264,38 @@ pub fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {
 
         if src_path.is_dir() {
             copy_dir_recursive(&src_path, &dst_path)?;
+        } else {
+            fs::copy(&src_path, &dst_path)
+                .with_context(|| format!("Failed to copy file: {}", src_path.display()))?;
+        }
+    }
+
+    Ok(())
+}
+
+/// 递归复制目录，跳过以 `.` 开头的文件与目录（.git、.github 等）
+/// 用于把仓库根目录整体作为 skill 安装时，避免带入仓库元数据
+pub fn copy_dir_excluding_hidden(src: &Path, dst: &Path) -> Result<()> {
+    if !src.is_dir() {
+        return Ok(());
+    }
+
+    fs::create_dir_all(dst)
+        .with_context(|| format!("Failed to create directory: {}", dst.display()))?;
+
+    for entry in
+        fs::read_dir(src).with_context(|| format!("Failed to read directory: {}", src.display()))?
+    {
+        let entry = entry?;
+        let name = entry.file_name().to_string_lossy().to_string();
+        if name.starts_with('.') {
+            continue;
+        }
+        let src_path = entry.path();
+        let dst_path = dst.join(&name);
+
+        if src_path.is_dir() {
+            copy_dir_excluding_hidden(&src_path, &dst_path)?;
         } else {
             fs::copy(&src_path, &dst_path)
                 .with_context(|| format!("Failed to copy file: {}", src_path.display()))?;
@@ -305,11 +374,19 @@ pub fn get_latest_commit_hash(repo_dir: &Path) -> Result<String> {
 }
 
 /// Get the git tree hash of a skill folder
+///
+/// `skill_path` is the full relative path from repo root (e.g., "skills/name"
+/// or "name"); empty means the repo root itself is the skill — use `HEAD:`
+/// (equivalent to `HEAD^{tree}`) to get the root tree hash.
 pub fn get_skill_folder_hash(repo_dir: &Path, skill_path: &str) -> Result<String> {
-    // skill_path is the full relative path from repo root (e.g., "skills/name" or "name")
+    let rev = if skill_path.is_empty() {
+        "HEAD:".to_string()
+    } else {
+        format!("HEAD:{}", skill_path)
+    };
     let output = Command::new("git")
         .current_dir(repo_dir)
-        .args(["rev-parse", &format!("HEAD:{}", skill_path)])
+        .args(["rev-parse", &rev])
         .output()
         .with_context(|| "Failed to run git rev-parse")?;
 

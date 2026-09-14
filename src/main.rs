@@ -236,6 +236,12 @@ enum PlatformsAction {
 
     /// Reset platforms to defaults
     Reset,
+
+    /// Toggle platform enabled state (interactive TUI, or specify keys)
+    Toggle {
+        /// Platform keys to toggle (interactive multi-select TUI if omitted)
+        keys: Vec<String>,
+    },
 }
 
 #[derive(Subcommand)]
@@ -380,6 +386,9 @@ fn run() -> Result<()> {
         Commands::Platforms { action } => match action {
             Some(PlatformsAction::List { all }) => commands::platforms::run(all),
             Some(PlatformsAction::Reset) => commands::platforms::run_reset(),
+            Some(PlatformsAction::Toggle { keys }) => {
+                commands::platforms::run_toggle(&keys)
+            }
             None => commands::platforms::run(false),
         },
         Commands::Add {

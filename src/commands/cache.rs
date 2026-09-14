@@ -202,6 +202,20 @@ fn collect_source_skills(url: &str, _source_name: &str) -> Result<(Vec<CachedSki
 /// Recursively collect skills from a repo directory, parsing SKILL.md frontmatter
 fn collect_skills_from_repo(repo_root: &Path, dir: &Path) -> Result<Vec<CachedSkill>> {
     let mut skills = Vec::new();
+    // 仓库本身就是一个 skill：SKILL.md 直接位于仓库根目录
+    if dir == repo_root && dir.join("SKILL.md").exists() {
+        let meta = SkillMeta::from_file(dir).unwrap_or_default();
+        skills.push(CachedSkill {
+            name: meta
+                .name
+                .clone()
+                .unwrap_or_else(|| "SKILL.md".to_string()),
+            path: "SKILL.md".to_string(),
+            description: meta.display_description(),
+            version: meta.display_version(),
+        });
+        return Ok(skills);
+    }
     collect_recursive(repo_root, dir, &mut skills)?;
     Ok(skills)
 }

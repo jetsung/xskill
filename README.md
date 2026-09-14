@@ -65,7 +65,7 @@ Pre-built binaries are available on [GitHub Releases](https://github.com/jetsung
 xskill sources add -n my-skills -u https://github.com/example/skills
 
 # Query available skills
-xskill query -f my-skills
+xskill query -f my-skills vue
 
 # Install a skill
 xskill add -f my-skills -s vue
@@ -103,7 +103,7 @@ xskill -v add -f my-skills -s vue
 | Command | Description |
 |---------|-------------|
 | `sources` | Manage configured sources (list/add/remove/rename) |
-| `platforms` | Manage configured platforms (list/reset) |
+| `platforms` | Manage configured platforms (list/reset/toggle) |
 | `add` | Install a skill |
 | `link` | Symlink existing skills to a platform |
 | `remove` | Remove a skill |
@@ -127,7 +127,8 @@ Config file: `~/.xskill/settings.json` (override with `XSKILL_CONFIG` env var).
   "platforms": {
     "claude": { "name": "Claude Code", "enabled": true, "path": ".claude", "skills": "skills", "agents": "CLAUDE.md", "agents_compat": false },
     "codex": { "name": "Codex", "enabled": true, "path": ".codex", "skills": "skills", "agents": "AGENTS.md", "agents_compat": true },
-    "cline": { "name": "Cline", "enabled": false, "path": ".cline", "skills": "skills", "agents": "CLAUDE.md", "agents_compat": true }
+    "cline": { "name": "Cline", "enabled": false, "path": ".cline", "skills": "skills", "agents": "CLAUDE.md", "agents_compat": true },
+    "omp": { "name": "Oh My Pi", "enabled": true, "path": ".omp/agent", "local_path": ".omp", "skills": "skills", "agents": "AGENTS.md", "agents_compat": true }
   },
   "sources": [
     { "name": "antfu", "type": "git", "url": "https://github.com/antfu/skills" }

@@ -197,7 +197,7 @@ fn platform_skills_dirs(
     } else {
         std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
     };
-    let platform_skills_dir = base_dir.join(&platform.path).join(&platform.skills);
+    let platform_skills_dir = base_dir.join(platform.effective_path(global)).join(&platform.skills);
 
     if platform.agents_compat {
         Some(vec![canonical_skills_dir(global), platform_skills_dir])
@@ -227,7 +227,7 @@ fn scan_platform_with_paths(
         std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
     };
 
-    let platform_path = base_dir.join(&platform.path);
+    let platform_path = base_dir.join(platform.effective_path(global));
     let skills_dir = platform_path.join(&platform.skills);
 
     scan_skills_dir_with_paths(&skills_dir)
@@ -324,15 +324,7 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "claude".to_string(),
-            Platform {
-                name: None,
-                enabled: true,
-                path: ".claude".to_string(),
-                skills: "skills".to_string(),
-                agents: "CLAUDE.md".to_string(),
-                source: "AGENTS.md".to_string(),
-                agents_compat: false,
-            },
+            Platform { name: None, enabled: true, path: ".claude".to_string(), local_path: None, skills: "skills".to_string(), agents: "CLAUDE.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
         );
         let result = config.get_platform("claude");
         assert!(result.is_some());
@@ -460,19 +452,11 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "test-platform".to_string(),
-            Platform {
-                name: None,
-                enabled: true,
-                path: tmp
-                    .path()
-                    .join(".test-platform")
-                    .to_string_lossy()
-                    .to_string(),
-                skills: "skills".to_string(),
-                agents: "AGENTS.md".to_string(),
-                source: "AGENTS.md".to_string(),
-                agents_compat: true,
-            },
+            Platform { name: None, enabled: true, path: tmp
+                .path()
+                .join(".test-platform")
+                .to_string_lossy()
+                .to_string(), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: true, builtin: false },
         );
 
         // 创建平台 skills 目录和 skill
@@ -504,15 +488,7 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "custom-plain".to_string(),
-            Platform {
-                name: None,
-                enabled: true,
-                path: ".custom-plain".to_string(),
-                skills: "skills".to_string(),
-                agents: "CUSTOM.md".to_string(),
-                source: "AGENTS.md".to_string(),
-                agents_compat: false,
-            },
+            Platform { name: None, enabled: true, path: ".custom-plain".to_string(), local_path: None, skills: "skills".to_string(), agents: "CUSTOM.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
         );
 
         let dirs = platform_skills_dirs(&config, "custom-plain", false).unwrap();
@@ -526,15 +502,7 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "custom-plain".to_string(),
-            Platform {
-                name: None,
-                enabled: true,
-                path: ".custom-plain".to_string(),
-                skills: "skills".to_string(),
-                agents: "CUSTOM.md".to_string(),
-                source: "AGENTS.md".to_string(),
-                agents_compat: false,
-            },
+            Platform { name: None, enabled: true, path: ".custom-plain".to_string(), local_path: None, skills: "skills".to_string(), agents: "CUSTOM.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
         );
 
         let dirs = platform_skills_dirs(&config, "custom-plain", true).unwrap();
@@ -548,15 +516,7 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "custom-compat".to_string(),
-            Platform {
-                name: None,
-                enabled: true,
-                path: ".custom-compat".to_string(),
-                skills: "skills".to_string(),
-                agents: "CUSTOM.md".to_string(),
-                source: "AGENTS.md".to_string(),
-                agents_compat: true,
-            },
+            Platform { name: None, enabled: true, path: ".custom-compat".to_string(), local_path: None, skills: "skills".to_string(), agents: "CUSTOM.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: true, builtin: false },
         );
 
         let dirs = platform_skills_dirs(&config, "custom-compat", false).unwrap();
@@ -572,15 +532,7 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "custom-compat".to_string(),
-            Platform {
-                name: None,
-                enabled: true,
-                path: ".custom-compat".to_string(),
-                skills: "skills".to_string(),
-                agents: "CUSTOM.md".to_string(),
-                source: "AGENTS.md".to_string(),
-                agents_compat: true,
-            },
+            Platform { name: None, enabled: true, path: ".custom-compat".to_string(), local_path: None, skills: "skills".to_string(), agents: "CUSTOM.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: true, builtin: false },
         );
 
         let dirs = platform_skills_dirs(&config, "custom-compat", true).unwrap();
@@ -602,15 +554,7 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "custom-empty".to_string(),
-            Platform {
-                name: None,
-                enabled: true,
-                path: ".custom-empty".to_string(),
-                skills: String::new(),
-                agents: "CUSTOM.md".to_string(),
-                source: "AGENTS.md".to_string(),
-                agents_compat: false,
-            },
+            Platform { name: None, enabled: true, path: ".custom-empty".to_string(), local_path: None, skills: String::new(), agents: "CUSTOM.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
         );
 
         assert!(platform_skills_dirs(&config, "custom-empty", false).is_none());

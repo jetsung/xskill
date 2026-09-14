@@ -168,7 +168,7 @@ fn remove_from_platform(
     } else {
         std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
     };
-    let skills_dir = platform.skills_dir_with_base(&base_dir).ok_or_else(|| {
+    let skills_dir = platform.skills_dir_with_base(&base_dir, global).ok_or_else(|| {
             anyhow::anyhow!(
                 "Platform {} has no skills directory configured",
                 platform_name
@@ -208,7 +208,7 @@ fn remove_from_all_platforms(config: &Config, skill: &str, global: bool) -> Resu
         if platform.agents_compat {
             continue;
         }
-        let platform_path = base_dir.join(&platform.path);
+        let platform_path = base_dir.join(platform.effective_path(global));
         if !platform_path.exists() || platform.skills.is_empty() {
             continue;
         }
@@ -246,7 +246,7 @@ fn remove_all_from_platform(config: &Config, platform_name: &str, global: bool) 
     } else {
         std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
     };
-    if let Some(skills_dir) = platform.skills_dir_with_base(&base_dir) {
+    if let Some(skills_dir) = platform.skills_dir_with_base(&base_dir, global) {
         if skills_dir.exists() || skills_dir.is_symlink() {
             return remove_all_from_dir(&skills_dir);
         }
@@ -276,7 +276,7 @@ fn remove_platform_symlinks(config: &Config, skill: &str, global: bool) -> Resul
         if platform.agents_compat {
             continue;
         }
-        let platform_path = base_dir.join(&platform.path);
+        let platform_path = base_dir.join(platform.effective_path(global));
         if !platform_path.exists() || platform.skills.is_empty() {
             continue;
         }
@@ -326,7 +326,7 @@ fn remove_all_platform_symlinks(config: &Config, global: bool) -> Result<usize> 
         if platform.agents_compat {
             continue;
         }
-        let platform_path = base_dir.join(&platform.path);
+        let platform_path = base_dir.join(platform.effective_path(global));
         if !platform_path.exists() || platform.skills.is_empty() {
             continue;
         }
@@ -375,7 +375,7 @@ fn remove_all_from_all_platforms(config: &Config, global: bool) -> Result<usize>
         if platform.agents_compat {
             continue;
         }
-        let platform_path = base_dir.join(&platform.path);
+        let platform_path = base_dir.join(platform.effective_path(global));
         if !platform_path.exists() || platform.skills.is_empty() {
             continue;
         }

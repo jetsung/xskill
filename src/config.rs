@@ -80,20 +80,32 @@ pub struct Platform {
     /// 是否启用：false（默认）时不出现在交互选择与批量操作，显式指定仍可操作
     #[serde(default)]
     pub enabled: bool,
-    /// 工具配置目录
+    /// 工具配置目录（全局模式：~/<path>/skills）
+    ///
+    /// 精简保存的内置渠道条目可省略（加载时由内置保护逻辑恢复默认值）
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub path: String,
+    /// 项目级配置目录（可选，留空时回退到 path）
+    ///
+    /// 少数平台的全局与项目级路径不一致（如 omp 全局 ~/.omp/agent/，项目级 .omp/），
+    /// 此字段用于覆盖项目级路径；为空时回退到 `path`。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub local_path: Option<String>,
     /// skills 子目录名（相对于 path），为空则不安装
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub skills: String,
     /// agents 配置文件名（相对于 path），为空则不安装
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "String::is_empty")]
     pub agents: String,
     /// agents 源文件名（固定 .agents/ 目录下），默认为 AGENTS.md
-    #[serde(default = "default_source")]
+    #[serde(default = "default_source", skip_serializing_if = "String::is_empty")]
     pub source: String,
     /// 是否兼容 .agents/ 资源（可复用项目级 agents 配置）
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub agents_compat: bool,
+    /// 是否为内置渠道（由 default_platforms 生成，用户配置中不可修改路径等字段）
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub builtin: bool,
 }
 
 /// 源配置
@@ -139,51 +151,60 @@ fn default_schema_url() -> String {
 }
 
 /// 构建默认平台列表（来自 docs/PLATFORMS.md）
-/// 元组：(key, display_name, enabled, path, skills, agents, agents_compat)
+/// 元组：(key, display_name, enabled, path, local_path, skills, agents, agents_compat)
+/// local_path 仅在全局与项目级路径不同时设置（如 omp 全局 .omp/agent，项目级 .omp）
 pub fn default_platforms() -> HashMap<String, Platform> {
-    let entries: Vec<(&str, &str, bool, &str, &str, &str, bool)> = vec![
+    let entries: Vec<(&str, &str, bool, &str, Option<&str>, &str, &str, bool)> = vec![
         // 常用渠道（默认启用）
-        ("antigravity", "Antigravity", true, ".gemini", "skills", "GEMINI.md", true),
-        ("claude", "Claude Code", true, ".claude", "skills", "CLAUDE.md", false),
-        ("codebuddy", "CodeBuddy", true, ".codebuddy", "skills", "CODEBUDDY.md", false),
-        ("codex", "Codex", true, ".codex", "skills", "AGENTS.md", true),
-        ("commandcode", "Command Code", false, ".commandcode", "skills", "AGENTS.md", true),
-        ("dsh", "DeepSeek Harness", true, ".dsh", "skills", "AGENTS.md", true),
-        ("omp", "Oh My Pi", true, ".omp/agent", "skills", "AGENTS.md", true),
-        ("opencode", "OpenCode", true, ".opencode", "skills", "AGENTS.md", true),
-        ("pi", "Pi", true, ".pi/agent", "skills", "AGENTS.md", true),
-        ("qoder", "Qoder", true, ".qoder", "skills", "AGENTS.md", true),
-        ("qoder-cn", "Qoder CN", true, ".qoder-cn", "skills", "AGENTS.md", true),
-        ("workbuddy", "WorkBuddy", true, ".workbuddy", "skills", "CODEBUDDY.md", false),
-        ("zcode", "ZCode", true, ".zcode", "skills", "AGENTS.md", true),
+        ("antigravity", "Antigravity", true, ".gemini", None, "skills", "GEMINI.md", true),
+        ("claude", "Claude Code", true, ".claude", None, "skills", "CLAUDE.md", false),
+        ("codebuddy", "CodeBuddy", true, ".codebuddy", None, "skills", "CODEBUDDY.md", false),
+        ("codex", "Codex", true, ".codex", None, "skills", "AGENTS.md", true),
+        ("commandcode", "Command Code", false, ".commandcode", None, "skills", "AGENTS.md", true),
+        ("dsh", "DeepSeek Harness", true, ".dsh", None, "skills", "AGENTS.md", true),
+        // omp 全局 ~/.omp/agent/，项目级 .omp/
+        ("omp", "Oh My Pi", true, ".omp/agent", Some(".omp"), "skills", "AGENTS.md", true),
+        ("opencode", "OpenCode", true, ".opencode", None, "skills", "AGENTS.md", true),
+        // pi 全局 ~/.pi/agent/，项目级 .pi/
+        ("pi", "Pi", true, ".pi/agent", Some(".pi"), "skills", "AGENTS.md", true),
+        ("qoder", "Qoder", true, ".qoder", None, "skills", "AGENTS.md", true),
+        ("qoder-cn", "Qoder CN", true, ".qoder-cn", None, "skills", "AGENTS.md", true),
+        ("workbuddy", "WorkBuddy", true, ".workbuddy", None, "skills", "CODEBUDDY.md", false),
+        ("zcode", "ZCode", true, ".zcode", None, "skills", "AGENTS.md", true),
         // 非常用渠道（默认禁用，可在 settings.json 中启用）
-        ("atomcode", "AtomCode", false, ".atomcode", "skills", "ATOMCODE.md", true),
-        ("cline", "Cline", false, ".cline", "skills", "CLAUDE.md", true),
-        ("factory", "Factory", false, ".factory", "skills", "AGENTS.md", true),
-        ("jcode", "JCode", false, ".jcode", "skills", "AGENTS.md", true),
-        ("kilo", "Kilo Code", false, ".kilocode", "skills", "AGENTS.md", true),
-        ("kiro", "Kiro", false, ".kiro", "skills", "AGENTS.md", false),
-        ("langcli", "LangCLI", false, ".langcli", "skills", "LANGCLI.md", false),
-        ("openclaude", "OpenClaude", false, ".openclaude", "skills", "CLAUDE.md", false),
-        ("openinterpreter", "Open Interpreter", false, ".openinterpreter", "skills", "AGENTS.md", true),
-        ("grok", "Grok Build CLI", false, ".grok", "skills", "AGENTS.md", true),
-        ("qwen", "Qwen", false, ".qwen", "skills", "AGENTS.md", true),
+        ("atomcode", "AtomCode", false, ".atomcode", None, "skills", "ATOMCODE.md", true),
+        ("cline", "Cline", false, ".cline", None, "skills", "CLAUDE.md", true),
+        ("factory", "Factory", false, ".factory", None, "skills", "AGENTS.md", true),
+        ("jcode", "JCode", false, ".jcode", None, "skills", "AGENTS.md", true),
+        ("kilo", "Kilo Code", false, ".kilocode", None, "skills", "AGENTS.md", true),
+        ("kiro", "Kiro", false, ".kiro", None, "skills", "AGENTS.md", false),
+        ("langcli", "LangCLI", false, ".langcli", None, "skills", "LANGCLI.md", false),
+        ("openclaude", "OpenClaude", false, ".openclaude", None, "skills", "CLAUDE.md", false),
+        ("openinterpreter", "Open Interpreter", false, ".openinterpreter", None, "skills", "AGENTS.md", true),
+        ("grok", "Grok Build CLI", false, ".grok", None, "skills", "AGENTS.md", true),
+        ("qwen", "Qwen", false, ".qwen", None, "skills", "AGENTS.md", true),
         // Zoo Code 接手已停服的 Roo Code，配置目录沿用 .roo
-        ("zoo", "Zoo Code", false, ".roo", "skills", "AGENTS.md", true),
+        ("zoo", "Zoo Code", false, ".roo", None, "skills", "AGENTS.md", true),
+        // MiMo Code 全局 ~/.config/mimocode/，项目级 .mimocode/
+        ("mimocode", "MiMo Code", false, ".config/mimocode", Some(".mimocode"), "skills", "AGENTS.md", true),
+        // agentty 兼容 .agents/ 规范目录，全局与项目级路径均为 .agentty
+        ("agentty", "Agentty", false, ".agentty", None, "skills", "AGENTS.md", true),
     ];
 
     let mut map = HashMap::new();
-    for (key, name, enabled, path, skills, agents, agents_compat) in entries {
+    for (key, name, enabled, path, local_path, skills, agents, agents_compat) in entries {
         map.insert(
             key.to_string(),
             Platform {
                 name: Some(name.to_string()),
                 enabled,
                 path: path.to_string(),
+                local_path: local_path.map(|s| s.to_string()),
                 skills: skills.to_string(),
                 agents: agents.to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat,
+                builtin: true,
             },
         );
     }
@@ -269,6 +290,9 @@ impl Config {
             config.platforms = default_platforms();
         }
 
+        // 内置渠道保护：仅允许用户覆盖 name/enabled，其余字段恢复内置默认值
+        config.enforce_builtin_platforms();
+
         // 导出代理环境变量，使 git/curl/wget 等子进程自动走代理
         config.apply_proxy_env();
 
@@ -321,6 +345,49 @@ impl Config {
     /// 获取指定平台配置
     pub fn get_platform(&self, name: &str) -> Option<&Platform> {
         self.platforms.get(name)
+    }
+
+    /// 规范化平台配置（保存前调用）：
+    /// - key 在内置列表中的渠道仅保留 name/enabled/builtin 三个字段（路径等由内置保护逻辑在加载时恢复）
+    /// - 自定义渠道（key 不在内置列表）builtin 强制为 false（无论用户如何设置）
+    pub fn normalize_platforms_for_save(&mut self) {
+        let builtin_keys: std::collections::HashSet<String> =
+            default_platforms().into_keys().collect();
+        for (key, platform) in self.platforms.iter_mut() {
+            if builtin_keys.contains(key) {
+                let name = platform.name.clone();
+                let enabled = platform.enabled;
+                *platform = Platform {
+                    name,
+                    enabled,
+                    path: String::new(),
+                    local_path: None,
+                    skills: String::new(),
+                    agents: String::new(),
+                    source: String::new(),
+                    agents_compat: false,
+                    builtin: true,
+                };
+            } else {
+                platform.builtin = false;
+            }
+        }
+    }
+
+    /// 内置渠道保护：与内置渠道同 key 的条目仅保留用户设置的 name/enabled，
+    /// 其余字段（path、local_path、skills、agents、source、agents_compat）恢复内置默认值
+    pub fn enforce_builtin_platforms(&mut self) {
+        let defaults = default_platforms();
+        for (key, default_platform) in &defaults {
+            if let Some(user_platform) = self.platforms.get_mut(key) {
+                let name = user_platform.name.clone();
+                let enabled = user_platform.enabled;
+                let mut restored = default_platform.clone();
+                restored.name = name;
+                restored.enabled = enabled;
+                self.platforms.insert(key.clone(), restored);
+            }
+        }
     }
 
     /// 获取所有平台名称列表（按字母排序）
@@ -453,21 +520,39 @@ impl Platform {
         self.name.clone().unwrap_or_else(|| key.to_string())
     }
 
-    /// 解析平台路径：支持相对路径、绝对路径和 ~ 开头的路径
-    fn resolve_path(&self) -> PathBuf {
-        if self.path.starts_with('/') {
+    /// 解析路径字符串：支持相对路径、绝对路径和 ~ 开头的路径
+    fn resolve_str(path: &str) -> PathBuf {
+        if path.starts_with('/') {
             // 绝对路径，直接使用
-            PathBuf::from(&self.path)
-        } else if self.path.starts_with('~') {
+            PathBuf::from(path)
+        } else if path.starts_with('~') {
             // ~ 开头的路径，替换为 home_dir
-            let stripped = self.path.trim_start_matches("~/").trim_start_matches('~');
+            let stripped = path.trim_start_matches("~/").trim_start_matches('~');
             dirs::home_dir()
                 .unwrap_or_else(|| PathBuf::from("~"))
                 .join(stripped)
         } else {
             // 相对路径，直接使用
-            PathBuf::from(&self.path)
+            PathBuf::from(path)
         }
+    }
+
+    /// 解析平台路径：支持相对路径、绝对路径和 ~ 开头的路径
+    fn resolve_path(&self) -> PathBuf {
+        Self::resolve_str(&self.path)
+    }
+
+    /// 根据模式返回有效的路径字符串
+    ///
+    /// - 全局模式（`global=true`）：使用 `path`（如 `.omp/agent`）
+    /// - 项目级模式（`global=false`）：优先使用 `local_path`，未设置时回退到 `path`
+    pub fn effective_path(&self, global: bool) -> &str {
+        if !global {
+            if let Some(local) = &self.local_path {
+                return local;
+            }
+        }
+        &self.path
     }
 
     /// 获取 skills 安装目录（相对于 resolve_path）
@@ -480,11 +565,11 @@ impl Platform {
     }
 
     /// 获取 skills 安装目录（基于指定 base_dir，用于 global/project 切换）
-    pub fn skills_dir_with_base(&self, base_dir: &Path) -> Option<PathBuf> {
+    pub fn skills_dir_with_base(&self, base_dir: &Path, global: bool) -> Option<PathBuf> {
         if self.skills.is_empty() {
             None
         } else {
-            Some(base_dir.join(&self.path).join(&self.skills))
+            Some(base_dir.join(self.effective_path(global)).join(&self.skills))
         }
     }
 
@@ -495,11 +580,6 @@ impl Platform {
         } else {
             Some(self.resolve_path().join(&self.agents))
         }
-    }
-
-    /// 获取 agents 源文件路径（固定 .agents/<source>）
-    pub fn source_file(&self) -> PathBuf {
-        PathBuf::from(".agents").join(&self.source)
     }
 }
 
@@ -512,10 +592,12 @@ mod tests {
             name: None,
             enabled: true,
             path: path.to_string(),
+            local_path: None,
             skills: skills.to_string(),
             agents: agents.to_string(),
             source: "AGENTS.md".to_string(),
             agents_compat: false,
+            builtin: false,
         }
     }
 
@@ -525,7 +607,6 @@ mod tests {
         assert_eq!(p.resolve_path(), PathBuf::from(".claude"));
         assert_eq!(p.skills_dir(), Some(PathBuf::from(".claude/skills")));
         assert_eq!(p.agents_file(), Some(PathBuf::from(".claude/CLAUDE.md")));
-        assert_eq!(p.source_file(), PathBuf::from(".agents/AGENTS.md"));
     }
 
     #[test]
@@ -687,7 +768,7 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 25);
+        assert_eq!(platforms.len(), 27);
         assert!(platforms.contains_key("antigravity"));
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
@@ -739,18 +820,24 @@ mod tests {
         assert_eq!(kiro.agents, "AGENTS.md");
         assert!(!kiro.agents_compat);
 
-        // omp 渠道默认路径为 .omp/agent（与 pi 一致）
+        // omp 渠道默认路径为 .omp/agent（全局），项目级为 .omp
         let omp = &platforms["omp"];
         assert_eq!(omp.name.as_deref(), Some("Oh My Pi"));
         assert_eq!(omp.path, ".omp/agent");
+        assert_eq!(omp.local_path.as_deref(), Some(".omp"));
+        assert_eq!(omp.effective_path(true), ".omp/agent");
+        assert_eq!(omp.effective_path(false), ".omp");
         assert_eq!(omp.skills, "skills");
         assert_eq!(omp.agents, "AGENTS.md");
         assert!(omp.agents_compat);
 
-        // pi 渠道默认路径为 .pi/agent（与 docs/PLATFORMS.md 一致）
+        // pi 渠道默认路径为 .pi/agent（全局），项目级为 .pi
         let pi = &platforms["pi"];
         assert_eq!(pi.name.as_deref(), Some("Pi"));
         assert_eq!(pi.path, ".pi/agent");
+        assert_eq!(pi.local_path.as_deref(), Some(".pi"));
+        assert_eq!(pi.effective_path(true), ".pi/agent");
+        assert_eq!(pi.effective_path(false), ".pi");
         assert_eq!(pi.skills, "skills");
         assert_eq!(pi.agents, "AGENTS.md");
 
@@ -805,6 +892,120 @@ mod tests {
         assert!(platforms["cline"].agents_compat);
         assert!(!platforms["claude"].agents_compat);
         assert!(!platforms["codebuddy"].agents_compat);
+
+        // mimocode 渠道：全局 .config/mimocode，项目级 .mimocode
+        let mimocode = &platforms["mimocode"];
+        assert_eq!(mimocode.name.as_deref(), Some("MiMo Code"));
+        assert_eq!(mimocode.path, ".config/mimocode");
+        assert_eq!(mimocode.local_path.as_deref(), Some(".mimocode"));
+        assert_eq!(mimocode.effective_path(true), ".config/mimocode");
+        assert_eq!(mimocode.effective_path(false), ".mimocode");
+        assert_eq!(mimocode.skills, "skills");
+        assert_eq!(mimocode.agents, "AGENTS.md");
+        assert!(mimocode.agents_compat);
+        assert!(!mimocode.enabled);
+
+        // agentty 渠道：全局与项目级路径相同，均为 .agentty
+        let agentty = &platforms["agentty"];
+        assert_eq!(agentty.name.as_deref(), Some("Agentty"));
+        assert_eq!(agentty.path, ".agentty");
+        assert_eq!(agentty.local_path, None);
+        assert_eq!(agentty.effective_path(true), ".agentty");
+        assert_eq!(agentty.effective_path(false), ".agentty");
+        assert_eq!(agentty.skills, "skills");
+        assert_eq!(agentty.agents, "AGENTS.md");
+        assert!(agentty.agents_compat);
+        assert!(!agentty.enabled);
+
+        // local_path 未设置时，effective_path 在两种模式下都回退到 path
+        let claude = &platforms["claude"];
+        assert_eq!(claude.effective_path(true), ".claude");
+        assert_eq!(claude.effective_path(false), ".claude");
+    }
+
+    #[test]
+    fn test_normalize_platforms_for_save() {
+        let mut config = default_config();
+
+        // 内置渠道：篡改 path/skills 后规范化，应精简为 name/enabled/builtin 三字段
+        {
+            let claude = config.platforms.get_mut("claude").unwrap();
+            claude.name = Some("My Claude".to_string());
+            claude.enabled = false;
+            claude.path = ".tampered".to_string();
+            claude.skills = "tampered".to_string();
+        }
+
+        // 自定义渠道：builtin 被误设为 true，规范化后应强制为 false
+        let mut custom = make_platform(".my-custom", "skills", "CUSTOM.md");
+        custom.builtin = true;
+        config.platforms.insert("my-custom".to_string(), custom);
+
+        config.normalize_platforms_for_save();
+
+        // 内置渠道：仅保留 name/enabled/builtin，其余字段清空（序列化时跳过）
+        let claude = &config.platforms["claude"];
+        assert_eq!(claude.name.as_deref(), Some("My Claude"));
+        assert!(!claude.enabled);
+        assert!(claude.builtin);
+        assert_eq!(claude.path, "");
+        assert_eq!(claude.skills, "");
+        assert_eq!(claude.agents, "");
+        assert_eq!(claude.source, "");
+        assert!(claude.local_path.is_none());
+        assert!(!claude.agents_compat);
+
+        // 精简条目序列化后仅含 name/enabled/builtin 三个字段（顺序无关）
+        let json = serde_json::to_string_pretty(&config.platforms["claude"]).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&json).unwrap();
+        let obj = value.as_object().unwrap();
+        let mut keys: Vec<_> = obj.keys().cloned().collect();
+        keys.sort();
+        assert_eq!(keys, vec!["builtin", "enabled", "name"]);
+
+        // 自定义渠道：builtin 强制 false，其余字段原样保留
+        let custom = &config.platforms["my-custom"];
+        assert!(!custom.builtin);
+        assert_eq!(custom.path, ".my-custom");
+        assert_eq!(custom.skills, "skills");
+        assert_eq!(custom.agents, "CUSTOM.md");
+    }
+
+    #[test]
+    fn test_enforce_builtin_platforms() {
+        let mut config = default_config();
+
+        // 用户篡改内置渠道的字段（path/skills/agents_compat），仅 name/enabled 允许覆盖
+        {
+            let claude = config.platforms.get_mut("claude").unwrap();
+            claude.name = Some("My Claude".to_string());
+            claude.enabled = false;
+            claude.path = ".hacked".to_string();
+            claude.skills = "hacked".to_string();
+            claude.agents_compat = true;
+        }
+
+        config.enforce_builtin_platforms();
+
+        let claude = &config.platforms["claude"];
+        // name/enabled 保留用户设置
+        assert_eq!(claude.name.as_deref(), Some("My Claude"));
+        assert!(!claude.enabled);
+        // 其余字段恢复内置默认值
+        assert_eq!(claude.path, ".claude");
+        assert_eq!(claude.skills, "skills");
+        assert!(!claude.agents_compat);
+        assert!(claude.builtin);
+
+        // 自定义渠道不受影响
+        config.platforms.insert(
+            "my-custom".to_string(),
+            make_platform(".my-custom", "skills", "CUSTOM.md"),
+        );
+        config.enforce_builtin_platforms();
+        let custom = &config.platforms["my-custom"];
+        assert_eq!(custom.path, ".my-custom");
+        assert!(!custom.builtin);
     }
 
     #[test]
@@ -824,7 +1025,7 @@ mod tests {
         assert_eq!(config.cache.ttl, 86400);
         assert!(!config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 25);
+        assert_eq!(config.platforms.len(), 27);
         // init 时 proxy 键占位为空字符串（不生效，供用户填写）
         assert_eq!(config.proxy, Some(String::new()));
     }

@@ -119,10 +119,15 @@ fn test_dsh_appears_in_platforms_list_detailed() {
         "platforms list should list DeepSeek Harness, got:\n{}",
         stdout
     );
-    // 详细视图列：PATH=.dsh、SKILLS=skills、AGENTS=.dsh/AGENTS.md、SOURCE=.agents/AGENTS.md
+    // 详细视图列：PATH=.dsh、SKILLS=skills、AGENTS=.dsh/AGENTS.md（SOURCE 列已移除，BUILTIN 为 ✓）
     assert!(
-        stdout.contains(".dsh") && stdout.contains(".dsh/AGENTS.md") && stdout.contains(".agents/AGENTS.md"),
-        "dsh row should show .dsh path with AGENTS.md agents file and .agents/AGENTS.md source, got:\n{}",
+        stdout.contains(".dsh") && stdout.contains(".dsh/AGENTS.md"),
+        "dsh row should show .dsh path with AGENTS.md agents file, got:\n{}",
+        stdout
+    );
+    assert!(
+        !stdout.contains("SOURCE"),
+        "SOURCE column should be removed from platforms list, got:\n{}",
         stdout
     );
 }

@@ -209,7 +209,7 @@ fn install_skills(
 
         for item in skills {
             let skill_name = &item.skill.name;
-            let (skill_path, dest_name) = extract_skill_path(&item.skill.path);
+            let (skill_path, dest_name) = extract_skill_path(&item.skill.path, source_url);
 
             // Derive the skill's source directory from the *leaf* skill path
             // (e.g. "git-commit"), never from `item.skill.path.parent()`.
@@ -244,7 +244,13 @@ fn install_skills(
             .join(&dest_name);
 
             let _ = crate::utils::remove_symlink(&canonical_dir);
-            if let Err(e) = git::copy_dir_recursive(&source_dir, &canonical_dir) {
+            // 根级 skill：排除 .git 等隐藏目录，避免把仓库元数据装进 skill
+            let copy_result = if skill_path.is_empty() {
+                git::copy_dir_excluding_hidden(&source_dir, &canonical_dir)
+            } else {
+                git::copy_dir_recursive(&source_dir, &canonical_dir)
+            };
+            if let Err(e) = copy_result {
                 all_failed.push(format!("{} ({})", skill_name, e));
                 continue;
             }
@@ -303,6 +309,7 @@ fn install_skills(
                 source_url,
                 &item.skill.path,
                 skill_name,
+                &dest_name,
                 global,
                 &skill_folder_hash,
             )?;
@@ -466,18 +473,22 @@ fn resolve_platform_dest(
         std::env::current_dir().unwrap_or_default()
     };
     Some(
-        base.join(&platform.path)
+        base.join(platform.effective_path(is_global))
             .join(&platform.skills)
             .join(skill_name),
     )
 }
 
 /// Update the lock file after successful installation.
+///
+/// `dest_name` 是实际安装名：根级 skill 时与 skill.name（frontmatter 名）不同
+/// （取仓库名），必须用它作为锁文件 key。
 fn update_lock_file(
     source: &str,
     source_url: &str,
     skill_path: &str,
-    skill_name: &str,
+    _skill_name: &str,
+    dest_name: &str,
     global: bool,
     skill_folder_hash: &str,
 ) -> Result<()> {
@@ -491,23 +502,28 @@ fn update_lock_file(
         .unwrap_or_else(|| "git".to_string());
 
     // Normalize skill_path: ensure it starts with skills/ and ends with /SKILL.md
+    // 根级 skill（"SKILL.md" 或 ""）保持 "SKILL.md"，不加 skills/ 前缀
     let skill_path_in_repo = {
-        let with_prefix = if skill_path.starts_with("skills/") {
-            skill_path.to_string()
+        if crate::utils::is_root_skill(skill_path) {
+            "SKILL.md".to_string()
         } else {
-            format!("skills/{}", skill_path)
-        };
-        if with_prefix.ends_with("/SKILL.md") {
-            with_prefix
-        } else {
-            format!("{}/SKILL.md", with_prefix)
+            let with_prefix = if skill_path.starts_with("skills/") {
+                skill_path.to_string()
+            } else {
+                format!("skills/{}", skill_path)
+            };
+            if with_prefix.ends_with("/SKILL.md") {
+                with_prefix
+            } else {
+                format!("{}/SKILL.md", with_prefix)
+            }
         }
     };
 
     let now = chrono::Utc::now();
     let timestamp = now.format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string();
 
-    let installed_at = if let Some(existing) = lock_file.skills.get(skill_name) {
+    let installed_at = if let Some(existing) = lock_file.skills.get(dest_name) {
         existing.installed_at.clone()
     } else {
         timestamp.clone()
@@ -523,7 +539,7 @@ fn update_lock_file(
         updated_at: timestamp,
     };
 
-    lock_file.upsert_skill(skill_name, entry);
+    lock_file.upsert_skill(dest_name, entry);
     lock_file.save(global)?;
 
     Ok(())
@@ -587,7 +603,12 @@ fn format_display(
 /// Extract (sparse_skill_path, leaf_name) from CachedSkill.path.
 /// e.g. "skills/engineering/grill/SKILL.md" → ("engineering/grill", "grill")
 /// e.g. "skills/vue/SKILL.md" → ("vue", "vue")
-fn extract_skill_path(full_path: &str) -> (String, String) {
+/// Root-level skill ("SKILL.md" or "") → ("", <repo name from source_url>)
+fn extract_skill_path(full_path: &str, source_url: &str) -> (String, String) {
+    // 根级 skill：仓库本身就是一个 skill，安装名取仓库名
+    if crate::utils::is_root_skill(full_path) {
+        return (String::new(), crate::utils::repo_name_from_url(source_url));
+    }
     // Strip the optional "skills/" prefix and the optional "/SKILL.md" suffix
     // independently. The cached `path` may omit the suffix (e.g.
     // "skills/git-commit"), so a failing `strip_suffix` must NOT discard a
@@ -604,11 +625,14 @@ fn extract_skill_path(full_path: &str) -> (String, String) {
 /// Resolve the on-disk directory of a single skill inside a cloned repo.
 ///
 /// `skill_path` is the leaf path returned by `extract_skill_path` (e.g.
-/// "git-commit"). The cached `path` omits the trailing "/SKILL.md", so we must
-/// build the directory from `skill_path` directly — never via
-/// `path.parent()`, which would resolve one level too high (the whole
-/// `skills/` directory) and copy the entire repo into one folder.
+/// "git-commit"); empty means the repo root itself is the skill. Never derive
+/// this from `CachedSkill.path.parent()` — when `path` omits "/SKILL.md",
+/// `.parent()` resolves one level too high and copies the entire repo.
 fn resolve_skill_source_dir(workdir: &std::path::Path, skill_path: &str) -> std::path::PathBuf {
+    // 根级 skill：仓库根目录本身就是 skill 目录
+    if skill_path.is_empty() {
+        return workdir.to_path_buf();
+    }
     let preferred = workdir.join("skills").join(skill_path);
     if preferred.exists() {
         preferred
@@ -694,23 +718,46 @@ mod tests {
 
     #[test]
     fn test_extract_skill_path_simple() {
-        let (path, name) = extract_skill_path("skills/vue/SKILL.md");
+        let (path, name) = extract_skill_path("skills/vue/SKILL.md", "https://example.com/repo");
         assert_eq!(path, "vue");
         assert_eq!(name, "vue");
     }
 
     #[test]
     fn test_extract_skill_path_nested() {
-        let (path, name) = extract_skill_path("skills/engineering/grill-with-docs/SKILL.md");
+        let (path, name) = extract_skill_path(
+            "skills/engineering/grill-with-docs/SKILL.md",
+            "https://example.com/repo",
+        );
         assert_eq!(path, "engineering/grill-with-docs");
         assert_eq!(name, "grill-with-docs");
     }
 
     #[test]
     fn test_extract_skill_path_deeply_nested() {
-        let (path, name) = extract_skill_path("skills/a/b/c/SKILL.md");
+        let (path, name) =
+            extract_skill_path("skills/a/b/c/SKILL.md", "https://example.com/repo");
         assert_eq!(path, "a/b/c");
         assert_eq!(name, "c");
+    }
+
+    #[test]
+    fn test_extract_skill_path_root() {
+        // 根级 skill：SKILL.md 位于仓库根目录，安装名取仓库名
+        let (path, name) = extract_skill_path(
+            "SKILL.md",
+            "https://github.com/bybit-exchange/svg-diagram",
+        );
+        assert_eq!(path, "");
+        assert_eq!(name, "svg-diagram");
+
+        // .git 后缀同样取仓库名
+        let (path, name) = extract_skill_path(
+            "SKILL.md",
+            "https://github.com/bybit-exchange/svg-diagram.git",
+        );
+        assert_eq!(path, "");
+        assert_eq!(name, "svg-diagram");
     }
 
     #[test]
@@ -736,7 +783,7 @@ mod tests {
         let _ = std::fs::remove_dir_all(&tmp);
         let workdir = tmp.join("repo");
         let skill_dir = workdir.join("git-commit");
-        std::fs::create_dir_all(&skill_dir).unwrap();
+
 
         let resolved = resolve_skill_source_dir(&workdir, "git-commit");
         assert_eq!(resolved, skill_dir);
@@ -747,7 +794,7 @@ mod tests {
     fn test_cached_path_without_skill_md_suffix_is_leaf() {
         // Regression: cached path omits "/SKILL.md". extract_skill_path must
         // still yield the leaf path so install targets only that skill.
-        let (path, name) = extract_skill_path("skills/git-commit");
+        let (path, name) = extract_skill_path("skills/git-commit", "https://example.com/repo");
         assert_eq!(path, "git-commit");
         assert_eq!(name, "git-commit");
     }
@@ -1065,15 +1112,7 @@ mod tests {
         let mut platforms = HashMap::new();
         platforms.insert(
             "claude".to_string(),
-            Platform {
-                name: None,
-                enabled: true,
-                path: ".claude".to_string(),
-                skills: "skills".to_string(),
-                agents: "CLAUDE.md".to_string(),
-                source: "AGENTS.md".to_string(),
-                agents_compat: false,
-            },
+            Platform { name: None, enabled: true, path: ".claude".to_string(), local_path: None, skills: "skills".to_string(), agents: "CLAUDE.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
         );
         let config = Config {
             platforms,
@@ -1101,15 +1140,7 @@ mod tests {
         let mut platforms = HashMap::new();
         platforms.insert(
             "minimal".to_string(),
-            Platform {
-                name: None,
-                enabled: true,
-                path: ".minimal".to_string(),
-                skills: String::new(),
-                agents: String::new(),
-                source: "AGENTS.md".to_string(),
-                agents_compat: false,
-            },
+            Platform { name: None, enabled: true, path: ".minimal".to_string(), local_path: None, skills: String::new(), agents: String::new(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
         );
         let config = Config {
             platforms,

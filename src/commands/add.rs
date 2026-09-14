@@ -141,11 +141,12 @@ fn install_to_canonical(
             println!("{}: {}", "Version".cyan().bold(), version);
         }
     }
-    println!(
-        "{}: {}",
-        "Path".cyan().bold(),
+    let display_path_str = if skill_path.is_empty() {
+        "SKILL.md".to_string()
+    } else {
         format!("{}/SKILL.md", skill_path)
-    );
+    };
+    println!("{}: {}", "Path".cyan().bold(), display_path_str);
 
     // 显示安装路径
     println!("{}: {}", "Installed".green(), display_path(dest_dir));
@@ -192,7 +193,7 @@ fn symlink_to_platform(
 
     // 跳过与规范目录相同的平台（避免自引用链接）
     let platform_skills_dir = base_dir_for(global)
-        .join(&platform.path)
+        .join(platform.effective_path(global))
         .join(&platform.skills);
     if platform_skills_dir == canonical_skills_dir(global) {
         println!(
@@ -206,7 +207,7 @@ fn symlink_to_platform(
 
     // 平台目录不存在时自动创建
     let base_dir = base_dir_for(global);
-    let platform_path = base_dir.join(&platform.path);
+    let platform_path = base_dir.join(platform.effective_path(global));
     if !platform_path.exists() {
         fs::create_dir_all(&platform_path)?;
     }
@@ -262,7 +263,7 @@ fn symlink_to_all_platforms(config: &Config, dest_name: &str, global: bool) -> R
             continue;
         }
         // 仅链接已存在的平台目录
-        let platform_path = base_dir.join(&platform.path);
+        let platform_path = base_dir.join(platform.effective_path(global));
         if !platform_path.exists() {
             continue;
         }
@@ -322,6 +323,12 @@ fn install_all_skills(
     // 克隆仓库并列出所有 skills
     let tmp_dir = git::clone_for_listing(&resolved.url)?;
     let skills_dir = tmp_dir.path().join("skills");
+
+    // 仓库本身就是一个 skill：SKILL.md 直接位于仓库根目录
+    // 此时唯一的 skill 就是仓库本身，跳过子目录扫描
+    if !skills_dir.exists() && tmp_dir.path().join("SKILL.md").exists() {
+        return install_root_skill(config, resolved, target, source, global, &tmp_dir);
+    }
 
     let (scan_dir, path_prefix) = if skills_dir.exists() {
         (skills_dir.as_path(), "skills")
@@ -447,7 +454,89 @@ fn install_all_skills(
     Ok(())
 }
 
-/// 复制 skill 到目标目录
+/// 安装根级 skill（仓库本身就是一个 skill，SKILL.md 位于仓库根目录）
+fn install_root_skill(
+    config: &Config,
+    resolved: &ResolvedSource,
+    target: &InstallTarget,
+    source: &str,
+    global: bool,
+    tmp_dir: &tempfile::TempDir,
+) -> Result<()> {
+    // 根级 skill 的安装名取仓库名
+    let dest_name = crate::utils::repo_name_from_url(&resolved.url);
+    let repo_root = tmp_dir.path();
+
+    // 读取 SKILL.md 信息
+    let meta = SkillMeta::from_file(repo_root).unwrap_or_default();
+
+    // 显示源 URL
+    println!("{}: {}", "Source URL".cyan().bold(), resolved.url);
+    println!();
+
+    // 显示 skill 信息
+    println!("{}: {}", "Name".cyan().bold(), meta.display_name(&dest_name).yellow());
+    println!("{}: {}", "Description".cyan().bold(), meta.display_description());
+    if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
+        if !version.is_empty() {
+            println!("{}: {}", "Version".cyan().bold(), version);
+        }
+    }
+    println!("{}: {}", "Path".cyan().bold(), "SKILL.md");
+
+    // 获取根 tree hash（HEAD: 等价 HEAD^{tree}）
+    let skill_folder_hash =
+        git::get_skill_folder_hash(repo_root, "").unwrap_or_default();
+
+    // 锁文件路径：根级 skill 为 "SKILL.md"
+    let now = chrono::Utc::now();
+    let timestamp = now.format("%Y-%m-%dT:%M:%S%.3fZ").to_string();
+    let source_type = config
+        .get_source(source)
+        .map(|s| s.effective_type())
+        .unwrap_or_else(|| "git".to_string());
+
+    let mut lock_file = LockFile::load(global)?;
+    let installed_at = if let Some(existing) = lock_file.skills.get(&dest_name) {
+        existing.installed_at.clone()
+    } else {
+        timestamp.clone()
+    };
+
+    let lock_entry = LockEntry {
+        source: source.to_string(),
+        source_type,
+        source_url: resolved.url.clone(),
+        skill_path: "SKILL.md".to_string(),
+        skill_folder_hash,
+        installed_at,
+        updated_at: timestamp.clone(),
+    };
+    lock_file.upsert_skill(&dest_name, lock_entry);
+    lock_file.updated_at = timestamp;
+    lock_file.save(global)?;
+
+    // 安装到规范目录（排除 .git 等隐藏目录）
+    let canonical_dir = canonical_skills_dir(global).join(&dest_name);
+    copy_skill_to_target(repo_root, &canonical_dir)?;
+
+    // 创建 symlink
+    match target {
+        InstallTarget::Canonical => {}
+        InstallTarget::CanonicalWithPlatform(platform_name) => {
+            symlink_to_platform(config, &dest_name, platform_name, global)?;
+        }
+        InstallTarget::CanonicalWithAllPlatforms => {
+            symlink_to_all_platforms(config, &dest_name, global)?;
+        }
+    }
+
+    println!();
+    println!("{}", "All skills installed".green());
+    Ok(())
+}
+
+/// 复制 skill 到目标目录（排除 .git 等隐藏目录/文件）
 fn copy_skill_to_target(source_dir: &Path, dest_dir: &Path) -> Result<()> {
     if !source_dir.exists() {
         bail!("Source directory not found: {}", source_dir.display());
@@ -456,7 +545,7 @@ fn copy_skill_to_target(source_dir: &Path, dest_dir: &Path) -> Result<()> {
     // 清理目标（包括断裂的 symlink）
     remove_symlink(dest_dir)?;
     fs::create_dir_all(dest_dir)?;
-    copy_dir_recursive(source_dir, dest_dir)?;
+    git::copy_dir_excluding_hidden(source_dir, dest_dir)?;
 
     println!("{}: {}", "Installed".green(), display_path(dest_dir));
     Ok(())
@@ -480,9 +569,14 @@ fn update_lock_file(
         .map(|s| s.effective_type())
         .unwrap_or_else(|| "git".to_string());
 
-    // skill_path is already the full relative path from repo root (e.g., "skills/name" or "name")
+    // skill_path is already the full relative path from repo root (e.g., "skills/name"
+    // or "name"); empty means the repo root itself is the skill
     // 构建 skillPath（相对于 Git 仓库）
-    let skill_path_in_repo = format!("{}/SKILL.md", skill_path);
+    let skill_path_in_repo = if skill_path.is_empty() {
+        "SKILL.md".to_string()
+    } else {
+        format!("{}/SKILL.md", skill_path)
+    };
 
     // 获取当前时间（格式化为 ISO 8601 with milliseconds）
     let now = chrono::Utc::now();
@@ -517,6 +611,8 @@ fn update_lock_file(
 }
 
 /// 查找 skill，支持 fallback：指定源 → 缓存 → 所有源 → 注册中心
+/// 返回 (source_name, source_url, skill_path, dest_name)。
+/// skill_path 为仓库相对路径；仓库本身是 skill 时为空字符串（根级 skill）。
 fn find_skill_with_fallback(
     config: &Config,
     skill_name: &str,
@@ -530,6 +626,12 @@ fn find_skill_with_fallback(
                     .get_source(src)
                     .map(|s| s.effective_name())
                     .unwrap_or_else(|| src.to_string());
+                // 根级 skill：dest 为空表示仓库本身是 skill
+                let dest = if dest.is_empty() {
+                    crate::utils::repo_name_from_url(&resolved.url)
+                } else {
+                    dest
+                };
                 return Ok((source_name, resolved.url, path, dest));
             }
         }
@@ -549,7 +651,7 @@ fn find_skill_with_fallback(
         ),
         1 => {
             let m = &matches[0];
-            let (skill_path, dest_name) = extract_skill_path(&m.skill_path);
+            let (skill_path, dest_name) = extract_skill_path(&m.skill_path, &m.source_url);
             Ok((
                 m.source_name.clone(),
                 m.source_url.clone(),
@@ -574,7 +676,7 @@ fn find_skill_with_fallback(
                 );
             }
             let selected = run_source_select_tui(skill_name, &matches)?;
-            let (skill_path, dest_name) = extract_skill_path(&selected.skill_path);
+            let (skill_path, dest_name) = extract_skill_path(&selected.skill_path, &selected.source_url);
             Ok((
                 selected.source_name,
                 selected.source_url,
@@ -685,15 +787,25 @@ fn run_source_select_tui(
 }
 
 /// Extract (dir_path, dir_name) from "skills/rel_path/SKILL.md" or "rel_path/SKILL.md"
-fn extract_skill_path(full_path: &str) -> (String, String) {
+///
+/// 根级 skill（"SKILL.md"）→ dir_path 为空，dir_name 取源 URL 的仓库名
+/// （如 https://github.com/bybit-exchange/svg-diagram → svg-diagram）
+fn extract_skill_path(full_path: &str, source_url: &str) -> (String, String) {
+    if crate::utils::is_root_skill(full_path) {
+        return (String::new(), crate::utils::repo_name_from_url(source_url));
+    }
     // Remove /SKILL.md suffix to get the directory path
-    let dir_path = full_path.strip_suffix("/SKILL.md").unwrap_or(full_path);
+    let dir_path = full_path
+        .strip_suffix("/SKILL.md")
+        .unwrap_or(full_path)
+        .to_string();
     // Get the last component as the directory name
-    let dest_name = dir_path.split('/').last().unwrap_or(dir_path).to_string();
-    (dir_path.to_string(), dest_name)
+    let dest_name = dir_path.split('/').last().unwrap_or(&dir_path).to_string();
+    (dir_path, dest_name)
 }
 
 /// 在仓库中查找 skill 的完整路径（递归搜索所有子目录）
+/// 返回 (full_path, dest_name)；仓库本身是 skill 时 full_path 为空、dest_name 为空
 fn find_skill_in_repo(repo_url: &str, skill_name: &str) -> Result<Option<(String, String)>> {
     let tmp_dir = git::clone_for_listing(repo_url)?;
     let skills_dir = tmp_dir.path().join("skills");
@@ -703,6 +815,15 @@ fn find_skill_in_repo(repo_url: &str, skill_name: &str) -> Result<Option<(String
     } else {
         (tmp_dir.path(), "")
     };
+
+    // 仓库本身就是一个 skill：SKILL.md 直接位于仓库根目录
+    if path_prefix.is_empty() && tmp_dir.path().join("SKILL.md").exists() {
+        let meta = SkillMeta::from_file(tmp_dir.path()).unwrap_or_default();
+        if meta.display_name("SKILL.md") == skill_name {
+            return Ok(Some((String::new(), String::new())));
+        }
+        return Ok(None);
+    }
 
     // 递归搜索所有子目录
     let mut matches = Vec::new();
@@ -873,30 +994,50 @@ mod tests {
 
     #[test]
     fn test_extract_skill_path_simple() {
-        let (path, dest) = extract_skill_path("skills/vue/SKILL.md");
+        let (path, dest) = extract_skill_path("skills/vue/SKILL.md", "https://example.com/repo");
         assert_eq!(path, "skills/vue");
         assert_eq!(dest, "vue");
     }
 
     #[test]
     fn test_extract_skill_path_nested() {
-        let (path, dest) = extract_skill_path("skills/frontend/vue/SKILL.md");
+        let (path, dest) =
+            extract_skill_path("skills/frontend/vue/SKILL.md", "https://example.com/repo");
         assert_eq!(path, "skills/frontend/vue");
         assert_eq!(dest, "vue");
     }
 
     #[test]
     fn test_extract_skill_path_no_prefix() {
-        let (path, dest) = extract_skill_path("vue/SKILL.md");
+        let (path, dest) = extract_skill_path("vue/SKILL.md", "https://example.com/repo");
         assert_eq!(path, "vue");
         assert_eq!(dest, "vue");
     }
 
     #[test]
     fn test_extract_skill_path_no_suffix() {
-        let (path, dest) = extract_skill_path("skills/vue");
+        let (path, dest) = extract_skill_path("skills/vue", "https://example.com/repo");
         assert_eq!(path, "skills/vue");
         assert_eq!(dest, "vue");
+    }
+
+    #[test]
+    fn test_extract_skill_path_root() {
+        // 根级 skill：SKILL.md 位于仓库根目录，安装名取仓库名
+        let (path, dest) = extract_skill_path(
+            "SKILL.md",
+            "https://github.com/bybit-exchange/svg-diagram",
+        );
+        assert_eq!(path, "");
+        assert_eq!(dest, "svg-diagram");
+
+        // .git 后缀同样取仓库名
+        let (path, dest) = extract_skill_path(
+            "SKILL.md",
+            "https://github.com/bybit-exchange/svg-diagram.git",
+        );
+        assert_eq!(path, "");
+        assert_eq!(dest, "svg-diagram");
     }
 
     // --- copy_dir_recursive ---

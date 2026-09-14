@@ -192,5 +192,4 @@ def main() -> None:
     print(f"\nGenerated {output_file}: {total_skills} skills from {len(result_sources)} sources")
 
 
-if __name__ == "__main__":
-    main()
+main()

@@ -33,8 +33,11 @@ pub fn resolve_source(config: &Config, source: &str) -> Result<ResolvedSource> {
         });
     }
 
-    // 3. 原样作为 URL
-    if source.starts_with("http://") || source.starts_with("https://") || source.starts_with("git@")
+    // 3. 原样作为 URL（file:// 用于本地仓库源，便于测试与离线场景）
+    if source.starts_with("http://")
+        || source.starts_with("https://")
+        || source.starts_with("git@")
+        || source.starts_with("file://")
     {
         return Ok(ResolvedSource {
             url: source.to_string(),
@@ -354,7 +357,6 @@ impl std::fmt::Debug for AgentValidationError {
 impl std::error::Error for AgentValidationError {}
 
 /// 获取 URL 末尾路径名（不含 .git 后缀）
-#[allow(dead_code)]
 pub fn url_last_segment(url: &str) -> String {
     let url = url.trim_end_matches('/');
     let url = url.trim_end_matches(".git");
@@ -364,9 +366,50 @@ pub fn url_last_segment(url: &str) -> String {
         .unwrap_or_else(|| url.to_string())
 }
 
+/// 判断 skill 路径是否为仓库根级别的 skill（即 SKILL.md 直接位于仓库根目录）
+///
+/// 兼容两种格式：`"SKILL.md"`（含后缀）与 `""`（无后缀的空路径）
+pub fn is_root_skill(skill_path: &str) -> bool {
+    let p = skill_path.trim();
+    let p = p.strip_prefix("./").unwrap_or(p);
+    p.is_empty() || p == "SKILL.md"
+}
+
+/// 从源 URL 提取仓库名，用作根级 skill 的安装名
+/// （如 `https://github.com/bybit-exchange/svg-diagram` → `svg-diagram`）
+pub fn repo_name_from_url(url: &str) -> String {
+    url_last_segment(url)
+}
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_is_root_skill() {
+        assert!(is_root_skill("SKILL.md"));
+        assert!(is_root_skill(""));
+        assert!(is_root_skill("./SKILL.md"));
+        assert!(!is_root_skill("skills/vue/SKILL.md"));
+        assert!(!is_root_skill("skills/vue"));
+        assert!(!is_root_skill("vue/SKILL.md"));
+        assert!(!is_root_skill("my-skill"));
+    }
+
+    #[test]
+    fn test_repo_name_from_url() {
+        assert_eq!(
+            repo_name_from_url("https://github.com/bybit-exchange/svg-diagram"),
+            "svg-diagram"
+        );
+        assert_eq!(
+            repo_name_from_url("https://github.com/bybit-exchange/svg-diagram.git"),
+            "svg-diagram"
+        );
+        assert_eq!(
+            repo_name_from_url("https://github.com/bybit-exchange/svg-diagram/"),
+            "svg-diagram"
+        );
+    }
 
     #[test]
     fn test_resolve_source_by_name() {
@@ -711,10 +754,12 @@ mod tests {
                 name: None,
                 enabled: true,
                 path: ".claude".to_string(),
+                local_path: None,
                 skills: "skills".to_string(),
                 agents: "CLAUDE.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                builtin: false,
             },
         );
         assert!(validate_agent(&config, "claude").is_ok());

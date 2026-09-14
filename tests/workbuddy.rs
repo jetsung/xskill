@@ -124,12 +124,15 @@ fn test_workbuddy_appears_in_platforms_list_detailed() {
         "platforms list should list WorkBuddy, got:\n{}",
         stdout
     );
-    // 详细视图列：PATH=.workbuddy、SKILLS=skills、AGENTS=.workbuddy/CODEBUDDY.md、SOURCE=.agents/AGENTS.md
+    // 详细视图列：PATH=.workbuddy、SKILLS=skills、AGENTS=.workbuddy/CODEBUDDY.md（SOURCE 列已移除）
     assert!(
-        stdout.contains(".workbuddy")
-            && stdout.contains(".workbuddy/CODEBUDDY.md")
-            && stdout.contains(".agents/AGENTS.md"),
-        "workbuddy row should show .workbuddy path with CODEBUDDY.md agents file and .agents/AGENTS.md source, got:\n{}",
+        stdout.contains(".workbuddy") && stdout.contains(".workbuddy/CODEBUDDY.md"),
+        "workbuddy row should show .workbuddy path with CODEBUDDY.md agents file, got:\n{}",
+        stdout
+    );
+    assert!(
+        !stdout.contains("SOURCE"),
+        "SOURCE column should be removed from platforms list, got:\n{}",
         stdout
     );
 }

@@ -109,8 +109,13 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
         for (skill_name, entry) in skills {
             println!("  {}: {}", "Updating".cyan(), skill_name);
 
-            // Extract skill directory path from skillPath (e.g., "skills/name" or "name")
-            let skill_dir_path = entry.skill_path.replace("/SKILL.md", "");
+            // Extract skill directory path from skillPath (e.g., "skills/name" or "name");
+            // root-level skill ("SKILL.md") → "" (the repo root itself is the skill)
+            let skill_dir_path = if crate::utils::is_root_skill(&entry.skill_path) {
+                String::new()
+            } else {
+                entry.skill_path.replace("/SKILL.md", "")
+            };
             let source_dir = tmp_dir.path().join(&skill_dir_path);
 
             if !source_dir.exists() {
@@ -142,11 +147,15 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
                 }
             }
 
-            // Copy skill to destination
+            // Copy skill to destination (root-level skill: exclude .git etc.)
             let dest_dir = base_dir.join(skill_name);
             crate::utils::remove_symlink(&dest_dir)?;
             fs::create_dir_all(&dest_dir)?;
-            crate::commands::restore::copy_dir_recursive(&source_dir, &dest_dir)?;
+            if skill_dir_path.is_empty() {
+                git::copy_dir_excluding_hidden(&source_dir, &dest_dir)?;
+            } else {
+                crate::commands::restore::copy_dir_recursive(&source_dir, &dest_dir)?;
+            }
 
             // Get skill_folder_hash from the shared clone
             let skill_folder_hash =

@@ -71,7 +71,7 @@ cargo install --path .
 xskill sources add -n my-skills -u https://github.com/example/skills
 
 # 查询可用技能
-xskill query -f my-skills
+xskill query -f my-skills vue
 
 # 安装技能
 xskill add -f my-skills -s vue
@@ -109,7 +109,7 @@ xskill -v add -f my-skills -s vue
 | 命令 | 说明 |
 |------|------|
 | `sources` | 管理配置源（list/add/remove/rename） |
-| `platforms` | 管理配置平台（list/reset） |
+| `platforms` | 管理配置平台（list/reset/toggle） |
 | `add` | 安装技能 |
 | `link` | 将已有技能软链接到指定平台 |
 | `remove` | 移除技能 |
@@ -131,8 +131,10 @@ xskill -v add -f my-skills -s vue
 {
   "$schema": "https://xskill.gcli.cn/xskill.schema.json",
   "platforms": {
-    "claude": { "path": ".claude", "skills": "skills", "agents": "CLAUDE.md", "agents_compat": false },
-    "codex": { "path": ".codex", "skills": "skills", "agents": "AGENTS.md", "agents_compat": true }
+    "claude": { "name": "Claude Code", "enabled": true, "path": ".claude", "skills": "skills", "agents": "CLAUDE.md", "agents_compat": false },
+    "codex": { "name": "Codex", "enabled": true, "path": ".codex", "skills": "skills", "agents": "AGENTS.md", "agents_compat": true },
+    "cline": { "name": "Cline", "enabled": false, "path": ".cline", "skills": "skills", "agents": "CLAUDE.md", "agents_compat": true },
+    "omp": { "name": "Oh My Pi", "enabled": true, "path": ".omp/agent", "local_path": ".omp", "skills": "skills", "agents": "AGENTS.md", "agents_compat": true }
   },
   "sources": [
     { "name": "antfu", "type": "git", "url": "https://github.com/antfu/skills" }

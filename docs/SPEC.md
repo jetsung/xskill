@@ -54,11 +54,20 @@
 |------|------|--------|------|
 | `name` | 否 | — | 渠道显示名称，缺失时回退到配置 key。`platforms`/`find`/`list` 等展示型输出显示该名称 |
 | `enabled` | 否 | `false` | 是否启用。禁用渠道不出现在 `platforms` 默认视图、find TUI 可选列表与 `add`/`remove`/`link` 的批量（`-a '*'`）操作中，显式指定渠道名（如 `xskill link claude <skill>`）不受影响；`platforms -a` 视图会显示全部渠道及 ENABLED 状态 |
-| `path` | 是 | — | 工具配置目录（相对路径、绝对路径或 `~/...`） |
+| `path` | 是 | — | 工具配置目录（相对路径、绝对路径或 `~/...`），全局模式（`-g`）下的配置目录 |
+| `local_path` | 否 | 回退 `path` | 项目级配置目录（可选），仅当全局与项目级路径不同时填写。项目级模式下优先使用，未设置时回退到 `path`（如 `pi` 全局为 `.pi/agent`、项目级为 `.pi`；`mimocode` 全局为 `.config/mimocode`、项目级为 `.mimocode`） |
 | `skills` | 否 | — | skills 子目录名（相对于 path），为空则不安装 |
 | `agents` | 否 | — | agents 配置文件名（相对于 path），为空则不安装 |
 | `source` | 否 | `"AGENTS.md"` | 源文件名（固定 `.agents/` 目录下），`<path>/<agents>` 符号链接至 `.agents/<source>` |
 | `agents_compat` | 否 | `false` | 是否兼容 `.agents/` 资源。为 `true` 时该平台直接读取规范目录，add/remove/link/restore 跳过 symlink 操作（单平台时输出 `Skipped`，多平台时静默跳过）。find TUI 中不显示在可选平台列表中，而是在 header 中以 `SELECTED: <platform>, ...` 形式展示（视为已选中）。list `-a` 过滤时合并列出规范目录与其自身 skills 目录下的 skill（同名去重、规范目录优先）。 |
+| `builtin` | 否 | `false` | 是否为内置渠道（由 `default_platforms()` 生成，全部为 `true`；用户自定义渠道为 `false`）。内置渠道受保护：用户配置仅可覆盖 `name` 与 `enabled`，其余字段在配置加载时强制恢复内置默认值。 |
+
+#### 内置渠道保护规则
+
+* **保护范围**：与内置渠道同 key 的条目，仅 `name`（显示名称）与 `enabled`（启用状态）允许用户修改；`path`、`local_path`、`skills`、`agents`、`source`、`agents_compat` 一律以内置默认值为准。
+* **执行时机**：`Config::load()` 加载配置后调用 `enforce_builtin_platforms()` 强制恢复，用户在 `settings.json` 中篡改的内置渠道字段不生效。
+* **自定义渠道不受限**：key 不在内置列表中的渠道（如自建渠道）字段可自由修改；要调整内置渠道的路径，可复制一份同字段的自定义渠道条目使用。
+* **`platforms reset`**：恢复内置默认渠道列表，与保护规则配套（见 `platforms` 子命令）。
 
 ### Source 字段说明
 
@@ -159,6 +168,15 @@ URL 解析规则：
     "pi": {
       "name": "Pi",
       "path": ".pi/agent",
+      "local_path": ".pi",
+      "skills": "skills",
+      "agents": "AGENTS.md",
+      "agents_compat": true
+    },
+    "agentty": {
+      "name": "Agentty",
+      "enabled": false,
+      "path": ".agentty",
       "skills": "skills",
       "agents": "AGENTS.md",
       "agents_compat": true
@@ -202,27 +220,30 @@ URL 解析规则：
 
 ### 目录扫描策略
 
-1. **优先 `skills/` 子目录**：若仓库根目录下存在 `skills/` 子目录，则从该目录开始扫描。
-2. **回退到项目根目录**：若 `skills/` 不存在，则从仓库根目录开始扫描（支持项目本身就是一个 skill 的场景）。
-3. **排除隐藏目录**：所有递归遍历均排除以 `.` 开头的目录（如 `.git`、`.agents`、`.github` 等），避免误扫描工具目录。
+1. **仓库本身即 skill（根级 skill）**：若 `SKILL.md` 直接位于仓库根目录（无 `skills/` 子目录，如 [bybit-exchange/svg-diagram](https://github.com/bybit-exchange/svg-diagram)），则该仓库整体就是一个 skill，`path` 为 `SKILL.md`，**不再扫描子目录**。安装名取自 URL 仓库名（如 `svg-diagram`），安装时检出整个仓库内容（skill 的资源可能位于任意子目录，如 `tools/`、`gallery/`），复制时排除 `.git` 等隐藏目录。
+2. **优先 `skills/` 子目录**：若仓库根目录下存在 `skills/` 子目录，则从该目录开始扫描。
+3. **回退到项目根目录扫描**：若 `skills/` 不存在且根目录无 `SKILL.md`，则从仓库根目录开始扫描子目录（支持 `my-skill/SKILL.md` 这类根目录一级子目录布局）。
+4. **排除隐藏目录**：所有递归遍历均排除以 `.` 开头的目录（如 `.git`、`.agents`、`.github` 等），避免误扫描工具目录。
 
 ### 路径格式
 
 `CachedSkill.path` 为 `SKILL.md` 相对于仓库根目录的相对路径，**可选**包含 `/SKILL.md` 后缀：
 
 | 场景 | 路径示例（含后缀） | 路径示例（无后缀） |
-|------|---------|---------|
+------|---------|---------|
 | `skills/` 子目录下的技能 | `skills/vue/SKILL.md` | `skills/vue` |
 | `skills/` 下嵌套目录的技能 | `skills/engineering/grill/SKILL.md` | `skills/engineering/grill` |
-| 项目根目录级别的技能 | `my-skill/SKILL.md` | `my-skill` |
+| 项目根目录一级子目录的技能 | `my-skill/SKILL.md` | `my-skill` |
+| 仓库本身即技能（根级 skill） | `SKILL.md` | `""`（空路径） |
 
 * **本地源**（`clone_and_collect` 扫描）产出的 `path` 包含 `/SKILL.md` 后缀。
 * **注册中心**（registry）返回的 `path` 可能省略 `/SKILL.md` 后缀（如 `skills/vue`）。安装逻辑必须同时兼容两种形式，不能假设后缀必然存在。
 * 无论是否含后缀，安装时统一通过剥离 `skills/` 前缀与可选的 `/SKILL.md` 后缀得到**叶子路径**（如 `skills/engineering/grill/SKILL.md` → `grill`），再据此定位 skill 目录。
+* **根级 skill**（`path` 为 `SKILL.md` 或空）时：叶子路径为空，skill 源目录即仓库根目录本身；安装名（同时是锁文件 key 与规范目录名）取源 URL 的仓库名，而非 frontmatter `name`；锁文件 `skill_path` 记录为 `SKILL.md`；tree hash 使用 `git rev-parse HEAD:`（根 tree）。
 
 ### 判断标准
 
-一个目录被视为"技能"的条件：该目录下存在 `SKILL.md` 文件。解析 `SKILL.md` 的 YAML frontmatter 提取元数据（`name`、`description`、`metadata.version`）。
+一个目录被视为"技能"的条件：该目录下存在 `SKILL.md` 文件。解析 `SKILL.md` 的 YAML frontmatter 提取元数据（`name`、`description`、`metadata.version`）。仓库根目录同样适用此标准（根级 skill）。
 
 ---
 
@@ -285,9 +306,10 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 - **项目级路径**：`./.xskill-lock.json`
 - **全局级路径**：`~/.agents/.xskill-lock.json`
 - **职责**：记录已安装 skill 的安装来源、路径、哈希、时间戳。仅记录规范目录中的安装信息，平台目录的软链接不记录在锁文件中（可从规范目录反向推导）。
-- **路径规范化**：`skill_path` 为 `SKILL.md` 相对于仓库根目录的完整路径，支持两种格式：
+- **路径规范化**：`skill_path` 为 `SKILL.md` 相对于仓库根目录的完整路径，支持三种格式：
   - `skills/<path>/SKILL.md`：技能位于 `skills/` 子目录下（如 `skills/vue/SKILL.md`、`skills/engineering/grill-with-docs/SKILL.md`）
   - `<name>/SKILL.md`：技能位于仓库根目录级别（如 `my-skill/SKILL.md`）
+  - `SKILL.md`：仓库本身即技能（根级 skill，如 [bybit-exchange/svg-diagram](https://github.com/bybit-exchange/svg-diagram)）
 
 ### 锁文件格式
 
@@ -515,32 +537,46 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 ### `platforms` — 管理配置平台
 
-* **行为**：以表格形式打印配置中的平台，并提供 `list`、`reset` 子命令。
+* **行为**：以表格形式打印配置中的平台，并提供 `list`、`reset`、`toggle` 子命令。
 * **子命令**：
   * `xskill platforms list`：列出配置平台（裸命令 `xskill platforms` 等同 `xskill platforms list`）。默认只显示启用（`enabled: true`）的渠道，NAME 列为渠道显示名称（缺失时回退 key），按名称排序。
     * `-a, --all`：显示全部渠道（含禁用），以 ENABLED 列标注启用状态。
-    * **输出格式**（所有视图一致，共七列 `NAME`、`PATH`、`SKILLS`、`AGENTS`、`SOURCE`、`COMPAT`、`ENABLED`）：
+    * **输出格式**（所有视图一致，共八列 `NAME`、`KEY`、`PATH`、`SKILLS`、`AGENTS`、`COMPAT`、`BUILTIN`、`ENABLED`）：
       ```
-      NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
-      Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
-      Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
-      Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
+      NAME         KEY         PATH     SKILLS  AGENTS     COMPAT  BUILTIN  ENABLED
+      Claude Code  claude      .claude  skills  CLAUDE.md  ✗       ✓        ✓
+      Codex        codex       .codex   skills  AGENTS.md  ✓       ✓        ✓
+      Cline        cline       .cline   skills  CLAUDE.md  ✓       ✗        ✗
       ```
-      > COMPAT 列 `✓` 绿色表示兼容，`✗` 红色表示不兼容；ENABLED 列 `✓` 绿色表示启用，`✗` 红色表示禁用，便于肉眼区分。
+      > KEY 列为配置 key（`add`/`link`/`remove` 等命令 `-a` 参数使用的渠道名）；PATH/SKILLS/AGENTS 三列（路径与文件名类信息）以暗灰色显示；COMPAT 列 `✓` 绿色表示兼容，`✗` 红色表示不兼容；BUILTIN 列 `✓` 绿色表示内置渠道，`✗` 红色表示自定义渠道；ENABLED 列 `✓` 绿色表示启用，`✗` 红色表示禁用，便于肉眼区分。
   * `xskill platforms reset`：重置 `platforms` 为内置默认渠道列表。
     * 执行前弹出一个 skim 单选 TUI（`↑/↓` 选择，`Enter` 确认，`Esc` 取消），回车默认选中第一项：
       * **完全恢复**（第一项，默认）：所有平台恢复内置默认配置，移除自定义平台。
       * **谨慎合并**：只更新内置渠道，自定义平台保留。
       * **取消**：不修改任何配置。
+    * **选项样式**：每个选项单行显示——`❯ 完全恢复 — 所有平台恢复内置默认配置，移除自定义平台`。选中项带 `❯ ` 前缀、蓝色加粗（未选中项以两格空格对齐）；破折号后的效果说明以暗灰色显示。
     * 若存在自定义平台，会先打印提示。
+    * **保存规范化**：重置写入 `~/.xskill/settings.json` 前对平台条目做规范化（`normalize_platforms_for_save`）：
+      * 内置渠道（key 在内置列表中）仅保存 `name`、`enabled`、`builtin`（值为 `true`）三个字段，`path`/`skills` 等其余字段不写入——加载时由内置渠道保护逻辑自动恢复默认值；
+      * 自定义渠道（key 不在内置列表中）`builtin` 强制为 `false`（无论用户是否设置该字段或设置为何值），其余字段原样保留。
     * 其他配置字段（`sources`、`cache`、`proxy` 等）不受影响。
     * 示例：
       ```
       $ xskill platforms reset
       Custom platforms: my-custom
       # skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
-      Platforms reset: 19 platforms, replaced with defaults (custom dropped)
+      Platforms reset: 27 platforms, replaced with defaults (custom dropped)
       ```
+  * `xskill platforms toggle [KEYS...]`：切换指定渠道的启用状态（`enabled` 取反）。
+    * **指定 key**：`xskill platforms toggle kiro agentty` 直接切换这些渠道的 `enabled` 状态。
+    * **省略 key**：进入全屏自绘多选 TUI（↑/↓ 或 j/k 移动、空格/TAB 勾选、Enter 确认、Esc 或 Ctrl-C 取消），列出**全部渠道**并**按当前启用状态预勾选**（启用的渠道勾选 `[x]`、禁用的渠道 `[ ]`）。每行前置勾选框；**已勾选（启用）的渠道名称以绿色显示**，未勾选为默认色；光标所在行名称加粗并带 `❯` 指示符。列表项格式为 `[x] 名称  [key]`（key 部分暗灰色），按显示名称排序，**全部渠道一次性完全显示**（无窗口滚动）。
+    * **确认语义**：Enter 后**按勾选状态设置**各渠道的 `enabled`（非翻转）——仅状态发生变化的渠道被记录并保存；TUI 中取消勾选已启用的渠道即表示禁用它。
+    * **输出**：每个状态发生变化的渠道输出一行 `<显示名称>: enabled`（绿色）或 `<显示名称>: disabled`（红色）；无变化时输出 `No changes.`（黄色）。
+    * **保存规范化**：与 `reset` 一致，写入前调用 `normalize_platforms_for_save`（内置渠道精简保存，自定义渠道 `builtin` 恒 `false`）。
+    * **边界情况**：
+      * key 不存在时报错并列出有效渠道（`Invalid platform: <key>` + `Valid platforms: ...`）。
+      * 省略 key 且非交互终端时报错 `'platforms toggle' requires an interactive terminal or platform keys.`。
+      * TUI 中按 Esc 或 Ctrl-C 取消时输出 `Cancelled.`，不修改配置。
 * **边界情况**：platforms 为空时输出 "No platforms configured"。空字段显示 ` - `。
 
 ### `add` — 安装技能

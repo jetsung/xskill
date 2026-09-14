@@ -1,7 +1,7 @@
 //! 集成测试：验证 `xskill platforms list` 默认只显示可用（启用）渠道
 //!
 //! 覆盖：
-//! - `platforms list` 以详细视图（含 SKILLS/AGENTS/SOURCE/ENABLED 列）只显示启用渠道
+//! - `platforms list` 以详细视图（含 KEY/SKILLS/AGENTS/COMPAT/BUILTIN/ENABLED 列）只显示启用渠道
 //! - 默认禁用渠道（如 kiro、commandcode）不出现
 //! - `--all` 显示全部渠道（含禁用）
 
@@ -50,10 +50,18 @@ fn test_platforms_list_shows_only_enabled_detailed() {
     );
 
     let stdout = String::from_utf8_lossy(&out.stdout);
-    // 详细视图：应包含详细表头
+    // 详细视图：应包含详细表头（含 KEY 与 BUILTIN，且 SOURCE 列已移除）
     assert!(
-        stdout.contains("SKILLS") && stdout.contains("ENABLED"),
+        stdout.contains("SKILLS")
+            && stdout.contains("ENABLED")
+            && stdout.contains("BUILTIN")
+            && stdout.contains("KEY"),
         "platforms list should use detailed view, got:\n{}",
+        stdout
+    );
+    assert!(
+        !stdout.contains("SOURCE"),
+        "SOURCE column should be removed from platforms list, got:\n{}",
         stdout
     );
     // 启用渠道应出现

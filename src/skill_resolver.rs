@@ -165,6 +165,7 @@ fn search_source_for_match(config: &Config, src: &str, skill_name: &str) -> Opti
 
     search_skills_in_dir(
         scan_dir,
+        tmp_dir.path(),
         skill_name,
         &source_name,
         &resolved.url,
@@ -422,14 +423,35 @@ fn merge_skills(local: CacheData, central: CacheData) -> CacheData {
 }
 
 /// Recursively search for a skill in a directory tree.
+///
+/// `repo_root` is the repository root. When `dir` == `repo_root` and the repo
+/// itself is a single skill (root-level SKILL.md), match it by name against
+/// the SKILL.md frontmatter `name` field only — the repo-root directory name
+/// is not a meaningful skill name.
 fn search_skills_in_dir(
     dir: &std::path::Path,
+    repo_root: &std::path::Path,
     target: &str,
     source_name: &str,
     source_url: &str,
     prefix: &str,
     base_prefix: &str,
 ) -> Option<(String, String, String)> {
+    // 仓库本身就是一个 skill：SKILL.md 直接位于仓库根目录
+    if dir == repo_root && dir.join("SKILL.md").exists() {
+        let meta = SkillMeta::from_file(dir).ok()?;
+        let display = meta.display_name("SKILL.md");
+        if display == target {
+            let full_path = if base_prefix.is_empty() {
+                "SKILL.md".to_string()
+            } else {
+                format!("{}/SKILL.md", base_prefix)
+            };
+            return Some((source_name.to_string(), source_url.to_string(), full_path));
+        }
+        return None;
+    }
+
     let entries = fs::read_dir(dir).ok()?;
 
     for entry in entries.flatten() {
@@ -464,6 +486,7 @@ fn search_skills_in_dir(
 
         if let Some(found) = search_skills_in_dir(
             &path,
+            repo_root,
             target,
             source_name,
             source_url,
@@ -503,7 +526,7 @@ fn clone_and_collect(url: &str) -> Result<(Vec<CachedSkill>, String)> {
     } else {
         (tmp_dir.path(), "")
     };
-    collect_skills_from_dir(scan_dir, &mut skills, &mut String::new(), base_prefix);
+    collect_skills_from_dir(scan_dir, tmp_dir.path(), &mut skills, &mut String::new(), base_prefix);
 
     let commit_hash = git::get_latest_commit_hash(tmp_dir.path()).unwrap_or_default();
     Ok((skills, commit_hash))
@@ -539,12 +562,43 @@ fn load_or_fetch_url_cache(url: &str, ttl_secs: u64) -> Result<CacheData> {
 }
 
 /// Recursively collect skills from a directory tree.
+///
+/// `repo_root` is the repository root (used to derive the display name for a
+/// root-level skill). When `dir` == `repo_root` and `SKILL.md` exists directly
+/// in it, the repo itself is a single skill (path = "SKILL.md"); subdirectory
+/// scanning is skipped entirely in that case.
 pub fn collect_skills_from_dir(
     dir: &std::path::Path,
+    repo_root: &std::path::Path,
     skills: &mut Vec<CachedSkill>,
     current_path: &mut String,
     base_prefix: &str,
 ) {
+    // 仓库本身就是一个 skill：SKILL.md 直接位于仓库根目录
+    if dir == repo_root && dir.join("SKILL.md").exists() {
+        let meta = SkillMeta::from_file(dir).unwrap_or_default();
+        let name = meta
+            .name
+            .clone()
+            .unwrap_or_else(|| "SKILL.md".to_string());
+        let path = if base_prefix.is_empty() {
+            "SKILL.md".to_string()
+        } else {
+            format!("{}/SKILL.md", base_prefix)
+        };
+        skills.push(CachedSkill {
+            name,
+            path,
+            description: meta.display_description(),
+            version: meta
+                .metadata
+                .as_ref()
+                .and_then(|m| m.version.clone())
+                .unwrap_or_default(),
+        });
+        return;
+    }
+
     let entries = match fs::read_dir(dir) {
         Ok(e) => e,
         Err(_) => return,
@@ -589,7 +643,7 @@ pub fn collect_skills_from_dir(
             });
         }
 
-        collect_skills_from_dir(&path, skills, current_path, base_prefix);
+        collect_skills_from_dir(&path, repo_root, skills, current_path, base_prefix);
         *current_path = saved;
     }
 }
