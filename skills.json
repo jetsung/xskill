@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-15T02:35:07.850Z",
+  "updated_at": "2026-09-15T10:43:20.262Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -174,7 +174,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "1899b18da3fa5183652f86165917d553cba1850a",
+      "commit_hash": "fb4eb04fcbd30de50052b1155d81167393dfb5aa",
       "skills": [
         {
           "name": "flowstudio-power-automate-governance",
