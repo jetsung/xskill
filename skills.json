@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-15T10:43:20.262Z",
+  "updated_at": "2026-09-15T15:56:47.517Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3057,7 +3057,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "3cca18b368ae95cdbdebbff572ccafa662551015",
+      "commit_hash": "959a8e9f1edc3adbe2f7e3054bb6fbefa6696260",
       "skills": [
         {
           "name": "teach",
