@@ -33,6 +33,7 @@
 | zoo | Zoo Code | `.roo` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✗ |
 | mimocode | MiMo Code | `.config/mimocode` | `.mimocode` | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✗ |
 | agentty | Agentty | `.agentty` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✗ |
+| hermes | Hermes Agent | `.hermes` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✗ |
 
 说明：
 
@@ -46,3 +47,4 @@
 - `qoder-cn`（Qoder 中国版）与 `qoder`（国际版）为同一产品的不同发行版，配置目录分别为 `~/.qoder-cn/` 与 `~/.qoder/`，互不共享。
 - `mimocode`（MiMo Code）全局配置目录为 `~/.config/mimocode/skills`，项目级为 `.mimocode/skills`（[官方文档](https://mimo.xiaomi.com/zh/mimocode/skills)）。
 - `agentty`（Agentty）全局配置目录为 `~/.agentty/skills`，项目级为 `.agentty/skills`，两者路径相同，无需 `local_path`；兼容 `.agents/` 规范目录（[官方文档](https://github.com/1ay1/agentty/blob/master/docs/website/skills.md)）。
+- `hermes`（Hermes Agent）全局配置目录为 `~/.hermes/skills`，项目级为 `.hermes/skills`，两者路径相同，无需 `local_path`；兼容 `.agents/` 规范目录。

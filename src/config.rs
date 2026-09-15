@@ -189,6 +189,8 @@ pub fn default_platforms() -> HashMap<String, Platform> {
         ("mimocode", "MiMo Code", false, ".config/mimocode", Some(".mimocode"), "skills", "AGENTS.md", true),
         // agentty 兼容 .agents/ 规范目录，全局与项目级路径均为 .agentty
         ("agentty", "Agentty", false, ".agentty", None, "skills", "AGENTS.md", true),
+        // hermes（Hermes Agent）兼容 .agents/ 规范目录
+        ("hermes", "Hermes Agent", false, ".hermes", None, "skills", "AGENTS.md", true),
     ];
 
     let mut map = HashMap::new();
@@ -768,7 +770,7 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 27);
+        assert_eq!(platforms.len(), 28);
         assert!(platforms.contains_key("antigravity"));
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
@@ -917,6 +919,18 @@ mod tests {
         assert!(agentty.agents_compat);
         assert!(!agentty.enabled);
 
+        // hermes 渠道（Hermes Agent）：全局与项目级路径相同，均为 .hermes
+        let hermes = &platforms["hermes"];
+        assert_eq!(hermes.name.as_deref(), Some("Hermes Agent"));
+        assert_eq!(hermes.path, ".hermes");
+        assert_eq!(hermes.local_path, None);
+        assert_eq!(hermes.effective_path(true), ".hermes");
+        assert_eq!(hermes.effective_path(false), ".hermes");
+        assert_eq!(hermes.skills, "skills");
+        assert_eq!(hermes.agents, "AGENTS.md");
+        assert!(hermes.agents_compat);
+        assert!(!hermes.enabled);
+
         // local_path 未设置时，effective_path 在两种模式下都回退到 path
         let claude = &platforms["claude"];
         assert_eq!(claude.effective_path(true), ".claude");
@@ -1025,7 +1039,7 @@ mod tests {
         assert_eq!(config.cache.ttl, 86400);
         assert!(!config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 27);
+        assert_eq!(config.platforms.len(), 28);
         // init 时 proxy 键占位为空字符串（不生效，供用户填写）
         assert_eq!(config.proxy, Some(String::new()));
     }

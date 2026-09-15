@@ -152,31 +152,32 @@ URL 解析规则：
     "claude": {
       "name": "Claude Code",
       "enabled": true,
-      "path": ".claude",
-      "skills": "skills",
-      "agents": "CLAUDE.md",
-      "agents_compat": false
+      "builtin": true
     },
     "codex": {
       "name": "Codex",
       "enabled": true,
-      "path": ".codex",
-      "skills": "skills",
-      "agents": "AGENTS.md",
-      "agents_compat": true
+      "builtin": true
     },
     "pi": {
       "name": "Pi",
-      "path": ".pi/agent",
-      "local_path": ".pi",
-      "skills": "skills",
-      "agents": "AGENTS.md",
-      "agents_compat": true
+      "enabled": true,
+      "builtin": true
     },
     "agentty": {
       "name": "Agentty",
       "enabled": false,
-      "path": ".agentty",
+      "builtin": true
+    },
+    "hermes": {
+      "name": "Hermes Agent",
+      "enabled": false,
+      "builtin": true
+    },
+    "my-custom": {
+      "name": "My Custom",
+      "enabled": true,
+      "path": ".mycustom",
       "skills": "skills",
       "agents": "AGENTS.md",
       "agents_compat": true
@@ -211,6 +212,8 @@ URL 解析规则：
   "proxy": "http://127.0.0.1:7890"
 }
 ```
+
+> **说明**：上例中内置渠道（`builtin: true`）采用精简保存格式——仅包含 `name`、`enabled`、`builtin` 三个字段，`path`、`skills` 等字段由内置渠道保护逻辑在配置加载时自动恢复默认值；自定义渠道（如 `my-custom`）需写全量字段。详见 [Platform 字段说明](#platform-字段说明)。
 
 ---
 
@@ -565,7 +568,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
       $ xskill platforms reset
       Custom platforms: my-custom
       # skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
-      Platforms reset: 27 platforms, replaced with defaults (custom dropped)
+      Platforms reset: 28 platforms, replaced with defaults (custom dropped)
       ```
   * `xskill platforms toggle [KEYS...]`：切换指定渠道的启用状态（`enabled` 取反）。
     * **指定 key**：`xskill platforms toggle kiro agentty` 直接切换这些渠道的 `enabled` 状态。
