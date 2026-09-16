@@ -301,29 +301,27 @@ xskill sources rename -i &lt;index&gt; -N &lt;new-name&gt;
 <pre><code class="language-bash">xskill platforms list
 </code></pre>
 <p>The bare <code>xskill platforms</code> command is equivalent to <code>xskill platforms list</code>.</p>
-<p>Default output format (columns <code>NAME</code>, <code>PATH</code>, <code>COMPAT</code>):</p>
-<pre><code>NAME         PATH      COMPAT
-Claude Code  .claude   ✗
-Codex        .codex    ✓
-</code></pre>
-<p><code>✓</code> in green indicates compatibility (<code>agents_compat: true</code>), <code>✗</code> in red indicates incompatibility.</p>
-<p>Show detailed platform information, including disabled platforms and their <code>ENABLED</code> status (columns <code>NAME</code>, <code>PATH</code>, <code>SKILLS</code>, <code>AGENTS</code>, <code>SOURCE</code>, <code>COMPAT</code>, <code>ENABLED</code>):</p>
-<pre><code class="language-bash">xskill platforms list -a
-</code></pre>
-<p>Output format:</p>
+<p>Output format (columns <code>NAME</code>, <code>PATH</code>, <code>SKILLS</code>, <code>AGENTS</code>, <code>SOURCE</code>, <code>COMPAT</code>, <code>ENABLED</code>):</p>
 <pre><code>NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
 Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
 Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
 Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 </code></pre>
-<p>Show detailed information for enabled platforms only (disabled platforms are hidden):</p>
-<pre><code class="language-bash">xskill platforms list -e
+<p><code>✓</code> in green indicates compatibility/enabled (<code>agents_compat: true</code> / <code>enabled: true</code>), <code>✗</code> in red indicates incompatibility/disabled.</p>
+<p>Show all platforms, including disabled ones (columns <code>NAME</code>, <code>PATH</code>, <code>SKILLS</code>, <code>AGENTS</code>, <code>SOURCE</code>, <code>COMPAT</code>, <code>ENABLED</code>):</p>
+<pre><code class="language-bash">xskill platforms list -a
+</code></pre>
+<p>The output format is the same as the default view, with disabled platforms marked by <code>✗</code> in the <code>ENABLED</code> column:</p>
+<pre><code>NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
+Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
+Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
+Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 </code></pre>
 <p>Options:</p>
 <ul>
-<li><code>-a, --all</code> — Show detailed information (path, skills directory, agents file, source file, agents compatibility, and enabled status) for all platforms, including disabled ones</li>
-<li><code>-e, --enabled</code> — Show the detailed view for enabled platforms only (<code>enabled: true</code>); disabled platforms are hidden. When combined with <code>-a</code>, the enabled filter takes precedence</li>
+<li><code>-a, --all</code> — Show all platforms, including disabled ones, marked by the <code>ENABLED</code> column</li>
 </ul>
+<p>All views output the full column set (<code>NAME</code>, <code>PATH</code>, <code>SKILLS</code>, <code>AGENTS</code>, <code>SOURCE</code>, <code>COMPAT</code>, <code>ENABLED</code>).</p>
 <p>Compatible platforms (<code>agents_compat: true</code>) are pre-selected in the interactive target-platform picker used by <code>add</code>, <code>link</code>, and related commands.</p>
 <h4 id="platforms-reset"><a class="header" href="#platforms-reset"><code>platforms reset</code></a></h4>
 <p>Reset <code>platforms</code> to the built-in default platform list. A skim single-select TUI is shown before applying (<code>↑/↓</code> to navigate, <code>Enter</code> to confirm, <code>Esc</code> to cancel; pressing Enter selects the first item by default):</p>

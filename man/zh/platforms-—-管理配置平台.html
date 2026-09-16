@@ -153,29 +153,27 @@
 <pre><code class="language-bash">xskill platforms list
 </code></pre>
 <p>裸命令 <code>xskill platforms</code> 等同于 <code>xskill platforms list</code>。</p>
-<p>默认输出格式（<code>NAME</code>、<code>PATH</code>、<code>COMPAT</code> 三列）:</p>
-<pre><code>NAME         PATH      COMPAT
-Claude Code  .claude   ✗
-Codex        .codex    ✓
-</code></pre>
-<p><code>✓</code> 绿色表示兼容（<code>agents_compat: true</code>），<code>✗</code> 红色表示不兼容，便于肉眼区分。</p>
-<p>显示详细平台信息,包含禁用渠道及其 <code>ENABLED</code> 状态（<code>NAME</code>、<code>PATH</code>、<code>SKILLS</code>、<code>AGENTS</code>、<code>SOURCE</code>、<code>COMPAT</code>、<code>ENABLED</code> 七列）:</p>
-<pre><code class="language-bash">xskill platforms list -a
-</code></pre>
-<p>输出格式:</p>
+<p>输出格式（<code>NAME</code>、<code>PATH</code>、<code>SKILLS</code>、<code>AGENTS</code>、<code>SOURCE</code>、<code>COMPAT</code>、<code>ENABLED</code> 七列）:</p>
 <pre><code>NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
 Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
 Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
 Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 </code></pre>
-<p>只显示已启用渠道的详细信息(隐藏禁用渠道):</p>
-<pre><code class="language-bash">xskill platforms list -e
+<p><code>✓</code> 绿色表示兼容/启用（<code>agents_compat: true</code> / <code>enabled: true</code>），<code>✗</code> 红色表示不兼容/禁用，便于肉眼区分。</p>
+<p>显示全部平台信息,包含禁用渠道:</p>
+<pre><code class="language-bash">xskill platforms list -a
+</code></pre>
+<p>输出格式同默认视图（<code>NAME</code>、<code>PATH</code>、<code>SKILLS</code>、<code>AGENTS</code>、<code>SOURCE</code>、<code>COMPAT</code>、<code>ENABLED</code> 七列），禁用渠道以 <code>ENABLED</code> 列 <code>✗</code> 标识:</p>
+<pre><code>NAME         PATH     SKILLS  AGENTS      SOURCE     COMPAT  ENABLED
+Claude Code  .claude  skills  CLAUDE.md   AGENTS.md  ✗       ✓
+Codex        .codex   skills  AGENTS.md   AGENTS.md  ✓       ✓
+Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 </code></pre>
 <p>选项：</p>
 <ul>
-<li><code>-a, --all</code> — 显示详细信息（路径、技能目录、代理文件、源文件、agents 兼容性和启用状态），包含全部渠道（含禁用）</li>
-<li><code>-e, --enabled</code> — 详细视图仅显示已启用（<code>enabled: true</code>）的渠道；与 <code>-a</code> 同时指定时按启用过滤优先</li>
+<li><code>-a, --all</code> — 包含全部渠道（含禁用），以 <code>ENABLED</code> 列标注启用状态</li>
 </ul>
+<p>所有视图均输出完整列信息（<code>NAME</code>、<code>PATH</code>、<code>SKILLS</code>、<code>AGENTS</code>、<code>SOURCE</code>、<code>COMPAT</code>、<code>ENABLED</code>）。</p>
 <p>兼容平台（<code>agents_compat: true</code>）会在 <code>add</code>、<code>link</code> 等命令的交互式目标平台选择器中自动预选。</p>
 <h4 id="platforms-reset"><a class="header" href="#platforms-reset"><code>platforms reset</code></a></h4>
 <p>将 <code>platforms</code> 重置为内置默认平台列表，执行前弹出 skim 单选 TUI（<code>↑/↓</code> 选择，<code>Enter</code> 确认，<code>Esc</code> 取消，回车默认选中第一项）：</p>
