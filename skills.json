@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-09-16T02:29:30.572Z",
+  "updated_at": "2026-09-16T10:31:39.501Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "ab0f0dc9f8916681fd27373874383ac5fe4d46ce",
+      "commit_hash": "75f80e46a75abc2aaf8aabd613afaca0d12f9ab2",
       "skills": [
         {
           "name": "model-channel-sync",
@@ -27,8 +27,8 @@
         {
           "name": "flarum-publish",
           "path": "skills/flarum-publish/SKILL.md",
-          "description": "发布文章（主题）到 Flarum 论坛，支持通过 REST API 创建讨论、按名称匹配标签；也可将 GitHub 项目链接整理为中文文章后发布。标签列表缓存于 ~/.cache/flarum_idev_tags，支持默认标签组与 AI 项目标签组，可按项目语言自动追加语言标签。当用户要求发布/投稿文章到 Flarum 论坛、同步内容到论坛，或要求把 GitHub 项目整理成论坛文章时使用。",
-          "version": "1.8.0"
+          "description": "发布文章（主题）到 Flarum 论坛，支持通过 REST API 创建讨论、按名称匹配标签、将文章配图转存到论坛图床（fof/upload）；也可将 GitHub 项目链接整理为中文文章后发布。标签列表缓存于 ~/.cache/flarum_idev_tags，支持默认标签组与 AI 项目标签组，可按项目语言自动追加语言标签。当用户要求发布/投稿文章到 Flarum 论坛、同步内容到论坛、把图片转存到论坛图床，或要求把 GitHub 项目整理成论坛文章时使用。",
+          "version": "1.9.0"
         },
         {
           "name": "huawei-deveco-studio-fetch",
