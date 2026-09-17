@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-17T15:55:06.898Z",
+  "updated_at": "2026-09-17T20:46:45.860Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -6638,7 +6638,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "8321021c54d670126ce3b2969d5deb880b4b0c2a",
+      "commit_hash": "dd6ee538aee0f548d4a6b520118f875431fd749e",
       "skills": [
         {
           "name": "dynamic-workflow-mode",
