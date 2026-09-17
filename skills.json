@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-17T10:41:24.389Z",
+  "updated_at": "2026-09-17T15:55:06.898Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3057,7 +3057,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "959a8e9f1edc3adbe2f7e3054bb6fbefa6696260",
+      "commit_hash": "74ca5fe077456a0b3b2f5310cf9430999fd0b5fd",
       "skills": [
         {
           "name": "teach",
@@ -3273,6 +3273,12 @@
           "name": "writing-beats",
           "path": "skills/in-progress/writing-beats/SKILL.md",
           "description": "Writing, exploit; assemble raw material into a journey of beats, grounding each term before a beat leans on it.",
+          "version": ""
+        },
+        {
+          "name": "pr",
+          "path": "skills/in-progress/pr/SKILL.md",
+          "description": "Use when writing a PR body.",
           "version": ""
         },
         {
