@@ -1,0 +1,100 @@
+# xskill
+
+> A skills management tool for discovering, installing, and managing reusable agent skill packs across multiple AI coding platforms.
+
+Use the current documentation at https://xskill.gcli.cn/man/en/ as the source of truth.
+Config file lives at `~/.xskill/settings.json` (override with `XSKILL_CONFIG`). Installs track state in `.xskill-lock.json` for reproducibility.
+
+## Install and set up
+
+Install the latest release for the current user:
+
+```sh
+curl -fsSL https://xskill.gcli.cn/install.sh | bash
+```
+
+On Windows (PowerShell):
+
+```powershell
+irm https://xskill.gcli.cn/install.ps1 | iex
+```
+
+Alternative install paths (npm, crates.io, git, source) are documented under Installation.
+
+After install, the `xskill` binary is on PATH. Configure a source, then query and install:
+
+```sh
+xskill sources add -n my-skills -u https://github.com/example/skills
+xskill query -f my-skills vue
+xskill add -f my-skills -s vue
+xskill list
+```
+
+Use `xskill --help` and `xskill <command> --help` as the command-line authority.
+
+## Workflow basics
+
+```sh
+# Install to global directory
+xskill add -f my-skills -s vue -g
+
+# Interactively find and install skills (multi-select TUI, requires cache)
+xskill find
+xskill find --skill git
+xskill find --from antfu
+
+# Link existing skills to a platform
+xskill link -s vue -a claude
+
+# Update installed skills from lock file
+xskill update
+
+# Restore skills from a project lock file
+xskill restore
+
+# Remove a skill
+xskill remove -s vue
+
+# Debug mode (show git command details)
+xskill -v add -f my-skills -s vue
+```
+
+## Documentation
+
+- Introduction: https://xskill.gcli.cn/man/en/introduction.html
+- Features: https://xskill.gcli.cn/man/en/features.html
+- Quick Start: https://xskill.gcli.cn/man/en/quick-start.html
+- Installation: https://xskill.gcli.cn/man/en/installation.html
+- Quick install: https://xskill.gcli.cn/man/en/quick-install.html
+- Global Options: https://xskill.gcli.cn/man/en/global-options.html
+- Commands: https://xskill.gcli.cn/man/en/commands.html
+- sources — Manage configured sources: https://xskill.gcli.cn/man/en/sources-—-manage-configured-sources.html
+- platforms — Manage configured platforms: https://xskill.gcli.cn/man/en/platforms-—-manage-configured-platforms.html
+- add — Install a skill: https://xskill.gcli.cn/man/en/add-—-install-a-skill.html
+- link — Symlink existing skills to a platform: https://xskill.gcli.cn/man/en/link-—-symlink-existing-skills-to-a-platform.html
+- remove — Remove a skill: https://xskill.gcli.cn/man/en/remove-—-remove-a-skill.html
+- update — Update installed skills: https://xskill.gcli.cn/man/en/update-—-update-installed-skills.html
+- restore — Restore skills from lock file: https://xskill.gcli.cn/man/en/restore-—-restore-skills-from-lock-file.html
+- list — List installed skills: https://xskill.gcli.cn/man/en/list-—-list-installed-skills.html
+- query — Query skills from a source: https://xskill.gcli.cn/man/en/query-—-query-skills-from-a-source.html
+- find — Interactively find and install skills: https://xskill.gcli.cn/man/en/find-—-interactively-find-and-install-skills.html
+- rec — Manage recommended skills: https://xskill.gcli.cn/man/en/rec-—-manage-recommended-skills.html
+- cache — Manage skills cache: https://xskill.gcli.cn/man/en/cache-—-manage-skills-cache.html
+- config — Manage configuration: https://xskill.gcli.cn/man/en/config-—-manage-configuration.html
+- new — Create a skill project: https://xskill.gcli.cn/man/en/new-—-create-a-skill-project.html
+- Configuration: https://xskill.gcli.cn/man/en/configuration.html
+- Config file location: https://xskill.gcli.cn/man/en/config-file-location.html
+- Configuration structure: https://xskill.gcli.cn/man/en/configuration-structure.html
+- Full example: https://xskill.gcli.cn/man/en/full-example.html
+- Platforms: https://xskill.gcli.cn/man/en/platforms.html
+- Sources: https://xskill.gcli.cn/man/en/sources.html
+- Recommended: https://xskill.gcli.cn/man/en/recommended.html
+- Cache: https://xskill.gcli.cn/man/en/cache.html
+- Registry: https://xskill.gcli.cn/man/en/registry.html
+- Installation Model: Canonical Directory + Symlinks: https://xskill.gcli.cn/man/en/installation-model-canonical-directory-+-symlinks.html
+- Symlink rules: https://xskill.gcli.cn/man/en/symlink-rules.html
+- Fallback mechanism: https://xskill.gcli.cn/man/en/fallback-mechanism.html
+- Lock File: https://xskill.gcli.cn/man/en/lock-file.html
+- JSON Schemas: https://xskill.gcli.cn/man/en/json-schemas.html
+- Development: https://xskill.gcli.cn/man/en/development.html
+- Simplified Chinese documentation: https://xskill.gcli.cn/man/zh/
