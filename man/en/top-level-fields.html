@@ -152,7 +152,7 @@
 <tr><td><code>updated_at</code></td><td>ISO 8601 timestamp of last lock file modification (any skill add/update/remove)</td></tr>
 </tbody></table>
 <p>The <code>update</code> command uses lock file records to re-fetch skills while preserving the original <code>installed_at</code> timestamp.</p>
-<p>The <code>restore</code> command reads from the project lock file and writes back to the same lock file scope (project-level by default, global with <code>-g</code>), updating <code>skill_folder_hash</code> and both <code>updated_at</code> fields while preserving <code>installed_at</code>.</p>
+<p>The <code>restore</code> command is read-only with respect to lock files: it reads the project lock file as the source of truth for what to restore and never writes back — the lock file stays byte-identical after a restore (success, partial failure, or <code>--dry-run</code>), always reflecting the original records made by <code>add</code>/<code>find</code>.</p>
 
                     </main>
 

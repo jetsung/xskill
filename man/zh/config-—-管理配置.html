@@ -152,7 +152,7 @@
 </code></pre>
 <p>选项：</p>
 <ul>
-<li><code>-i, --init</code> — 初始化配置文件，生成含默认值的完整配置（默认平台、缓存、注册中心）</li>
+<li><code>-i, --init</code> — 初始化配置文件，生成含默认值的完整配置（默认平台、缓存、注册中心）。内置平台条目按精简格式保存（仅 <code>name</code>/<code>enabled</code>/<code>builtin</code> 三字段），与 <code>platforms reset</code> 一致</li>
 <li><code>-e, --edit</code> — 在 <code>$EDITOR</code> 中打开配置（默认 <code>vi</code>）</li>
 <li><code>-g, --get &lt;key&gt;</code> — 通过点号路径获取配置值（如 <code>cache.enabled</code>）</li>
 <li><code>-s, --set &lt;key=value&gt;</code> — 通过点号路径设置配置值（如 <code>cache.enabled=true</code>）</li>

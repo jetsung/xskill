@@ -324,17 +324,16 @@ Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 <p>All views output the full column set (<code>NAME</code>, <code>PATH</code>, <code>SKILLS</code>, <code>AGENTS</code>, <code>SOURCE</code>, <code>COMPAT</code>, <code>ENABLED</code>).</p>
 <p>Compatible platforms (<code>agents_compat: true</code>) are pre-selected in the interactive target-platform picker used by <code>add</code>, <code>link</code>, and related commands.</p>
 <h4 id="platforms-reset"><a class="header" href="#platforms-reset"><code>platforms reset</code></a></h4>
-<p>Reset <code>platforms</code> to the built-in default platform list. A skim single-select TUI is shown before applying (<code>↑/↓</code> to navigate, <code>Enter</code> to confirm, <code>Esc</code> to cancel; pressing Enter selects the first item by default):</p>
+<p>Reset <code>platforms</code> to the built-in default platform list. The mode is selected via mutually exclusive flags (non-interactive, no TUI):</p>
 <ul>
-<li><strong>Full restore</strong> (first item, default) — Restore all platforms to built-in defaults, dropping custom platforms</li>
-<li><strong>Careful merge</strong> — Update built-in platforms only, keep custom platforms</li>
-<li><strong>Cancel</strong> — Make no changes</li>
+<li><code>--replace</code> (short <code>-r</code>) — Full restore: reset all platforms to built-in defaults, dropping custom platforms</li>
+<li><code>--merge</code> (short <code>-m</code>) — Careful merge: restore built-in platforms to defaults, keeping custom platforms</li>
 </ul>
+<p>Exactly one flag is required: providing both reports an error and performs no reset; providing neither prints the usage help (exit code 0, config untouched).</p>
 <p>If custom platforms exist, a prompt is printed first. Other configuration fields (<code>sources</code>, <code>cache</code>, <code>proxy</code>, etc.) are not affected.</p>
 <p>Example:</p>
-<pre><code class="language-bash">$ xskill platforms reset
+<pre><code class="language-bash">$ xskill platforms reset --replace
 Custom platforms: my-custom
-# skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
 Platforms reset: 18 platforms, replaced with defaults (custom dropped)
 </code></pre>
 <p>Edge cases:</p>
@@ -669,7 +668,7 @@ false   foo    invalid                              bar
 </code></pre>
 <p>Options:</p>
 <ul>
-<li><code>-i, --init</code> — Initialize config file with default values (default platforms, cache, registry).</li>
+<li><code>-i, --init</code> — Initialize config file with default values (default platforms, cache, registry). Built-in platform entries are saved in minimal form (<code>name</code>/<code>enabled</code>/<code>builtin</code> only), consistent with <code>platforms reset</code>.</li>
 <li><code>-e, --edit</code> — Open config in <code>$EDITOR</code> (defaults to <code>vi</code>)</li>
 <li><code>-g, --get &lt;key&gt;</code> — Get a config value by dot path (e.g., <code>cache.enabled</code>)</li>
 <li><code>-s, --set &lt;key=value&gt;</code> — Set a config value by dot path (e.g., <code>cache.enabled=true</code>)</li>
@@ -940,7 +939,7 @@ Fallback: copy (file duplication)
 <tr><td><code>updated_at</code></td><td>ISO 8601 timestamp of last lock file modification (any skill add/update/remove)</td></tr>
 </tbody></table>
 <p>The <code>update</code> command uses lock file records to re-fetch skills while preserving the original <code>installed_at</code> timestamp.</p>
-<p>The <code>restore</code> command reads from the project lock file and writes back to the same lock file scope (project-level by default, global with <code>-g</code>), updating <code>skill_folder_hash</code> and both <code>updated_at</code> fields while preserving <code>installed_at</code>.</p>
+<p>The <code>restore</code> command is read-only with respect to lock files: it reads the project lock file as the source of truth for what to restore and never writes back — the lock file stays byte-identical after a restore (success, partial failure, or <code>--dry-run</code>), always reflecting the original records made by <code>add</code>/<code>find</code>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="json-schemas"><a class="header" href="#json-schemas">JSON Schemas</a></h2>
 <p>Two JSON Schemas are provided in the <a href="https://github.com/jetsung/xskill/tree/main/schemas"><code>schemas/</code></a> directory and hosted at <code>xskill.gcli.cn</code>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="xskillschemajson--tool-configuration"><a class="header" href="#xskillschemajson--tool-configuration"><code>xskill.schema.json</code> — Tool configuration</a></h3>
