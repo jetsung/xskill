@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-17T20:46:45.860Z",
+  "updated_at": "2026-09-18T02:19:40.610Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -174,7 +174,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "0a66795706fffe0a2fb99a7eb1af5f9b67c6db8d",
+      "commit_hash": "4f4796f0bf30e105700f97ed8408c12b6aa95e06",
       "skills": [
         {
           "name": "flowstudio-power-automate-governance",
@@ -2721,6 +2721,12 @@
           "version": ""
         },
         {
+          "name": "sql-object-impact-analysis",
+          "path": "skills/sql-object-impact-analysis/SKILL.md",
+          "description": "Before modifying a table, column, stored procedure, view, or trigger in a legacy codebase, trace every place that references it — across other SQL objects (procs, views, triggers) AND application code (C#, Angular/TypeScript, JS, or any language in the repo) — and produce a structured blast-radius report so you know what breaks before you change it. Use when the user asks 'what uses this column/table/procedure', 'is it safe to change X', 'what depends on this', 'impact of renaming/dropping X', or before any schema/proc modification in an unfamiliar or legacy codebase. Not for privacy/PII exposure analysis (see data-breach-blast-radius) or query performance tuning (see sql-optimization).",
+          "version": ""
+        },
+        {
           "name": "sponsor-finder",
           "path": "skills/sponsor-finder/SKILL.md",
           "description": "Find which of a GitHub repository's dependencies are sponsorable via GitHub Sponsors. Uses deps.dev API for dependency resolution across npm, PyPI, Cargo, Go, RubyGems, Maven, and NuGet. Checks npm funding metadata, FUNDING.yml files, and web search. Verifies every link. Shows direct and transitive dependencies with OSSF Scorecard health data. Invoke with /sponsor followed by a GitHub owner/repo (e.g. \"/sponsor expressjs/express\").",
@@ -2900,7 +2906,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "be4e44a9fbc5e8df0beaefadbb28bd22ee61cc39",
+      "commit_hash": "a120596f6d7ff9b967a3f5e0331ea911376ee5ef",
       "skills": [
         {
           "name": "using-agent-skills",
