@@ -327,17 +327,16 @@ Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 <p>所有视图均输出完整列信息（<code>NAME</code>、<code>PATH</code>、<code>SKILLS</code>、<code>AGENTS</code>、<code>SOURCE</code>、<code>COMPAT</code>、<code>ENABLED</code>）。</p>
 <p>兼容平台（<code>agents_compat: true</code>）会在 <code>add</code>、<code>link</code> 等命令的交互式目标平台选择器中自动预选。</p>
 <h4 id="platforms-reset"><a class="header" href="#platforms-reset"><code>platforms reset</code></a></h4>
-<p>将 <code>platforms</code> 重置为内置默认平台列表，执行前弹出 skim 单选 TUI（<code>↑/↓</code> 选择，<code>Enter</code> 确认，<code>Esc</code> 取消，回车默认选中第一项）：</p>
+<p>将 <code>platforms</code> 重置为内置默认平台列表，通过互斥旗标指定模式（非交互执行，不弹出 TUI）：</p>
 <ul>
-<li><strong>完全恢复</strong>（第一项，默认）— 所有平台恢复内置默认配置，移除自定义平台</li>
-<li><strong>谨慎合并</strong> — 只更新内置平台，自定义平台保留</li>
-<li><strong>取消</strong> — 不修改任何配置</li>
+<li><code>--replace</code>（短参 <code>-r</code>）— 完全恢复：所有平台恢复内置默认配置，移除自定义平台</li>
+<li><code>--merge</code>（短参 <code>-m</code>）— 谨慎合并：只更新内置平台，自定义平台保留</li>
 </ul>
+<p>两个旗标必须且只能提供一个：同时提供时报错且不执行重置；均不提供时打印上述用法帮助（退出码 0，不修改配置）。</p>
 <p>若存在自定义平台，会先打印提示。其他配置字段（<code>sources</code>、<code>cache</code>、<code>proxy</code> 等）不受影响。</p>
 <p>示例：</p>
-<pre><code class="language-bash">$ xskill platforms reset
+<pre><code class="language-bash">$ xskill platforms reset --replace
 Custom platforms: my-custom
-# skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
 Platforms reset: 18 platforms, replaced with defaults (custom dropped)
 </code></pre>
 <p>边界情况：</p>
@@ -672,7 +671,7 @@ false   foo    invalid                              bar
 </code></pre>
 <p>选项：</p>
 <ul>
-<li><code>-i, --init</code> — 初始化配置文件，生成含默认值的完整配置（默认平台、缓存、注册中心）</li>
+<li><code>-i, --init</code> — 初始化配置文件，生成含默认值的完整配置（默认平台、缓存、注册中心）。内置平台条目按精简格式保存（仅 <code>name</code>/<code>enabled</code>/<code>builtin</code> 三字段），与 <code>platforms reset</code> 一致</li>
 <li><code>-e, --edit</code> — 在 <code>$EDITOR</code> 中打开配置（默认 <code>vi</code>）</li>
 <li><code>-g, --get &lt;key&gt;</code> — 通过点号路径获取配置值（如 <code>cache.enabled</code>）</li>
 <li><code>-s, --set &lt;key=value&gt;</code> — 通过点号路径设置配置值（如 <code>cache.enabled=true</code>）</li>
@@ -943,7 +942,7 @@ Valid agents: platform1, platform2, ...     （黑灰色）
 <tr><td><code>updated_at</code></td><td>锁文件最后修改的 ISO 8601 时间戳（增删改任意 skill 时更新）</td></tr>
 </tbody></table>
 <p><code>update</code> 命令使用锁文件记录重新获取技能，同时保留原始 <code>installed_at</code> 时间戳。</p>
-<p><code>restore</code> 命令从项目锁文件读取，并写回同级锁文件（默认项目级，<code>-g</code> 时全局级），更新 <code>skill_folder_hash</code> 和两个 <code>updated_at</code> 字段，保留原始 <code>installed_at</code>。</p>
+<p><code>restore</code> 命令对锁文件只读：仅从项目锁文件读取恢复清单，不会以任何形式回写——恢复后（无论成功、部分失败或 <code>--dry-run</code>）锁文件内容与执行前逐字节一致，始终反映 <code>add</code>/<code>find</code> 安装时的原始记录。</p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="json-schema"><a class="header" href="#json-schema">JSON Schema</a></h2>
 <p><a href="https://github.com/jetsung/xskill/tree/main/schemas"><code>schemas/</code></a> 目录提供两个 JSON Schema，同时托管在 <code>xskill.gcli.cn</code>。</p>
 <div style="break-before: page; page-break-before: always;"></div><h3 id="xskillschemajson--工具配置"><a class="header" href="#xskillschemajson--工具配置"><code>xskill.schema.json</code> — 工具配置</a></h3>

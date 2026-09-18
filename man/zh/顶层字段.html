@@ -152,7 +152,7 @@
 <tr><td><code>updated_at</code></td><td>锁文件最后修改的 ISO 8601 时间戳（增删改任意 skill 时更新）</td></tr>
 </tbody></table>
 <p><code>update</code> 命令使用锁文件记录重新获取技能，同时保留原始 <code>installed_at</code> 时间戳。</p>
-<p><code>restore</code> 命令从项目锁文件读取，并写回同级锁文件（默认项目级，<code>-g</code> 时全局级），更新 <code>skill_folder_hash</code> 和两个 <code>updated_at</code> 字段，保留原始 <code>installed_at</code>。</p>
+<p><code>restore</code> 命令对锁文件只读：仅从项目锁文件读取恢复清单，不会以任何形式回写——恢复后（无论成功、部分失败或 <code>--dry-run</code>）锁文件内容与执行前逐字节一致，始终反映 <code>add</code>/<code>find</code> 安装时的原始记录。</p>
 
                     </main>
 
