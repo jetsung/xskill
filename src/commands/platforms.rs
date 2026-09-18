@@ -1,9 +1,7 @@
-use crate::config::{Config, Platform, default_platforms};
+use crate::config::{Config, Platform, default_config, default_platforms};
 use crate::output::print_table;
 use anyhow::{Result, bail};
 use colored::Colorize;
-use ratatui::text::{Line as TuiLine, Span as TuiSpan};
-use skim::prelude::*;
 use std::io::IsTerminal;
 
 fn compat_str(agents_compat: bool) -> String {
@@ -79,13 +77,11 @@ pub fn run(all: bool) -> Result<()> {
 
 /// 重置模式
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum ResetMode {
+pub enum ResetMode {
     /// 完全替换：platforms 重置为默认列表（丢弃自定义）
     Replace,
     /// 覆盖：默认值覆盖内置平台，保留自定义平台
     Merge,
-    /// 取消
-    Cancel,
 }
 
 /// 返回当前配置中的自定义平台名称（不在默认列表中的，排序）
@@ -115,27 +111,30 @@ fn apply_reset_mode(config: &mut Config, mode: ResetMode) {
             }
             merged
         }
-        ResetMode::Cancel => return,
     };
 }
 
-/// 重置 platforms：弹出一个单选 TUI，由用户选择重置方式
-pub fn run_reset() -> Result<()> {
-    if !std::io::stdin().is_terminal() {
-        bail!("'platforms reset' requires an interactive terminal.");
-    }
+/// platforms reset 无旗标时的用法帮助（不执行任何重置）
+pub fn run_reset_usage() {
+    println!("Usage: xskill platforms reset (--replace | --merge)");
+    println!();
+    println!("Modes:");
+    println!("  -r, --replace  完全恢复：重置为默认列表，丢弃自定义平台");
+    println!("  -m, --merge    谨慎合并：内置平台恢复默认，保留自定义平台");
+}
 
-    let mut config = Config::load()?;
+/// 重置 platforms（非交互，由 --replace/--merge 旗标指定模式）
+pub fn run_reset(mode: ResetMode) -> Result<()> {
+    // 配置文件不存在时使用与 config --init 相同的默认配置，保证生成字段一致
+    let mut config = if Config::config_path().exists() {
+        Config::load()?
+    } else {
+        default_config()
+    };
 
     let custom = custom_platform_names(&config);
     if !custom.is_empty() {
         println!("{}: {}", "Custom platforms".yellow(), custom.join(", "));
-    }
-
-    let mode = select_reset_mode()?;
-    if mode == ResetMode::Cancel {
-        println!("{}", "Cancelled.".yellow());
-        return Ok(());
     }
 
     apply_reset_mode(&mut config, mode);
@@ -146,7 +145,6 @@ pub fn run_reset() -> Result<()> {
     let desc = match mode {
         ResetMode::Replace => "replaced with defaults (custom dropped)",
         ResetMode::Merge => "merged (custom kept)",
-        ResetMode::Cancel => unreachable!(),
     };
     println!(
         "{}: {} platforms, {}",
@@ -347,103 +345,6 @@ fn select_toggle_platforms(config: &Config) -> Result<Option<Vec<(String, bool)>
     result
 }
 
-/// 显示 skim 单选 TUI，返回选中的模式
-fn select_reset_mode() -> Result<ResetMode> {
-    let items: Vec<ResetItem> = ResetMode::OPTIONS
-        .iter()
-        .map(|(mode, title, desc)| ResetItem {
-            title: title.to_string(),
-            desc: desc.to_string(),
-            mode: *mode,
-        })
-        .collect();
-
-    let opts = SkimOptionsBuilder::default()
-        .multi(false)
-        .prompt("Reset platforms: ".to_string())
-        .exact(true)
-        .highlight_line(true)
-        .reverse(true)
-        .color("current:bg:236,current_match:fg:151:bg:236".to_string())
-        .header(" \nup/down navigate | enter select | esc cancel\n ".to_string())
-        .build()
-        .map_err(|e| anyhow::anyhow!("{}", e))?;
-
-    let output = Skim::run_items(opts, items).map_err(|e| anyhow::anyhow!("{}", e))?;
-
-    if output.is_abort {
-        return Ok(ResetMode::Cancel);
-    }
-
-    let matched = match output.current {
-        Some(item) => item,
-        None => bail!("No mode selected."),
-    };
-
-    matched
-        .downcast_item::<ResetItem>()
-        .map(|item| item.mode)
-        .ok_or_else(|| anyhow::anyhow!("Failed to retrieve selected mode"))
-}
-
-/// 单选 TUI 的可选择项（单行式：操作名 + 暗灰色效果说明）
-///
-/// 不使用 multiline 模式：skim 的续行渲染不经过自定义 display()（样式不可控），
-/// 且首行会被裁剪到 text() 第一子行长度（短标题会被前缀挤掉）。
-struct ResetItem {
-    title: String,
-    desc: String,
-    mode: ResetMode,
-}
-
-impl ResetMode {
-    /// 定义顺序即显示顺序（reverse(true) 下 items[0] 显示在最上方，回车默认选中第一项）。
-    const OPTIONS: [(ResetMode, &'static str, &'static str); 3] = [
-        (
-            ResetMode::Replace,
-            "完全恢复",
-            "所有平台恢复内置默认配置，移除自定义平台",
-        ),
-        (ResetMode::Merge, "谨慎合并", "只更新内置渠道，自定义平台保留"),
-        (ResetMode::Cancel, "取消", "不修改任何配置"),
-    ];
-}
-
-impl SkimItem for ResetItem {
-    fn text(&self) -> Cow<'_, str> {
-        Cow::Owned(format!("{} — {}", self.title, self.desc))
-    }
-
-    fn output(&self) -> Cow<'_, str> {
-        Cow::Owned(match self.mode {
-            ResetMode::Replace => "replace".to_string(),
-            ResetMode::Merge => "merge".to_string(),
-            ResetMode::Cancel => "cancel".to_string(),
-        })
-    }
-
-    fn display(&self, context: DisplayContext) -> TuiLine<'_> {
-        use ratatui::style::{Color, Modifier};
-        let base = context.base_style;
-        let is_selected = base.bg.is_some();
-        // 选中项加 "❯ " 前缀并高亮加粗；未选中项用空格占位对齐
-        let prefix = if is_selected { "❯ " } else { "  " };
-        let title_style = if is_selected {
-            base.fg(Color::Blue).add_modifier(Modifier::BOLD)
-        } else {
-            base
-        };
-        // 说明文字暗灰色，与操作名区分层级
-        let desc_style = base.fg(Color::DarkGray);
-        // 单行模式：skim 的匹配裁剪基于 text()，display 内容须与之保持一致
-        TuiLine::from(vec![
-            TuiSpan::styled(format!("{}{}", prefix, self.title), title_style),
-            TuiSpan::styled(" — ", desc_style),
-            TuiSpan::styled(self.desc.clone(), desc_style),
-        ])
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::{ResetMode, compat_str, default_platforms};
@@ -609,5 +510,56 @@ mod tests {
         let claude = &config.platforms["claude"];
         assert_eq!(claude.agents, "CLAUDE.md");
         assert_eq!(claude.path, ".claude");
+    }
+
+    /// 旗标式 run_reset 测试（--replace/--merge 非交互路径）：临时目录 + XSKILL_CONFIG 隔离。
+    /// 返回测试专用环境锁的 guard，调用方持有期间断言结果，防止并行测试篡改 XSKILL_CONFIG
+    fn run_reset_nontty(mode: ResetMode) -> (std::sync::MutexGuard<'static, ()>, Config) {
+        // 跨模块共享锁：串行化所有依赖 XSKILL_CONFIG 的测试
+        let guard = crate::config::test_env_lock().lock().unwrap_or_else(|e| e.into_inner());
+        let tmp = std::env::temp_dir().join(format!(
+            "xskill-test-reset-{}-{}-{:?}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos(),
+            mode
+        ));
+        std::fs::create_dir_all(&tmp).unwrap();
+        let cfg_path = tmp.join("settings.json");
+
+        // 预置含自定义平台的配置文件（save 依赖 XSKILL_CONFIG 解析路径，先设置）
+        let mut config = default_config();
+        config.platforms.insert(
+            "my-custom".to_string(),
+            platform("my-custom"),
+        );
+        // SAFETY: 测试专用环境变量，测试进程内串行执行
+        unsafe { std::env::set_var("XSKILL_CONFIG", &cfg_path) };
+        config.save().unwrap();
+        super::run_reset(mode).unwrap();
+
+        let loaded = Config::load();
+        // 清理环境变量，避免影响其他测试
+        unsafe { std::env::remove_var("XSKILL_CONFIG") };
+        std::fs::remove_dir_all(&tmp).unwrap();
+        (guard, loaded.unwrap())
+    }
+
+    #[test]
+    fn test_run_reset_replace_drops_custom() {
+        let (_guard, config) = run_reset_nontty(ResetMode::Replace);
+        // 自定义平台被移除，只剩内置默认列表
+        assert!(!config.platforms.contains_key("my-custom"));
+        assert_eq!(config.platforms.len(), default_platforms().len());
+    }
+
+    #[test]
+    fn test_run_reset_merge_keeps_custom() {
+        let (_guard, config) = run_reset_nontty(ResetMode::Merge);
+        // 自定义平台保留，内置平台恢复默认
+        assert!(config.platforms.contains_key("my-custom"));
+        assert_eq!(config.platforms.len(), default_platforms().len() + 1);
     }
 }

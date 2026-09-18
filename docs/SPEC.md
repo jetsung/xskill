@@ -552,12 +552,11 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
       Cline        cline       .cline   skills  CLAUDE.md  ✓       ✗        ✗
       ```
       > KEY 列为配置 key（`add`/`link`/`remove` 等命令 `-a` 参数使用的渠道名）；PATH/SKILLS/AGENTS 三列（路径与文件名类信息）以暗灰色显示；COMPAT 列 `✓` 绿色表示兼容，`✗` 红色表示不兼容；BUILTIN 列 `✓` 绿色表示内置渠道，`✗` 红色表示自定义渠道；ENABLED 列 `✓` 绿色表示启用，`✗` 红色表示禁用，便于肉眼区分。
-  * `xskill platforms reset`：重置 `platforms` 为内置默认渠道列表。
-    * 执行前弹出一个 skim 单选 TUI（`↑/↓` 选择，`Enter` 确认，`Esc` 取消），回车默认选中第一项：
-      * **完全恢复**（第一项，默认）：所有平台恢复内置默认配置，移除自定义平台。
-      * **谨慎合并**：只更新内置渠道，自定义平台保留。
-      * **取消**：不修改任何配置。
-    * **选项样式**：每个选项单行显示——`❯ 完全恢复 — 所有平台恢复内置默认配置，移除自定义平台`。选中项带 `❯ ` 前缀、蓝色加粗（未选中项以两格空格对齐）；破折号后的效果说明以暗灰色显示。
+  * `xskill platforms reset`：重置 `platforms` 为内置默认渠道列表。旗标式非交互执行（不弹出 TUI、不要求交互式终端），通过互斥旗标指定模式：
+    * **`--replace`（短参 `-r`）**：完全恢复——所有平台恢复内置默认配置，移除自定义平台。
+    * **`--merge`（短参 `-m`）**：谨慎合并——只更新内置渠道，自定义平台保留。
+    * **互斥约束**：`--replace` 与 `--merge` 同时提供时报错（`the argument '--replace' cannot be used with '--merge'`，退出码非 0），不执行重置。
+    * **两旗标均缺省**：打印用法帮助（说明两种旗标含义与互斥约束），退出码 0，不执行重置、不修改配置文件。
     * 若存在自定义平台，会先打印提示。
     * **保存规范化**：重置写入 `~/.xskill/settings.json` 前对平台条目做规范化（`normalize_platforms_for_save`）：
       * 内置渠道（key 在内置列表中）仅保存 `name`、`enabled`、`builtin`（值为 `true`）三个字段，`path`/`skills` 等其余字段不写入——加载时由内置渠道保护逻辑自动恢复默认值；
@@ -565,9 +564,8 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
     * 其他配置字段（`sources`、`cache`、`proxy` 等）不受影响。
     * 示例：
       ```
-      $ xskill platforms reset
+      $ xskill platforms reset --replace
       Custom platforms: my-custom
-      # skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
       Platforms reset: 28 platforms, replaced with defaults (custom dropped)
       ```
   * `xskill platforms toggle [KEYS...]`：切换指定渠道的启用状态（`enabled` 取反）。
@@ -773,12 +771,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
   * `Skills to restore:` 使用默认色。
   * 多目标时（`-a '*'` 或默认多平台）：表头行蓝色，每组首行默认色，续行 TARGET 使用黑灰色。
   * 单目标时（`-a <name>` 指定具体平台）：不使用颜色。
-* **锁文件更新**：安装成功后更新目标锁文件（默认项目级 `.xskill-lock.json`，`-g` 时全局级 `~/.agents/.xskill-lock.json`，不存在则创建）：
-  * `skill_folder_hash`：从远程仓库获取最新 git tree hash。
-  * `installed_at`：若目标锁文件中已存在同名 skill，保留其 `installed_at`；否则使用源锁文件中的值。
-  * `updated_at`（条目级）：更新为当前时间戳。
-  * `updated_at`（顶层）：更新为当前时间戳。
-  * 项目级与全局级锁文件遵循相同的更新逻辑。
+* **锁文件只读**：`restore` 仅读取锁文件作为恢复来源清单，不会以任何形式回写——恢复成功、部分失败或 `--dry-run` 后，目标锁文件内容与执行前逐字节一致（含各条目的 `installed_at`、`updated_at`、`skill_folder_hash` 与顶层 `updated_at`）。锁文件始终反映 `add`/`find` 安装时的原始记录。
 * **agents_compat 兼容**：当目标平台 `agents_compat` 为 `true` 时，跳过 symlink 创建（`-a '*'` 静默跳过，`-a <name>` 时返回空目标列表）。`-a '*'` 时仅恢复至已启用平台（跳过 `enabled: false` 的渠道，显式指定不受限）。
 * **边界情况**：
   * 锁文件不存在或无 skill 条目时输出 "No skills to restore"。
@@ -981,7 +974,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 * **行为**：管理 `~/.xskill/settings.json` 配置文件。无参数时输出用法提示。
 * **参数**：
-  * `-i, --init`：初始化配置文件，生成含默认值的完整配置（含默认平台、缓存、注册中心配置）。若配置文件已存在则提示，不覆盖。
+  * `-i, --init`：初始化配置文件，生成含默认值的完整配置（含默认平台、缓存、注册中心配置）。内置平台条目与 `platforms reset` 一致做规范化保存——仅写入 `name`、`enabled`、`builtin` 三个字段，其余字段在配置加载时由内置渠道保护逻辑自动补全。若配置文件已存在则提示，不覆盖。
   * `-e, --edit`：在编辑器中打开配置文件（使用 `$EDITOR` 环境变量，默认 `vi`）。
   * `-g, --get <key>`：读取单个配置值，使用点号路径（如 `cache.enabled`、`sources`）。
   * `-s, --set <key=value>`：设置单个配置值，使用点号路径（如 `cache.enabled=true`）。

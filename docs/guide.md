@@ -278,20 +278,20 @@ Compatible platforms (`agents_compat: true`) are pre-selected in the interactive
 
 #### `platforms reset`
 
-Reset `platforms` to the built-in default platform list. A skim single-select TUI is shown before applying (`↑/↓` to navigate, `Enter` to confirm, `Esc` to cancel; pressing Enter selects the first item by default):
+Reset `platforms` to the built-in default platform list. The mode is selected via mutually exclusive flags (non-interactive, no TUI):
 
-- **Full restore** (first item, default) — Restore all platforms to built-in defaults, dropping custom platforms
-- **Careful merge** — Update built-in platforms only, keep custom platforms
-- **Cancel** — Make no changes
+- `--replace` (short `-r`) — Full restore: reset all platforms to built-in defaults, dropping custom platforms
+- `--merge` (short `-m`) — Careful merge: restore built-in platforms to defaults, keeping custom platforms
+
+Exactly one flag is required: providing both reports an error and performs no reset; providing neither prints the usage help (exit code 0, config untouched).
 
 If custom platforms exist, a prompt is printed first. Other configuration fields (`sources`, `cache`, `proxy`, etc.) are not affected.
 
 Example:
 
 ```bash
-$ xskill platforms reset
+$ xskill platforms reset --replace
 Custom platforms: my-custom
-# skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
 Platforms reset: 18 platforms, replaced with defaults (custom dropped)
 ```
 
@@ -713,7 +713,7 @@ xskill config [OPTIONS]
 ```
 
 Options:
-- `-i, --init` — Initialize config file with default values (default platforms, cache, registry).
+- `-i, --init` — Initialize config file with default values (default platforms, cache, registry). Built-in platform entries are saved in minimal form (`name`/`enabled`/`builtin` only), consistent with `platforms reset`.
 - `-e, --edit` — Open config in `$EDITOR` (defaults to `vi`)
 - `-g, --get <key>` — Get a config value by dot path (e.g., `cache.enabled`)
 - `-s, --set <key=value>` — Set a config value by dot path (e.g., `cache.enabled=true`)
@@ -1057,7 +1057,7 @@ The lock file tracks installed skills for reproducibility.
 
 The `update` command uses lock file records to re-fetch skills while preserving the original `installed_at` timestamp.
 
-The `restore` command reads from the project lock file and writes back to the same lock file scope (project-level by default, global with `-g`), updating `skill_folder_hash` and both `updated_at` fields while preserving `installed_at`.
+The `restore` command is read-only with respect to lock files: it reads the project lock file as the source of truth for what to restore and never writes back — the lock file stays byte-identical after a restore (success, partial failure, or `--dry-run`), always reflecting the original records made by `add`/`find`.
 
 ## JSON Schemas
 

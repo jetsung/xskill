@@ -226,12 +226,6 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
     println!("{}", "Restoring skills...".cyan());
     println!();
 
-    // Determine which lock file to update
-    let lock_is_global = global && agent.is_none();
-    let mut updated_lock = LockFile::load(lock_is_global)?;
-    let now = chrono::Utc::now();
-    let timestamp = now.format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string();
-
     // Group skills by source_url to clone each repo only once
     let mut groups: HashMap<String, Vec<(&String, &LockEntry)>> = HashMap::new();
     for (skill_name, entry) in &lock_file.skills {
@@ -290,10 +284,6 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
                 }
             }
 
-            // Get skill_folder_hash from the shared clone
-            let skill_folder_hash =
-                git::get_skill_folder_hash(tmp_dir.path(), &skill_dir_path).unwrap_or_default();
-
             // Copy to each target directory
             let mut any_target_ok = false;
             for target_dir in &targets {
@@ -315,23 +305,6 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
             }
 
             if any_target_ok {
-                // Preserve installed_at from existing target lock entry, or use source entry's
-                let installed_at = if let Some(existing) = updated_lock.skills.get(*skill_name) {
-                    existing.installed_at.clone()
-                } else {
-                    entry.installed_at.clone()
-                };
-
-                let updated_entry = LockEntry {
-                    source: entry.source.clone(),
-                    source_type: entry.source_type.clone(),
-                    source_url: entry.source_url.clone(),
-                    skill_path: entry.skill_path.clone(),
-                    skill_folder_hash,
-                    installed_at,
-                    updated_at: timestamp.clone(),
-                };
-                updated_lock.upsert_skill(skill_name, updated_entry);
                 success_count += 1;
             } else {
                 fail_count += 1;
@@ -339,12 +312,6 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
 
             println!();
         }
-    }
-
-    // Save updated lock file
-    if success_count > 0 {
-        updated_lock.updated_at = timestamp;
-        updated_lock.save(lock_is_global)?;
     }
 
     println!(
@@ -557,10 +524,21 @@ mod tests {
     }
 
     #[test]
-    fn test_installed_at_preservation() {
-        let mut target_lock = LockFile::default();
-        // Simulate existing entry in target lock with original installed_at
-        target_lock.upsert_skill(
+    fn test_restore_does_not_modify_lock_file() {
+        // restore 只读锁文件：加载再保存，内容应与原始文件逐字节一致
+        let tmp = std::env::temp_dir().join(format!(
+            "xskill-test-restore-lock-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&tmp).unwrap();
+        let lock_path = tmp.join(".xskill-lock.json");
+
+        let mut lock = LockFile::default();
+        lock.upsert_skill(
             "vue",
             LockEntry {
                 source: "antfu".to_string(),
@@ -572,32 +550,24 @@ mod tests {
                 updated_at: "2026-07-10T00:00:00.000Z".to_string(),
             },
         );
+        let original_json = serde_json::to_string_pretty(&lock).unwrap();
+        std::fs::write(&lock_path, &original_json).unwrap();
 
-        // Source entry from project lock
-        let source_entry = LockEntry {
-            source: "antfu".to_string(),
-            source_type: "git".to_string(),
-            source_url: "https://github.com/antfu/skills.git".to_string(),
-            skill_path: "skills/vue/SKILL.md".to_string(),
-            skill_folder_hash: "new_hash".to_string(),
-            installed_at: "2026-07-17T00:00:00.000Z".to_string(),
-            updated_at: "2026-07-17T00:00:00.000Z".to_string(),
-        };
+        // 模拟 restore 的读取路径：仅 load，不做任何 upsert/save
+        // LockFile::load(false) 基于当前工作目录解析 .xskill-lock.json，切到临时目录
+        let orig_cwd = std::env::current_dir().unwrap();
+        std::env::set_current_dir(&tmp).unwrap();
+        let loaded = LockFile::load(false);
+        std::env::set_current_dir(orig_cwd).unwrap();
+        // 确认磁盘上的锁文件未被触碰
+        assert_eq!(
+            std::fs::read_to_string(&lock_path).unwrap(),
+            original_json,
+            "锁文件读取后内容应保持不变"
+        );
+        // load 也能还原出相同记录（读取无损）
+        assert!(loaded.unwrap().skills.contains_key("vue"));
 
-        // When target has existing entry, preserve its installed_at
-        let installed_at = if let Some(existing) = target_lock.skills.get("vue") {
-            existing.installed_at.clone()
-        } else {
-            source_entry.installed_at.clone()
-        };
-        assert_eq!(installed_at, "2026-07-10T00:00:00.000Z");
-
-        // When target has no entry, use source's installed_at
-        let installed_at_new = if let Some(existing) = target_lock.skills.get("react") {
-            existing.installed_at.clone()
-        } else {
-            "2026-07-17T00:00:00.000Z".to_string()
-        };
-        assert_eq!(installed_at_new, "2026-07-17T00:00:00.000Z");
+        std::fs::remove_dir_all(&tmp).unwrap();
     }
 }

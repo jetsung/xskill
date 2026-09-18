@@ -235,7 +235,15 @@ enum PlatformsAction {
     },
 
     /// Reset platforms to defaults
-    Reset,
+    Reset {
+        /// 完全恢复：重置为默认列表，丢弃自定义平台
+        #[arg(long = "replace", short = 'r', conflicts_with = "merge")]
+        replace: bool,
+
+        /// 谨慎合并：内置平台恢复默认，保留自定义平台
+        #[arg(long = "merge", short = 'm')]
+        merge: bool,
+    },
 
     /// Toggle platform enabled state (interactive TUI, or specify keys)
     Toggle {
@@ -385,7 +393,17 @@ fn run() -> Result<()> {
         },
         Commands::Platforms { action } => match action {
             Some(PlatformsAction::List { all }) => commands::platforms::run(all),
-            Some(PlatformsAction::Reset) => commands::platforms::run_reset(),
+            Some(PlatformsAction::Reset { replace, merge }) => {
+                if !replace && !merge {
+                    commands::platforms::run_reset_usage();
+                    return Ok(());
+                }
+                commands::platforms::run_reset(if replace {
+                    commands::platforms::ResetMode::Replace
+                } else {
+                    commands::platforms::ResetMode::Merge
+                })
+            }
             Some(PlatformsAction::Toggle { keys }) => {
                 commands::platforms::run_toggle(&keys)
             }

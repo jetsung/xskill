@@ -213,6 +213,13 @@ pub fn default_platforms() -> HashMap<String, Platform> {
     map
 }
 
+/// 测试共用锁：保护 XSKILL_CONFIG 环境变量的设置/读取，避免并行测试互相干扰
+#[cfg(test)]
+pub(crate) fn test_env_lock() -> &'static std::sync::Mutex<()> {
+    static LOCK: std::sync::OnceLock<std::sync::Mutex<()>> = std::sync::OnceLock::new();
+    LOCK.get_or_init(|| std::sync::Mutex::new(()))
+}
+
 /// 构建含默认值的完整配置（用于 init）
 pub fn default_config() -> Config {
     Config {

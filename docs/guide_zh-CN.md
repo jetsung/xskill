@@ -284,20 +284,20 @@ Cline        .cline   skills  CLAUDE.md   AGENTS.md  ✓       ✗
 
 #### `platforms reset`
 
-将 `platforms` 重置为内置默认平台列表，执行前弹出 skim 单选 TUI（`↑/↓` 选择，`Enter` 确认，`Esc` 取消，回车默认选中第一项）：
+将 `platforms` 重置为内置默认平台列表，通过互斥旗标指定模式（非交互执行，不弹出 TUI）：
 
-- **完全恢复**（第一项，默认）— 所有平台恢复内置默认配置，移除自定义平台
-- **谨慎合并** — 只更新内置平台，自定义平台保留
-- **取消** — 不修改任何配置
+- `--replace`（短参 `-r`）— 完全恢复：所有平台恢复内置默认配置，移除自定义平台
+- `--merge`（短参 `-m`）— 谨慎合并：只更新内置平台，自定义平台保留
+
+两个旗标必须且只能提供一个：同时提供时报错且不执行重置；均不提供时打印上述用法帮助（退出码 0，不修改配置）。
 
 若存在自定义平台，会先打印提示。其他配置字段（`sources`、`cache`、`proxy` 等）不受影响。
 
 示例：
 
 ```bash
-$ xskill platforms reset
+$ xskill platforms reset --replace
 Custom platforms: my-custom
-# skim TUI: 完全恢复(默认) / 谨慎合并 / 取消
 Platforms reset: 18 platforms, replaced with defaults (custom dropped)
 ```
 
@@ -719,7 +719,7 @@ xskill config [OPTIONS]
 ```
 
 选项：
-- `-i, --init` — 初始化配置文件，生成含默认值的完整配置（默认平台、缓存、注册中心）
+- `-i, --init` — 初始化配置文件，生成含默认值的完整配置（默认平台、缓存、注册中心）。内置平台条目按精简格式保存（仅 `name`/`enabled`/`builtin` 三字段），与 `platforms reset` 一致
 - `-e, --edit` — 在 `$EDITOR` 中打开配置（默认 `vi`）
 - `-g, --get <key>` — 通过点号路径获取配置值（如 `cache.enabled`）
 - `-s, --set <key=value>` — 通过点号路径设置配置值（如 `cache.enabled=true`）
@@ -1063,7 +1063,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 `update` 命令使用锁文件记录重新获取技能，同时保留原始 `installed_at` 时间戳。
 
-`restore` 命令从项目锁文件读取，并写回同级锁文件（默认项目级，`-g` 时全局级），更新 `skill_folder_hash` 和两个 `updated_at` 字段，保留原始 `installed_at`。
+`restore` 命令对锁文件只读：仅从项目锁文件读取恢复清单，不会以任何形式回写——恢复后（无论成功、部分失败或 `--dry-run`）锁文件内容与执行前逐字节一致，始终反映 `add`/`find` 安装时的原始记录。
 
 ## JSON Schema
 

@@ -46,7 +46,9 @@ pub fn run_init() -> Result<()> {
         return Ok(());
     }
 
-    let config = default_config();
+    let mut config = default_config();
+    // 与 platforms reset 一致：内置渠道精简为 name/enabled/builtin 三字段
+    config.normalize_platforms_for_save();
     config.save()?;
 
     println!("{}: {}", "Config file initialized".green(), path.display());
@@ -414,5 +416,42 @@ mod tests {
         assert_eq!(format_value(&Value::String("test".to_string())), "test");
         assert_eq!(format_value(&Value::Number(42.into())), "42");
         assert_eq!(format_value(&Value::Null), "");
+    }
+
+    #[test]
+    fn test_run_init_platforms_minimal_fields() {
+        // 临时目录 + XSKILL_CONFIG 指向不存在的配置文件
+        let tmp = std::env::temp_dir().join(format!(
+            "xskill-test-init-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&tmp).unwrap();
+        let cfg_path = tmp.join("settings.json");
+        // SAFETY: 单线程测试进程中修改测试专用环境变量
+        unsafe { std::env::set_var("XSKILL_CONFIG", &cfg_path) };
+        assert!(!cfg_path.exists());
+
+        run_init().unwrap();
+        assert!(cfg_path.exists(), "init 应生成配置文件");
+
+        let content = std::fs::read_to_string(&cfg_path).unwrap();
+        let value: Value = serde_json::from_str(&content).unwrap();
+        let platforms = value["platforms"].as_object().expect("platforms 应为对象");
+        assert!(!platforms.is_empty());
+        for (key, entry) in platforms {
+            let keys: Vec<&str> = entry.as_object().unwrap().keys().map(String::as_str).collect();
+            assert_eq!(
+                keys, ["builtin", "enabled", "name"],
+                "内置平台 {key} 应仅含 name/enabled/builtin 三字段，实际: {keys:?}"
+            );
+        }
+
+        // 清理
+        unsafe { std::env::remove_var("XSKILL_CONFIG") };
+        std::fs::remove_dir_all(&tmp).unwrap();
     }
 }
