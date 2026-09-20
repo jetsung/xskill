@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-09-20T15:08:12.868Z",
+  "updated_at": "2026-09-20T20:00:58.023Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "8ae3990b5e4bd6a023a67f8d78f4368d5de00e11",
+      "commit_hash": "e631b4961619754073b153d6dcde852dbbaec3c1",
       "skills": [
         {
           "name": "model-channel-sync",
@@ -29,6 +29,12 @@
           "path": "skills/flarum-publish/SKILL.md",
           "description": "发布文章（主题）到 Flarum 论坛，支持通过 REST API 创建讨论、按名称匹配标签、将文章配图转存到论坛图床（fof/upload）；也可将 GitHub 项目链接整理为中文文章后发布。标签列表缓存于 ~/.cache/flarum_idev_tags，支持默认标签组与 AI 项目标签组，可按项目语言自动追加语言标签。当用户要求发布/投稿文章到 Flarum 论坛、同步内容到论坛、把图片转存到论坛图床，或要求把 GitHub 项目整理成论坛文章时使用。",
           "version": "1.10.0"
+        },
+        {
+          "name": "atuin",
+          "path": "skills/atuin/SKILL.md",
+          "description": "Install, configure, drive, sync, and troubleshoot Atuin — the shell-history tool that replaces the shell's built-in history with a SQLite database recording cwd, exit code, duration, host, and session, with optional end-to-end encrypted sync and an in-process daemon. Use when the user asks to install Atuin, set up the shell plugin, register / login / sync an account, import old history, search / filter / delete history, tune config.toml or keybindings, exclude secrets and noisy commands, install AI-agent hooks (claude-code, codex, opencode, pi), write .atuin/skills, self-host a sync server, or run `atuin doctor`.",
+          "version": ""
         },
         {
           "name": "huawei-deveco-studio-fetch",
@@ -2906,7 +2912,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "c004a74784a08295d52749b04cda634125b9a581",
+      "commit_hash": "dc27a9c2e13721158157632de61b4106c6c2a2a1",
       "skills": [
         {
           "name": "using-agent-skills",
@@ -6650,7 +6656,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "934195f955cf0da847d59fcd6f68856bce112d8b",
+      "commit_hash": "2b6e839771e53096d8451a213d40dc64ec8acac0",
       "skills": [
         {
           "name": "dynamic-workflow-mode",
