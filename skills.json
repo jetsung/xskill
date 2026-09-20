@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-09-20T10:19:20.090Z",
+  "updated_at": "2026-09-20T15:08:12.868Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "7e3db68b9f4f01447445e1f34b9320c62b46164e",
+      "commit_hash": "8ae3990b5e4bd6a023a67f8d78f4368d5de00e11",
       "skills": [
         {
           "name": "model-channel-sync",
           "path": "skills/model-channel-sync/SKILL.md",
-          "description": "管理 AI 模型渠道（provider）配置：①提取真正可用的免费/零价模型（抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论）； ②以 pi 等平台配置为基准，同步/更新渠道、模型、APIKEY 到多个 agent 工具（pi、zcode、dsh、omp、opencode、qoder、codebuddy 等）的配置文件。 凡用户提到\"获取/提取/列出 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、\"有哪些免费模型可用\"、 \"给 XX 渠道加免费模型\"、\"这个免费模型能用吗/测试一下\"、\"把模型更新到 pi/omp/opencode/dsh/zcode/qoder/codebuddy\"、 \"以 pi 为基准更新 XX 渠道\"、\"同步渠道/模型/APIKEY 到 XX\"、\"更新 XX 的 APIKEY\"时，都应使用此技能。 支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。",
+          "description": "管理 AI 模型渠道（provider）配置：①提取真正可用的免费/零价模型（抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论）； ②以 pi 等平台配置为基准，同步/更新渠道、模型、APIKEY 到多个 agent 工具（pi、zcode、dsh、omp、opencode、qoder、codebuddy、dbx 等）的配置文件。 凡用户提到\"获取/提取/列出 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、\"有哪些免费模型可用\"、 \"给 XX 渠道加免费模型\"、\"这个免费模型能用吗/测试一下\"、\"把模型更新到 pi/omp/opencode/dsh/zcode/qoder/codebuddy/dbx\"、 \"以 pi 为基准更新 XX 渠道\"、\"同步渠道/模型/APIKEY 到 XX\"、\"更新 XX 的 APIKEY\"时，都应使用此技能。 支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。",
           "version": ""
         },
         {
