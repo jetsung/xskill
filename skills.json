@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-09-21T11:30:38.287Z",
+  "updated_at": "2026-09-21T17:28:59.795Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "6f65e3556844cb743f84953b001e2dd66c50b17c",
+      "commit_hash": "649efd8ab5abfca73171713831136ab26f7ab617",
       "skills": [
         {
           "name": "model-channel-sync",
@@ -28,7 +28,7 @@
           "name": "flarum-publish",
           "path": "skills/flarum-publish/SKILL.md",
           "description": "通过 Flarum REST API 把内容发布到 Flarum 论坛。当用户要求发布/投稿文章（主题/讨论）到 Flarum 论坛、同步内容到论坛、转存图片到论坛图床（fof/upload），或给出 GitHub 项目链接要求整理成中文文章发布时，使用本 skill——即使没有明说「Flarum」，只要是发帖到论坛即适用。支持按名称匹配标签（缓存于 ~/.cache/flarum_idev_tags，含默认/AI 标签组，按项目语言自动追加语言标签）。可选功能：项目文章发布后，仅当用户以关键词（如「整理教程」「生成使用教程」）触发时，把 GitHub 项目整理为基础使用教程并以回帖（POST /api/posts）回复到之前已创建的文章；agent 不得主动触发。",
-          "version": "1.12.1"
+          "version": "1.13.0"
         },
         {
           "name": "atuin",
