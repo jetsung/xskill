@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-20T20:00:58.023Z",
+  "updated_at": "2026-09-21T02:29:05.589Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "4f4796f0bf30e105700f97ed8408c12b6aa95e06",
+      "commit_hash": "ad4c196b933c5ca7f82a5ba78969ddcd2603ba80",
       "skills": [
         {
           "name": "flowstudio-power-automate-governance",
@@ -1239,6 +1239,12 @@
           "version": ""
         },
         {
+          "name": "macos-golden-gate-design",
+          "path": "skills/macos-golden-gate-design/SKILL.md",
+          "description": "Design, implement, review, or refactor native macOS 27 Golden Gate interfaces in SwiftUI or AppKit. Use when a Mac app must match Apple's current macOS 27 UI kit and restrained Liquid Glass language: integrated windows, full-height sidebars, native toolbars, flat lists, tables, and forms, clear pane boundaries, accessible materials, and removal of unnecessary nested cards, framed panels, or glassmorphism. Also use for Figma macOS 27 design-to-code work and audits of interfaces that feel too boxed.",
+          "version": ""
+        },
+        {
           "name": "mcp-create-declarative-agent",
           "path": "skills/mcp-create-declarative-agent/SKILL.md",
           "description": "Skill converted from mcp-create-declarative-agent.prompt.md",
@@ -2259,6 +2265,12 @@
           "version": ""
         },
         {
+          "name": "agent-architecture",
+          "path": "skills/agent-architecture/SKILL.md",
+          "description": "Design AI agent architectures through requirements discovery, or audit and diagnose architectural flaws in existing agents. Architecture only; excludes implementation and general code review.",
+          "version": ""
+        },
+        {
           "name": "python-pypi-package-builder",
           "path": "skills/python-pypi-package-builder/SKILL.md",
           "description": "End-to-end skill for building, testing, linting, versioning, and publishing a production-grade Python library to PyPI. Covers all four build backends (setuptools+setuptools_scm, hatchling, flit, poetry), PEP 440 versioning, semantic versioning, dynamic git-tag versioning, OOP/SOLID design, type hints (PEP 484/526/544/561), Trusted Publishing (OIDC), and the full PyPA packaging flow. Use for: creating Python packages, pip-installable SDKs, CLI tools, framework plugins, pyproject.toml setup, py.typed, setuptools_scm, semver, mypy, pre-commit, GitHub Actions CI/CD, or PyPI publishing.",
@@ -2424,6 +2436,12 @@
           "name": "codebase-memory-mcp",
           "path": "skills/codebase-memory-mcp/SKILL.md",
           "description": "Use when exploring unfamiliar code, mapping architecture, finding symbols or relationships, tracing callers, callees, data flow or dependencies, assessing impact, auditing dead or complex code, or handling explicit Codebase Memory requests. Otherwise skip tasks confined to a supplied known file, tiny one-file check, exact literal, configuration value, error string, or non-code text.",
+          "version": ""
+        },
+        {
+          "name": "protobuf-grpc-api-review",
+          "path": "skills/protobuf-grpc-api-review/SKILL.md",
+          "description": "Review Protocol Buffer (.proto) and gRPC API changes for wire and JSON compatibility, safe schema evolution, rollout hazards, and RPC contract quality. Use when reviewing proto diffs, adding or changing messages and services, planning migrations, or diagnosing cross-version failures.",
           "version": ""
         },
         {
