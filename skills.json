@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-21T21:27:09.948Z",
+  "updated_at": "2026-09-22T02:31:58.281Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "ad4c196b933c5ca7f82a5ba78969ddcd2603ba80",
+      "commit_hash": "a19b3101cc797a35de8b1c1698c13d1344703522",
       "skills": [
         {
           "name": "flowstudio-power-automate-governance",
@@ -391,6 +391,12 @@
           "path": "skills/impediment-prioritization/SKILL.md",
           "description": "Ranks any list of impediments and their countermeasures using a value-stream scoring model (ROI, Cost to Implement, Ease of Deployment, Risk Factor) and a fixed prioritization formula. Use when someone asks to prioritize, rank, sequence, or triage impediments, countermeasures, remediation items, risks, findings, gaps, action items, or backlog entries; or mentions value-stream prioritization, A3 / lean countermeasure ranking, ROI vs. effort scoring, or building a remediation / improvement backlog. Works with GHQR findings, audit results, retrospective action items, risk registers, architecture review gaps, or any free-form `{impediment, countermeasure}` list.",
           "version": "2.0.0"
+        },
+        {
+          "name": "api-breaking-change-detector",
+          "path": "skills/api-breaking-change-detector/SKILL.md",
+          "description": "Cross-references C# Web API controllers/DTOs against their TypeScript/JavaScript consumers (React, Angular, Vue, Svelte, Node.js, or hand-written/auto-generated HTTP clients like Fetch, Axios, NSwag) to catch contract drift in both directions: backend changes that break client applications (renamed/removed JSON keys, new required parameters, status code shifts) and frontend code sending fields the backend no longer reads. Works directly against source code, not exported OpenAPI spec files. Use when the user asks to check for breaking API changes, verify frontend/backend contract sync, or audit a DTO/controller change against its TypeScript/JS consumers before merging. Not for generating new API code from a spec (see openapi-to-application-code) or scaffolding new endpoints (see aspnet-minimal-api-openapi).",
+          "version": ""
         },
         {
           "name": "ruff-recursive-fix",
