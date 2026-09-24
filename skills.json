@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-24T16:11:01.684Z",
+  "updated_at": "2026-09-24T20:57:23.762Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -59,7 +59,7 @@
     {
       "source": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
-      "commit_hash": "34040c9c568585f6929bedeaad110ad08f079624",
+      "commit_hash": "33375500bcea98d610eb30ce10ac4e59b89c390d",
       "skills": [
         {
           "name": "slack-gif-creator",
@@ -6680,7 +6680,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "bf70150eb2df8070024e5bdf08e4aa08959e2735",
+      "commit_hash": "e482e579415fde18357cafce70f177ae19fd7f03",
       "skills": [
         {
           "name": "blueprint",
