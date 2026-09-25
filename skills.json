@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-25T16:11:42.408Z",
+  "updated_at": "2026-09-25T20:53:47.930Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3280,7 +3280,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "db2309783547a14e150dbcbfc19120e4028446c3",
+      "commit_hash": "79b6aa9c98f1e36795b2bc4ef2a8f770c6d3a777",
       "skills": [
         {
           "name": "openspec-update-change",
@@ -4188,7 +4188,7 @@
     {
       "source": "obra/superpowers",
       "url": "https://github.com/obra/superpowers",
-      "commit_hash": "5bf4e78011075bcfc0dc295f0724994cd123ee71",
+      "commit_hash": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
       "skills": [
         {
           "name": "subagent-driven-development",
