@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-24T20:57:23.762Z",
+  "updated_at": "2026-09-25T02:37:13.328Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "1f5644080a525d26a2e24f61a7609fb9b261c21a",
+      "commit_hash": "6c4d33b9cfca967a28bb2962ef4d55e4a384c88c",
       "skills": [
         {
           "name": "qdrant-search-quality",
