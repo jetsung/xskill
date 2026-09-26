@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-26T02:40:08.694Z",
+  "updated_at": "2026-09-26T10:32:37.131Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -2888,7 +2888,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "bcab6a1b8503100e8618c3b4e32cc78de43de769",
+      "commit_hash": "2686b620fc1fed2e8f60c704839c766b8594c6b6",
       "skills": [
         {
           "name": "idea-refine",
@@ -2989,7 +2989,7 @@
         {
           "name": "code-review-and-quality",
           "path": "skills/code-review-and-quality/SKILL.md",
-          "description": "Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch.",
+          "description": "Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch. Use when asked to review a diff or a pull request, even when the diff is pasted inline.",
           "version": ""
         },
         {
