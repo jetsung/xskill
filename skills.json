@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-29T03:24:24.892Z",
+  "updated_at": "2026-09-29T11:50:59.691Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "6efe0d035a6415137153bb9b3959589191b7afbe",
+      "commit_hash": "997e95a6e42869c350f8ca6ec4c066287697c9f0",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -1398,6 +1398,12 @@
           "name": "react18-lifecycle-patterns",
           "path": "skills/react18-lifecycle-patterns/SKILL.md",
           "description": "Provides exact before/after migration patterns for the three unsafe class component lifecycle methods - componentWillMount, componentWillReceiveProps, and componentWillUpdate - targeting React 18.3.1. Use this skill whenever a class component needs its lifecycle methods migrated, when deciding between getDerivedStateFromProps vs componentDidUpdate, when adding getSnapshotBeforeUpdate, or when fixing React 18 UNSAFE_ lifecycle warnings. Always use this skill before writing any lifecycle migration code - do not guess the pattern from memory, the decision trees here prevent the most common migration mistakes.",
+          "version": ""
+        },
+        {
+          "name": "v-development",
+          "path": "skills/v-development/SKILL.md",
+          "description": "Guide GitHub Copilot through V language development: installing the toolchain, project layout with v.mod, building, testing, formatting, and writing idiomatic V including Option/Result error handling. Use when the user works with V source files, v.mod projects, or asks about V syntax, tooling, and conventions.",
           "version": ""
         },
         {
