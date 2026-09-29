@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-28T22:47:03.991Z",
+  "updated_at": "2026-09-29T03:24:24.892Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -59,7 +59,7 @@
     {
       "source": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
-      "commit_hash": "33375500bcea98d610eb30ce10ac4e59b89c390d",
+      "commit_hash": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
       "skills": [
         {
           "name": "slack-gif-creator",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "6c4d33b9cfca967a28bb2962ef4d55e4a384c88c",
+      "commit_hash": "6efe0d035a6415137153bb9b3959589191b7afbe",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -639,6 +639,12 @@
           "version": ""
         },
         {
+          "name": "lean-comments",
+          "path": "skills/lean-comments/SKILL.md",
+          "description": "Audits, writes, and refines maintained first-party source-code comments and declaration-level documentation across languages. Use when adding, editing, reviewing, cleaning up, or auditing comments, doc comments, docstrings, TODO, FIXME, NOTE, suppressions, or other source commentary, including while modifying code and deciding whether a comment is warranted at all. Defaults to no comment unless it preserves meaningful, non-obvious information that cannot reasonably be recovered from the code or nearby repository context.",
+          "version": ""
+        },
+        {
           "name": "md-to-docx",
           "path": "skills/md-to-docx/SKILL.md",
           "description": "Convert Markdown files to professionally formatted Word (.docx) documents with embedded PNG images — pure JavaScript, no external tools required",
@@ -899,8 +905,8 @@
         {
           "name": "audit-integrity",
           "path": "skills/audit-integrity/SKILL.md",
-          "description": "Shared audit integrity framework for all AppSec agents — enforces output quality, intellectual honesty, and continuous improvement through anti-rationalization guards, self-critique loops, retry protocols, non-negotiable behaviors, self-reflection quality gates (1-10 scoring, ≥8 threshold), and a self-learning system with lesson/memory governance for security analysis agents.",
-          "version": "1.0"
+          "description": "Enforce output quality, evidence verification, and quality gates across security audits. Use this skill when you perform SAST, SCA, threat modeling, or security code reviews. Use this skill to verify code locations and taint traces for all findings. Use this skill to prevent the suppression of valid security findings. Use this skill to evaluate reports against quality thresholds (score ≥ 8/10) before delivery.",
+          "version": "1.1"
         },
         {
           "name": "technical-job-search",
