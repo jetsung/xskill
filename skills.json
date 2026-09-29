@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-29T17:19:34.261Z",
+  "updated_at": "2026-09-29T21:40:37.943Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3286,7 +3286,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "d4e1c77ebae0bd96a7c649fa35edef997989450a",
+      "commit_hash": "781c7f9447b4eeb6fdc69fa745ff46f6168f3edf",
       "skills": [
         {
           "name": "openspec-update-change",
@@ -6638,7 +6638,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "d3b8a3e908904e242ed2dbe66af62cca71131419",
+      "commit_hash": "bd9402f774511f682f6a6d9a8c5dcc38a4c5536c",
       "skills": [
         {
           "name": "blueprint",
