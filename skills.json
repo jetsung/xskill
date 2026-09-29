@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-29T11:50:59.691Z",
+  "updated_at": "2026-09-29T17:19:34.261Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3057,7 +3057,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "commit_hash": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
       "skills": [
         {
           "name": "setup-pre-commit",
@@ -3134,7 +3134,7 @@
         {
           "name": "domain-modeling",
           "path": "skills/engineering/domain-modeling/SKILL.md",
-          "description": "Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a CONTEXT.md, or recording or editing an ADR.",
+          "description": "Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR.",
           "version": ""
         },
         {
@@ -3156,6 +3156,12 @@
           "version": ""
         },
         {
+          "name": "pr",
+          "path": "skills/engineering/pr/SKILL.md",
+          "description": "Use when writing a PR body.",
+          "version": ""
+        },
+        {
           "name": "prototype",
           "path": "skills/engineering/prototype/SKILL.md",
           "description": "Build a throwaway prototype to answer a design question. Use when the user wants to sanity-check whether a state model or logic feels right, or explore what a UI should look like.",
@@ -3174,9 +3180,21 @@
           "version": ""
         },
         {
+          "name": "retro",
+          "path": "skills/engineering/retro/SKILL.md",
+          "description": "Conduct a retrospective on a coding session.",
+          "version": ""
+        },
+        {
           "name": "to-tickets",
           "path": "skills/engineering/to-tickets/SKILL.md",
           "description": "Break a plan, spec, or the current conversation into a set of tracer-bullet tickets, each declaring its blocking edges, published to the configured tracker (edges as text in one file per ticket locally, or native blocking links on a real tracker).",
+          "version": ""
+        },
+        {
+          "name": "implement-spec",
+          "path": "skills/engineering/implement-spec/SKILL.md",
+          "description": "Implement the result of /to-spec and /to-tickets in code.",
           "version": ""
         },
         {
@@ -3195,12 +3213,6 @@
           "name": "tdd",
           "path": "skills/engineering/tdd/SKILL.md",
           "description": "Test-driven development. Use when the user wants to build features or fix bugs test-first, mentions \"red-green-refactor\", or wants integration tests.",
-          "version": ""
-        },
-        {
-          "name": "resolving-merge-conflicts",
-          "path": "skills/engineering/resolving-merge-conflicts/SKILL.md",
-          "description": "Use when you need to resolve an in-progress git merge/rebase conflict.",
           "version": ""
         },
         {
@@ -3234,27 +3246,9 @@
           "version": ""
         },
         {
-          "name": "pr",
-          "path": "skills/in-progress/pr/SKILL.md",
-          "description": "Use when writing a PR body.",
-          "version": ""
-        },
-        {
           "name": "claude-handoff",
           "path": "skills/in-progress/claude-handoff/SKILL.md",
           "description": "Hand the current conversation off to a fresh background agent that picks up the work immediately.",
-          "version": ""
-        },
-        {
-          "name": "retro",
-          "path": "skills/in-progress/retro/SKILL.md",
-          "description": "Conduct a retrospective on a coding session.",
-          "version": ""
-        },
-        {
-          "name": "implement-spec",
-          "path": "skills/in-progress/implement-spec/SKILL.md",
-          "description": "Implement a specification in code.",
           "version": ""
         },
         {
