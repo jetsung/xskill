@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-30T03:07:48.213Z",
+  "updated_at": "2026-09-30T11:37:27.566Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "e7c25a4e9c440dde98cb704230c24026ad01e925",
+      "commit_hash": "e62be9667aff87958ed94bee2b396433897d1529",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -2833,7 +2833,7 @@
     {
       "source": "antfu/skills",
       "url": "https://github.com/antfu/skills",
-      "commit_hash": "c113e151b5e0b93150339c79220f0c3ac04eda7a",
+      "commit_hash": "e53a142a2420e8cd812cfe9ed0484ab01bc856aa",
       "skills": [
         {
           "name": "nuxt",
@@ -2866,12 +2866,6 @@
           "version": "2026.9.25"
         },
         {
-          "name": "antfu-design",
-          "path": "skills/antfu-design/SKILL.md",
-          "description": "antfu-style design conventions, broadened. UnoCSS-first, class-based semantic tokens with dual light/dark for tooling and devtools UIs, plus design-read, anti-slop, and micro-interaction polish for landing pages and product surfaces. Use when building or refactoring any interface with UnoCSS.",
-          "version": "2026.06.22"
-        },
-        {
           "name": "pnpm",
           "path": "skills/pnpm/SKILL.md",
           "description": "Node.js package manager with strict dependency resolution. Use when running pnpm specific commands, configuring workspaces via pnpm-workspace.yaml, or managing dependencies with catalogs, patches, overrides, config dependencies, or the global virtual store.",
@@ -2890,10 +2884,16 @@
           "version": "2026.9.25"
         },
         {
+          "name": "antfu-create-pr",
+          "path": "skills/antfu-create-pr/SKILL.md",
+          "description": "Create a reviewable GitHub pull request from the current branch with a Conventional Commits title, a concise evidence-based body, and before/after screenshots for UI changes. Use when asked to open, create, publish, or prepare a PR.",
+          "version": "2026.09.30"
+        },
+        {
           "name": "antfu",
           "path": "skills/antfu/SKILL.md",
           "description": "Anthony Fu's opinionated tooling and conventions for JavaScript/TypeScript projects. Use when setting up new projects, configuring ESLint/Prettier alternatives, monorepos, library publishing, or when the user mentions Anthony Fu's preferences.",
-          "version": "2026.06.22"
+          "version": "2026.09.30"
         },
         {
           "name": "nitro",
