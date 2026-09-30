@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-29T21:40:37.943Z",
+  "updated_at": "2026-09-30T03:07:48.213Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "997e95a6e42869c350f8ca6ec4c066287697c9f0",
+      "commit_hash": "e7c25a4e9c440dde98cb704230c24026ad01e925",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -1194,6 +1194,12 @@
           "name": "roslyn-analyzers",
           "path": "skills/roslyn-analyzers/SKILL.md",
           "description": "Build, review, debug, package, and test Roslyn diagnostic analyzers, code fix providers, and incremental source generators. Use for DiagnosticAnalyzer, CodeFixProvider, IIncrementalGenerator, IOperation analysis, Microsoft.CodeAnalysis dependency pinning, Roslyn test harnesses, C#/VB tests, and analyzer NuGet packaging.",
+          "version": ""
+        },
+        {
+          "name": "microsoft-store-publisher",
+          "path": "skills/microsoft-store-publisher/SKILL.md",
+          "description": "Prepare, validate, submit, and monitor Windows desktop apps in Microsoft Partner Center. Use for MSIX packaging, Store identity, listings, WACK, Partner Center automation, certification, and publishing.",
           "version": ""
         },
         {
@@ -2827,7 +2833,7 @@
     {
       "source": "antfu/skills",
       "url": "https://github.com/antfu/skills",
-      "commit_hash": "d02c48452d782231e4c32d7069cde731a4c7db42",
+      "commit_hash": "c113e151b5e0b93150339c79220f0c3ac04eda7a",
       "skills": [
         {
           "name": "nuxt",
@@ -3286,7 +3292,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "781c7f9447b4eeb6fdc69fa745ff46f6168f3edf",
+      "commit_hash": "c879d13d5f5d045c532a08523316d2d74f2db99a",
       "skills": [
         {
           "name": "openspec-update-change",
@@ -6638,7 +6644,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "bd9402f774511f682f6a6d9a8c5dcc38a4c5536c",
+      "commit_hash": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f",
       "skills": [
         {
           "name": "blueprint",
@@ -6821,7 +6827,7 @@
           "version": ""
         },
         {
-          "name": "uspto-database",
+          "name": "scientific-db-uspto-database",
           "path": "skills/scientific-db-uspto-database/SKILL.md",
           "description": "USPTO patent and trademark data workflow for official record lookup, PatentSearch queries, TSDR checks, assignment data, and reproducible IP research logs. Use when a task needs official United States patent or trademark records from USPTO systems.",
           "version": ""
@@ -6983,7 +6989,7 @@
           "version": ""
         },
         {
-          "name": "pubmed-database",
+          "name": "scientific-db-pubmed-database",
           "path": "skills/scientific-db-pubmed-database/SKILL.md",
           "description": "Direct PubMed and NCBI E-utilities search workflows for biomedical literature, MeSH queries, PMID lookup, citation retrieval, and API-backed literature monitoring. Use when a task needs biomedical literature from PubMed rather than general web search.",
           "version": ""
@@ -7523,6 +7529,12 @@
           "version": ""
         },
         {
+          "name": "i18n-sync",
+          "path": "skills/i18n-sync/SKILL.md",
+          "description": "Translate and synchronize application JSON locale files using source-key usage, project terminology, and focused validation. Use when adding keys or languages, updating source copy, or reviewing missing and stale translations.",
+          "version": ""
+        },
+        {
           "name": "codehealth-mcp",
           "path": "skills/codehealth-mcp/SKILL.md",
           "description": "Real-time structural Code Health via CodeScene MCP — review before edits, verify score deltas after changes, gate commits and PRs. Use when reviewing code quality, refactoring, checking if AI changes degraded a file, or before commit/PR.",
@@ -7541,7 +7553,7 @@
           "version": ""
         },
         {
-          "name": "literature-review",
+          "name": "scientific-thinking-literature-review",
           "path": "skills/scientific-thinking-literature-review/SKILL.md",
           "description": "Systematic literature-review workflow for academic, biomedical, technical, and scientific topics, including search planning, source screening, synthesis, citation checks, and evidence logging. Use when the task is to find, screen, synthesize, and cite a body of academic or technical literature.",
           "version": ""
@@ -7601,7 +7613,7 @@
           "version": ""
         },
         {
-          "name": "gget",
+          "name": "scientific-pkg-gget",
           "path": "skills/scientific-pkg-gget/SKILL.md",
           "description": "gget CLI and Python workflow for quick genomic database queries, sequence lookup, BLAST-style searches, enrichment checks, and reproducible bioinformatics evidence logs. Use when a task needs quick bioinformatics lookup across genomic reference databases with the gget CLI or Python package.",
           "version": ""
@@ -7835,7 +7847,7 @@
           "version": ""
         },
         {
-          "name": "scholar-evaluation",
+          "name": "scientific-thinking-scholar-evaluation",
           "path": "skills/scientific-thinking-scholar-evaluation/SKILL.md",
           "description": "Structured scholarly-work evaluation for papers, proposals, literature reviews, methods sections, evidence quality, citation support, and research-writing feedback. Use when evaluating academic or scientific work — papers, proposals, methods sections, or evidence quality — against a repeatable rubric.",
           "version": ""
