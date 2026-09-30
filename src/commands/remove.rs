@@ -5,7 +5,7 @@ use anyhow::{Context, Result};
 use chrono::Utc;
 use colored::Colorize;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Remove target
 enum RemoveTarget {
@@ -154,12 +154,7 @@ fn remove_from_platform(
     let platform = config.get_platform(platform_name).unwrap();
 
     if platform.agents_compat {
-        println!(
-            "{}: {} ({})",
-            "Skipped".dimmed(),
-            platform_name,
-            "agents_compat"
-        );
+        println!("{}: {} (agents_compat)", "Skipped".dimmed(), platform_name);
         return Ok(0);
     }
 
@@ -168,7 +163,9 @@ fn remove_from_platform(
     } else {
         std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
     };
-    let skills_dir = platform.skills_dir_with_base(&base_dir, global).ok_or_else(|| {
+    let skills_dir = platform
+        .skills_dir_with_base(&base_dir, global)
+        .ok_or_else(|| {
             anyhow::anyhow!(
                 "Platform {} has no skills directory configured",
                 platform_name
@@ -232,12 +229,7 @@ fn remove_all_from_platform(config: &Config, platform_name: &str, global: bool) 
     let platform = config.get_platform(platform_name).unwrap();
 
     if platform.agents_compat {
-        println!(
-            "{}: {} ({})",
-            "Skipped".dimmed(),
-            platform_name,
-            "agents_compat"
-        );
+        println!("{}: {} (agents_compat)", "Skipped".dimmed(), platform_name);
         return Ok(0);
     }
 
@@ -246,10 +238,10 @@ fn remove_all_from_platform(config: &Config, platform_name: &str, global: bool) 
     } else {
         std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
     };
-    if let Some(skills_dir) = platform.skills_dir_with_base(&base_dir, global) {
-        if skills_dir.exists() || skills_dir.is_symlink() {
-            return remove_all_from_dir(&skills_dir);
-        }
+    if let Some(skills_dir) = platform.skills_dir_with_base(&base_dir, global)
+        && (skills_dir.exists() || skills_dir.is_symlink())
+    {
+        return remove_all_from_dir(&skills_dir);
     }
 
     Ok(0)
@@ -295,7 +287,7 @@ fn remove_platform_symlinks(config: &Config, skill: &str, global: bool) -> Resul
 }
 
 /// Remove skill from target directory (handles both symlink and directory)
-fn remove_from_target(_skill: &str, target_dir: &PathBuf) -> Result<usize> {
+fn remove_from_target(_skill: &str, target_dir: &Path) -> Result<usize> {
     if target_dir.is_symlink() || target_dir.exists() {
         remove_symlink(target_dir)?;
         println!("{}: {}", "Removed".green(), display_path(target_dir));

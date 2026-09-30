@@ -48,7 +48,7 @@ pub fn install_skill(
 
     // 检查是否已安装，记录旧版本
     let old_meta = if dest_dir.exists() {
-        SkillMeta::from_file(&dest_dir).ok()
+        SkillMeta::from_file(dest_dir).ok()
     } else {
         None
     };
@@ -81,17 +81,17 @@ pub fn install_skill(
     // 确保目标目录存在
     crate::utils::remove_symlink(dest_dir)
         .with_context(|| format!("Failed to remove old directory: {}", dest_dir.display()))?;
-    fs::create_dir_all(&dest_dir)
+    fs::create_dir_all(dest_dir)
         .with_context(|| format!("Failed to create directory: {}", dest_dir.display()))?;
 
     // 复制文件（排除 .git 等隐藏目录/文件，避免把仓库元数据装进 skill）
-    copy_dir_excluding_hidden(&sparse_checkout_dir, &dest_dir)?;
+    copy_dir_excluding_hidden(&sparse_checkout_dir, dest_dir)?;
 
     // 在 tmp_dir 存活时计算 tree hash（避免后续再次克隆）
     let skill_folder_hash = get_skill_folder_hash(&tmp_path, skill_path).unwrap_or_default();
 
     // 读取新版本
-    let new_meta = SkillMeta::from_file(&dest_dir)?;
+    let new_meta = SkillMeta::from_file(dest_dir)?;
     let new_version = new_meta
         .metadata
         .as_ref()

@@ -610,73 +610,6 @@ xskill find --from https://github.com/example/skills
 
 **注意：** 需要已填充的缓存。如尚未更新缓存，请先运行 `xskill cache update`。使用 URL 方式的 `--from` 时，技能列表会自动拉取并缓存。
 
-### `rec` — 管理推荐技能
-
-管理推荐技能源，支持列表、添加和移除操作。
-
-```bash
-xskill rec <COMMAND>
-```
-
-#### `rec list`
-
-列出所有推荐源：
-
-```bash
-xskill rec list
-```
-
-输出格式：
-```
-SOURCE  NAME   URL                                  SKILLS
-true    antfu  https://github.com/antfu/skills       vue, react
-false   foo    invalid                              bar
-```
-
-- `SOURCE` 列：`true` 表示该推荐源的名称存在于 `sources` 配置中且 URL 一致，`false` 表示不匹配。
-- `URL` 在名称存在于 sources 但 URL 不匹配时显示 `invalid`（红色）。
-
-#### `rec add`
-
-向推荐源添加技能。若条目已存在，新技能将被追加（自动去重）。
-
-```bash
-xskill rec add [-n <name>] [-u <url>] -s <skills>
-```
-
-选项：
-- `-n, --name` — 源名称（若未提供 `--url`，则必须存在于 sources 中）
-- `-u, --url` — 源地址（当 name 存在于 sources 中且 url 匹配时，仅保存 name）
-- `-s, --skills` — 逗号分隔的技能名称列表（必填）
-
-参数组合逻辑：
-- **仅 `-n` 和 `-s`**：验证 `-n` 存在于 sources 中，保存 name + skills
-- **`-n`、`-u` 和 `-s`**：
-  - 若 `-n` 存在于 sources 中且 url 与 `-u` 匹配：仅保存 name + skills（无需 url）
-  - 若 `-n` 存在于 sources 中但 url 与 `-u` 不匹配：报错
-  - 若 `-n` 不存在于 sources 中：使用 url + skills 保存（name 为 url 值）
-- **仅 `-u` 和 `-s`**：使用 url + skills 保存
-
-追加行为：若条目 "antfu" 已有技能 `vue`，执行 `rec add -n antfu -s react,angular` 后结果为 `vue,react,angular`。
-
-#### `rec remove`
-
-移除推荐源或特定技能：
-
-```bash
-xskill rec remove [-n <name>] [-u <url>] [-s <skills>]
-```
-
-选项：
-- `-n, --name` — 源名称（用于标识条目，或与 `-u`/`-s` 配合使用）
-- `-u, --url` — 源地址（当同时指定 `-n` 和 `-u` 时，优先以 `-u` 为准）
-- `-s, --skills` — 逗号分隔的技能名称列表（移除特定技能而非整个条目）
-
-优先级逻辑：
-- 同时指定 `-n` 和 `-u`：优先按 `-u` 查找，若未找到则回退到 `-n`
-- 仅指定 `-n`：删除对应名称的整条数据
-- 指定 `-n` 和 `-s`：删除该名称下对应的技能
-- 指定 `-u` 和 `-s`：删除该 URL 下对应的技能
 
 ### `cache` — 管理技能缓存
 
@@ -715,38 +648,40 @@ xskill cache clear [-f <source>]
 查看或修改全局配置文件。
 
 ```bash
-xskill config [OPTIONS]
+xskill config <COMMAND>
 ```
 
-选项：
-- `-i, --init` — 初始化配置文件，生成含默认值的完整配置（默认平台、缓存、注册中心）。内置平台条目按精简格式保存（仅 `name`/`enabled`/`builtin` 三字段），与 `platforms reset` 一致
-- `-e, --edit` — 在 `$EDITOR` 中打开配置（默认 `vi`）
-- `-g, --get <key>` — 通过点号路径获取配置值（如 `cache.enabled`）
-- `-s, --set <key=value>` — 通过点号路径设置配置值（如 `cache.enabled=true`）
-- `-w, --show` — 以美化后的 JSON 打印当前加载的完整配置（合并默认值，如补全缺失的平台）。输出无颜色，便于管道处理
-- `-V, --validate` — 校验配置文件。先做 JSON 语法与强类型结构校验，再对照 JSON Schema 做完整 Schema 校验。优先查找本地 Schema（`$XSKILL_SCHEMA`、`<config_dir>/schemas/xskill.schema.json`、从可执行文件目录向上查找、`<exe_dir>/../share/xskill/xskill.schema.json`）；本地均无则从 `https://xskill.gcli.cn/xskill.schema.json` 拉取（遵循代理配置）。成功输出 `Valid <path> (schema: <source>)`，失败打印每条错误（含 JSON 路径）并以 1 退出
+子命令：
+- `init` — 初始化配置文件，生成含默认值的完整配置（默认平台、缓存、注册中心）。内置平台条目按精简格式保存（仅 `name`/`enabled`/`builtin` 三字段）——由 `Config::save()` 对**所有**写配置的命令统一保证
+- `edit` — 在 `$EDITOR` 中打开配置（默认 `vi`）
+- `get <key>` — 通过点号路径获取配置值（如 `cache.enabled`）
+- `set <key=value>` — 通过点号路径设置配置值（如 `cache.enabled=true`）
+- `show` — 以美化后的 JSON 打印当前加载的完整配置（合并默认值，如补全缺失的平台）。输出无颜色，便于管道处理
+- `validate` — 校验配置文件。先做 JSON 语法与强类型结构校验，再对照 JSON Schema 做完整 Schema 校验。优先查找本地 Schema（`$XSKILL_SCHEMA`、`<config_dir>/schemas/xskill.schema.json`、从可执行文件目录向上查找、`<exe_dir>/../share/xskill/xskill.schema.json`）；本地均无则从 `https://xskill.gcli.cn/xskill.schema.json` 拉取（遵循代理配置）。成功输出 `Valid <path> (schema: <source>)`，失败打印每条错误（含 JSON 路径）并以 1 退出
+
+> `--verbose` 与 `--help` 保持全局旗标不变，仅 config 的动作转为子命令。不带子命令执行 `xskill config` 时显示帮助。
 
 示例 — 读取/设置代理：
 ```bash
-xskill config --get proxy
-xskill config --set proxy=socks5h://127.0.0.1:40027
-xskill config --validate
+xskill config get proxy
+xskill config set proxy=socks5h://127.0.0.1:40027
+xskill config validate
 ```
 
 #### 示例
 
 ```bash
 # 初始化配置文件
-xskill config --init
+xskill config init
 
 # 在编辑器中打开配置
-xskill config --edit
+xskill config edit
 
 # 读取值
-xskill config --get cache.enabled
+xskill config get cache.enabled
 
 # 设置值
-xskill config --set cache.enabled=true
+xskill config set cache.enabled=true
 ```
 
 ### `new` — 创建技能项目
@@ -780,7 +715,6 @@ xskill new --name <name> [--description <desc>] [--template <template>]
   "$schema": "https://xskill.gcli.cn/xskill.schema.json",
   "platforms": { ... },
   "sources": [ ... ],
-  "recommended": [ ... ],
   "cache": { ... },
   "registry": { ... }
 }
@@ -820,12 +754,6 @@ xskill new --name <name> [--description <desc>] [--template <template>]
     {
       "name": "mattpocock",
       "url": "https://github.com/mattpocock/skills"
-    }
-  ],
-  "recommended": [
-    {
-      "name": "antfu",
-      "skills": ["vue", "react"]
     }
   ],
   "cache": {
@@ -882,14 +810,6 @@ xskill new --name <name> [--description <desc>] [--template <template>]
 | `type` | 否 | `"git"` | 源类型：`git` 或 `api` |
 | `url` | 是 | — | 仓库 URL（须以 `http://` 或 `https://` 开头） |
 
-### 推荐
-
-推荐技能由 `rec` 命令管理，方便安装。
-
-| 字段 | 必填 | 说明 |
-|------|------|------|
-| `name` | 是 | 源名称（必须匹配已配置的源） |
-| `skills` | 是 | 推荐技能名称数组 |
 
 ### 缓存
 
@@ -906,7 +826,7 @@ xskill new --name <name> [--description <desc>] [--template <template>]
 
 | 字段 | 必填 | 默认值 | 说明 |
 |------|------|--------|------|
-| `registry.enabled` | 否 | `false` | 是否启用注册中心查询 |
+| `registry.enabled` | 否 | `true` | 是否启用注册中心查询 |
 | `registry.url` | 否 | `https://xskill.gcli.cn/skills.json` | 注册中心地址 |
 
 URL 解析规则：
@@ -923,13 +843,13 @@ URL 解析规则：
 示例：
 ```bash
 # 启用注册中心
-xskill config --set registry.enabled=true
+xskill config set registry.enabled=true
 
 # 使用自定义注册中心地址（裸域名）
-xskill config --set registry.url=https://example.com
+xskill config set registry.url=https://example.com
 
 # 使用自定义注册中心地址（带路径）
-xskill config --set registry.url=https://example.com/api/v1/
+xskill config set registry.url=https://example.com/api/v1/
 ```
 
 ### `--from` 参数解析
@@ -1077,10 +997,9 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `$schema` | `string` | 否 | JSON Schema URL，用于编辑器校验。`config --init` 自动生成 |
+| `$schema` | `string` | 否 | JSON Schema URL，用于编辑器校验。`config init` 自动生成 |
 | `platforms` | `object<string, Platform>` | 否 | 平台配置，以平台标识符为键（如 `"claude"`、`"codex"`） |
 | `sources` | `Source[]` | 否 | 技能源仓库 |
-| `recommended` | `RecommendedSource[]` | 否 | 按源分组的推荐技能集 |
 | `cache` | `CacheConfig` | 否 | 缓存配置 |
 | `registry` | `RegistryConfig` | 否 | 注册中心配置 |
 | `proxy` | `string` | 否 | 代理地址。设置后导出 `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY`（含小写形式）环境变量，git clone 与 curl/wget 自动生效。协议支持 `http`、`https`、`socks5`、`socks5h`、`socks4`、`socks4a`（`socks5h`/`socks4a` 由代理端解析 DNS）。 |
@@ -1103,13 +1022,6 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 | `type` | `string` | 否 | `"git"` | 源类型。枚举：`"git"`、`"api"` |
 | `url` | `string` | 是 | — | 源仓库 URL。须以 `http://` 或 `https://` 开头 |
 
-**RecommendedSource**（`recommended[]`）：
-
-| 字段 | 类型 | 必填 | 默认值 | 说明 |
-|------|------|------|--------|------|
-| `name` | `string` | 否 | `""` | 源名称，引用 `sources` 中的条目，或自定义标签 |
-| `url` | `string` | 否 | `""` | 直接源 URL（当 `name` 在 sources 中未找到时作为回退） |
-| `skills` | `string[]` | 是 | — | 推荐技能名称列表。至少 1 项 |
 
 **CacheConfig**（`cache`）：
 
@@ -1122,7 +1034,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 | 字段 | 类型 | 必填 | 默认值 | 说明 |
 |------|------|------|--------|------|
-| `enabled` | `boolean` | 否 | `false` | 启用注册中心查询。启用后 `query` 和 `find` 会额外查询注册中心 |
+| `enabled` | `boolean` | 否 | `true` | 启用注册中心查询。启用后 `query` 和 `find` 会额外查询注册中心 |
 | `url` | `string` | 否 | `"https://xskill.gcli.cn/skills.json"` | 注册中心地址。支持裸域名、目录路径或完整文件路径 |
 
 ### `registry.schema.json` — 注册中心索引
@@ -1156,7 +1068,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 ### 编辑器集成
 
-`xskill config --init` 会自动在 `settings.json` 中添加 `$schema` 字段：
+`xskill config init` 会自动在 `settings.json` 中添加 `$schema` 字段：
 
 ```json
 {
@@ -1216,7 +1128,6 @@ xskill/
 │       ├── query.rs        # 查询远程/缓存技能
 │       ├── sources.rs      # 管理源（CRUD）
 │       ├── platforms.rs    # 列出平台
-│       ├── rec.rs          # 管理推荐技能（list/add/remove）
 │       ├── cache.rs        # 缓存管理
 │       ├── config.rs       # 配置管理
 │       └── new.rs          # 创建技能项目

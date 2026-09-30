@@ -82,11 +82,11 @@ pub fn find_all_skills(
     let mut seen_urls: HashSet<String> = HashSet::new();
 
     // 1. Try preferred source first
-    if let Some(src) = prefer_source {
-        if let Some(m) = search_source_for_match(config, src, skill_name) {
-            seen_urls.insert(normalize_url(&m.source_url));
-            results.push(m);
-        }
+    if let Some(src) = prefer_source
+        && let Some(m) = search_source_for_match(config, src, skill_name)
+    {
+        seen_urls.insert(normalize_url(&m.source_url));
+        results.push(m);
     }
 
     // 2. Search local cache
@@ -221,13 +221,11 @@ fn search_registry_for_match(
                 // - Empty → "-"
                 // - Same name as local source but different URL → "-"
                 // - Name equals URL → "-"
-                let display_name = if source_cache.source.is_empty() {
-                    "-".to_string()
-                } else if local_names.contains(source_cache.source.as_str())
-                    && normalize_url(&source_cache.source) != normalize_url(&url)
+                let display_name = if source_cache.source.is_empty()
+                    || (local_names.contains(source_cache.source.as_str())
+                        && normalize_url(&source_cache.source) != normalize_url(&url))
+                    || source_cache.source == url
                 {
-                    "-".to_string()
-                } else if source_cache.source == url {
                     "-".to_string()
                 } else {
                     source_cache.source.clone()
@@ -375,7 +373,7 @@ fn merge_skills(local: CacheData, central: CacheData) -> CacheData {
         .sources
         .iter()
         .filter_map(|s| s.url.as_deref())
-        .map(|u| normalize_url(u))
+        .map(normalize_url)
         .collect();
 
     // Collect local source names for name-based dedup
@@ -526,7 +524,13 @@ fn clone_and_collect(url: &str) -> Result<(Vec<CachedSkill>, String)> {
     } else {
         (tmp_dir.path(), "")
     };
-    collect_skills_from_dir(scan_dir, tmp_dir.path(), &mut skills, &mut String::new(), base_prefix);
+    collect_skills_from_dir(
+        scan_dir,
+        tmp_dir.path(),
+        &mut skills,
+        &mut String::new(),
+        base_prefix,
+    );
 
     let commit_hash = git::get_latest_commit_hash(tmp_dir.path()).unwrap_or_default();
     Ok((skills, commit_hash))
@@ -577,10 +581,7 @@ pub fn collect_skills_from_dir(
     // 仓库本身就是一个 skill：SKILL.md 直接位于仓库根目录
     if dir == repo_root && dir.join("SKILL.md").exists() {
         let meta = SkillMeta::from_file(dir).unwrap_or_default();
-        let name = meta
-            .name
-            .clone()
-            .unwrap_or_else(|| "SKILL.md".to_string());
+        let name = meta.name.clone().unwrap_or_else(|| "SKILL.md".to_string());
         let path = if base_prefix.is_empty() {
             "SKILL.md".to_string()
         } else {

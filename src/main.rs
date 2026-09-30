@@ -1,3 +1,5 @@
+//! xskill — 用于发现、安装与管理可复用 agent skill 包的命令行工具。
+
 mod cache;
 mod commands;
 mod config;
@@ -10,7 +12,6 @@ mod utils;
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use colored::Colorize;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 /// 全局 verbose 标志
@@ -99,12 +100,6 @@ enum Commands {
         skill: String,
     },
 
-    /// Manage recommended skills sources
-    Rec {
-        #[command(subcommand)]
-        action: RecAction,
-    },
-
     /// Update installed skills
     Update {
         /// Only update global skills
@@ -150,29 +145,8 @@ enum Commands {
 
     /// Manage configuration
     Config {
-        /// Initialize config file with default values
-        #[arg(short = 'i', long = "init")]
-        init: bool,
-
-        /// Open config file in editor
-        #[arg(short = 'e', long = "edit")]
-        edit: bool,
-
-        /// Get config value by dot path (e.g. cache.enabled)
-        #[arg(short = 'g', long = "get")]
-        get: Option<String>,
-
-        /// Set config value (e.g. cache.enabled=true)
-        #[arg(short = 's', long = "set")]
-        set: Option<String>,
-
-        /// Show the full loaded configuration as pretty JSON
-        #[arg(short = 'w', long = "show")]
-        show: bool,
-
-        /// Validate the configuration against the JSON Schema
-        #[arg(short = 'V', long = "validate")]
-        validate: bool,
+        #[command(subcommand)]
+        action: ConfigAction,
     },
 
     /// Find and install a skill interactively
@@ -308,42 +282,6 @@ enum SourcesAction {
 }
 
 #[derive(Subcommand)]
-enum RecAction {
-    /// List recommended sources
-    List,
-
-    /// Add skills to a recommended source
-    Add {
-        /// Source name (must exist in sources if --url not provided)
-        #[arg(short = 'n', long = "name")]
-        name: Option<String>,
-
-        /// Source URL (when name exists in sources and url matches, only name is saved)
-        #[arg(short = 'u', long = "url")]
-        url: Option<String>,
-
-        /// Comma-separated list of skill names (required)
-        #[arg(short = 's', long = "skills")]
-        skills: String,
-    },
-
-    /// Remove a recommended source or specific skills
-    Remove {
-        /// Source name (used to identify entry, or with -u/-s for specific removal)
-        #[arg(short = 'n', long = "name")]
-        name: Option<String>,
-
-        /// Source URL (when both -n and -u provided, -u takes priority)
-        #[arg(short = 'u', long = "url")]
-        url: Option<String>,
-
-        /// Comma-separated list of skill names to remove (removes specific skills instead of entire entry)
-        #[arg(short = 's', long = "skills")]
-        skills: Option<String>,
-    },
-}
-
-#[derive(Subcommand)]
 enum CacheAction {
     /// Clear cached data
     Clear {
@@ -358,6 +296,33 @@ enum CacheAction {
         #[arg(short = 'f', long = "from")]
         from: Option<String>,
     },
+}
+
+#[derive(Subcommand)]
+enum ConfigAction {
+    /// Initialize config file with default values
+    Init,
+
+    /// Open config file in editor
+    Edit,
+
+    /// Get config value by dot path (e.g. cache.enabled)
+    Get {
+        /// Dot path to the config value
+        key: String,
+    },
+
+    /// Set config value (e.g. cache.enabled=true)
+    Set {
+        /// Key=value pair (e.g. cache.enabled=true)
+        key_value: String,
+    },
+
+    /// Show the full loaded configuration as pretty JSON
+    Show,
+
+    /// Validate the configuration against the JSON Schema
+    Validate,
 }
 
 fn main() {
@@ -404,9 +369,7 @@ fn run() -> Result<()> {
                     commands::platforms::ResetMode::Merge
                 })
             }
-            Some(PlatformsAction::Toggle { keys }) => {
-                commands::platforms::run_toggle(&keys)
-            }
+            Some(PlatformsAction::Toggle { keys }) => commands::platforms::run_toggle(&keys),
             None => commands::platforms::run(false),
         },
         Commands::Add {
@@ -452,15 +415,6 @@ fn run() -> Result<()> {
             commands::remove::run(&final_skill, global, final_agent.as_deref())
         }
         Commands::Query { source, skill } => commands::query::run(&skill, source.as_deref()),
-        Commands::Rec { action } => match action {
-            RecAction::List => commands::rec::run(),
-            RecAction::Add { name, url, skills } => {
-                commands::rec::run_add(name.as_deref(), url.as_deref(), &skills)
-            }
-            RecAction::Remove { name, url, skills } => {
-                commands::rec::run_remove(name.as_deref(), url.as_deref(), skills.as_deref())
-            }
-        },
         Commands::Update { global, skill } => commands::update::run(global, skill.as_deref()),
         Commands::Restore {
             global,
@@ -472,35 +426,14 @@ fn run() -> Result<()> {
             CacheAction::Clear { from } => commands::cache::run_clear(from.as_deref()),
             CacheAction::Update { from } => commands::cache::run_update(from.as_deref()),
         },
-        Commands::Config {
-            init,
-            edit,
-            get,
-            set,
-            show,
-            validate,
-        } => {
-            if init {
-                commands::config::run_init()
-            } else if edit {
-                commands::config::run_edit()
-            } else if let Some(key) = get {
-                commands::config::run_get(&key)
-            } else if let Some(kv) = set {
-                commands::config::run_set(&kv)
-            } else if show {
-                commands::config::run_show()
-            } else if validate {
-                commands::config::run_validate()
-            } else {
-                println!(
-                    "{}",
-                    "Usage: xskill config --init | --edit | --get <key> | --set <key=value> | --show | --validate"
-                        .dimmed()
-                );
-                Ok(())
-            }
-        }
+        Commands::Config { action } => match action {
+            ConfigAction::Init => commands::config::run_init(),
+            ConfigAction::Edit => commands::config::run_edit(),
+            ConfigAction::Get { key } => commands::config::run_get(&key),
+            ConfigAction::Set { key_value } => commands::config::run_set(&key_value),
+            ConfigAction::Show => commands::config::run_show(),
+            ConfigAction::Validate => commands::config::run_validate(),
+        },
         Commands::Find {
             source,
             skill,

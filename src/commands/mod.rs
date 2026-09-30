@@ -7,7 +7,6 @@ pub mod list;
 pub mod new;
 pub mod platforms;
 pub mod query;
-pub mod rec;
 pub mod remove;
 pub mod restore;
 pub mod sources;

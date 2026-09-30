@@ -33,8 +33,6 @@ pub struct Config {
     pub platforms: HashMap<String, Platform>,
     #[serde(default)]
     pub sources: Vec<Source>,
-    #[serde(default)]
-    pub recommended: Vec<RecommendedSource>,
     #[serde(default, deserialize_with = "deserialize_null_default")]
     pub cache: CacheConfig,
     #[serde(default, deserialize_with = "deserialize_null_default")]
@@ -66,7 +64,7 @@ pub struct RegistryConfig {
     /// 是否启用注册中心，默认 false
     #[serde(default)]
     pub enabled: bool,
-    /// 注册中心 URL，默认 "https://xskill.gcli.cn/skills.json"
+    /// 注册中心 URL，默认 `https://xskill.gcli.cn/skills.json`
     #[serde(default = "default_registry_url")]
     pub url: String,
 }
@@ -80,7 +78,7 @@ pub struct Platform {
     /// 是否启用：false（默认）时不出现在交互选择与批量操作，显式指定仍可操作
     #[serde(default)]
     pub enabled: bool,
-    /// 工具配置目录（全局模式：~/<path>/skills）
+    /// 工具配置目录（全局模式：~/`<path>`/skills）
     ///
     /// 精简保存的内置渠道条目可省略（加载时由内置保护逻辑恢复默认值）
     #[serde(default, skip_serializing_if = "String::is_empty")]
@@ -121,15 +119,6 @@ pub struct Source {
     pub url: String,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct RecommendedSource {
-    #[serde(default, deserialize_with = "deserialize_null_default")]
-    pub name: String,
-    #[serde(default, deserialize_with = "deserialize_null_default")]
-    pub url: String,
-    pub skills: Vec<String>,
-}
-
 fn default_source() -> String {
     "AGENTS.md".to_string()
 }
@@ -150,47 +139,310 @@ fn default_schema_url() -> String {
     CONFIG_SCHEMA_URL.to_string()
 }
 
+/// 默认平台条目元组：(key, display_name, enabled, path, local_path, skills, agents, agents_compat)
+type PlatformEntry = (
+    &'static str,
+    &'static str,
+    bool,
+    &'static str,
+    Option<&'static str>,
+    &'static str,
+    &'static str,
+    bool,
+);
+
 /// 构建默认平台列表（来自 docs/PLATFORMS.md）
-/// 元组：(key, display_name, enabled, path, local_path, skills, agents, agents_compat)
 /// local_path 仅在全局与项目级路径不同时设置（如 omp 全局 .omp/agent，项目级 .omp）
 pub fn default_platforms() -> HashMap<String, Platform> {
-    let entries: Vec<(&str, &str, bool, &str, Option<&str>, &str, &str, bool)> = vec![
+    let entries: Vec<PlatformEntry> = vec![
         // 常用渠道（默认启用）
-        ("antigravity", "Antigravity", true, ".gemini", None, "skills", "GEMINI.md", true),
-        ("claude", "Claude Code", true, ".claude", None, "skills", "CLAUDE.md", false),
-        ("codebuddy", "CodeBuddy", true, ".codebuddy", None, "skills", "CODEBUDDY.md", false),
-        ("codex", "Codex", true, ".codex", None, "skills", "AGENTS.md", true),
-        ("commandcode", "Command Code", false, ".commandcode", None, "skills", "AGENTS.md", true),
-        ("dsh", "DeepSeek Harness", true, ".dsh", None, "skills", "AGENTS.md", true),
+        (
+            "antigravity",
+            "Antigravity",
+            true,
+            ".gemini",
+            None,
+            "skills",
+            "GEMINI.md",
+            true,
+        ),
+        (
+            "claude",
+            "Claude Code",
+            true,
+            ".claude",
+            None,
+            "skills",
+            "CLAUDE.md",
+            false,
+        ),
+        (
+            "codebuddy",
+            "CodeBuddy",
+            true,
+            ".codebuddy",
+            None,
+            "skills",
+            "CODEBUDDY.md",
+            false,
+        ),
+        (
+            "codex",
+            "Codex",
+            true,
+            ".codex",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "commandcode",
+            "Command Code",
+            false,
+            ".commandcode",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "dsh",
+            "DeepSeek Harness",
+            true,
+            ".dsh",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
         // omp 全局 ~/.omp/agent/，项目级 .omp/
-        ("omp", "Oh My Pi", true, ".omp/agent", Some(".omp"), "skills", "AGENTS.md", true),
-        ("opencode", "OpenCode", true, ".opencode", None, "skills", "AGENTS.md", true),
+        (
+            "omp",
+            "Oh My Pi",
+            true,
+            ".omp/agent",
+            Some(".omp"),
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "opencode",
+            "OpenCode",
+            true,
+            ".opencode",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
         // pi 全局 ~/.pi/agent/，项目级 .pi/
-        ("pi", "Pi", true, ".pi/agent", Some(".pi"), "skills", "AGENTS.md", true),
-        ("qoder", "Qoder", true, ".qoder", None, "skills", "AGENTS.md", true),
-        ("qoder-cn", "Qoder CN", true, ".qoder-cn", None, "skills", "AGENTS.md", true),
-        ("workbuddy", "WorkBuddy", true, ".workbuddy", None, "skills", "CODEBUDDY.md", false),
-        ("zcode", "ZCode", true, ".zcode", None, "skills", "AGENTS.md", true),
+        (
+            "pi",
+            "Pi",
+            true,
+            ".pi/agent",
+            Some(".pi"),
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "qoder",
+            "Qoder",
+            true,
+            ".qoder",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "qoder-cn",
+            "Qoder CN",
+            true,
+            ".qoder-cn",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "workbuddy",
+            "WorkBuddy",
+            true,
+            ".workbuddy",
+            None,
+            "skills",
+            "CODEBUDDY.md",
+            false,
+        ),
+        (
+            "zcode",
+            "ZCode",
+            true,
+            ".zcode",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
         // 非常用渠道（默认禁用，可在 settings.json 中启用）
-        ("atomcode", "AtomCode", false, ".atomcode", None, "skills", "ATOMCODE.md", true),
-        ("cline", "Cline", false, ".cline", None, "skills", "CLAUDE.md", true),
-        ("factory", "Factory", false, ".factory", None, "skills", "AGENTS.md", true),
-        ("jcode", "JCode", false, ".jcode", None, "skills", "AGENTS.md", true),
-        ("kilo", "Kilo Code", false, ".kilocode", None, "skills", "AGENTS.md", true),
-        ("kiro", "Kiro", false, ".kiro", None, "skills", "AGENTS.md", false),
-        ("langcli", "LangCLI", false, ".langcli", None, "skills", "LANGCLI.md", false),
-        ("openclaude", "OpenClaude", false, ".openclaude", None, "skills", "CLAUDE.md", false),
-        ("openinterpreter", "Open Interpreter", false, ".openinterpreter", None, "skills", "AGENTS.md", true),
-        ("grok", "Grok Build CLI", false, ".grok", None, "skills", "AGENTS.md", true),
-        ("qwen", "Qwen", false, ".qwen", None, "skills", "AGENTS.md", true),
+        (
+            "atomcode",
+            "AtomCode",
+            false,
+            ".atomcode",
+            None,
+            "skills",
+            "ATOMCODE.md",
+            true,
+        ),
+        (
+            "cline",
+            "Cline",
+            false,
+            ".cline",
+            None,
+            "skills",
+            "CLAUDE.md",
+            true,
+        ),
+        (
+            "factory",
+            "Factory",
+            false,
+            ".factory",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "jcode",
+            "JCode",
+            false,
+            ".jcode",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "kilo",
+            "Kilo Code",
+            false,
+            ".kilocode",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "kiro",
+            "Kiro",
+            false,
+            ".kiro",
+            None,
+            "skills",
+            "AGENTS.md",
+            false,
+        ),
+        (
+            "langcli",
+            "LangCLI",
+            false,
+            ".langcli",
+            None,
+            "skills",
+            "LANGCLI.md",
+            false,
+        ),
+        (
+            "openclaude",
+            "OpenClaude",
+            false,
+            ".openclaude",
+            None,
+            "skills",
+            "CLAUDE.md",
+            false,
+        ),
+        (
+            "openinterpreter",
+            "Open Interpreter",
+            false,
+            ".openinterpreter",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "grok",
+            "Grok Build CLI",
+            false,
+            ".grok",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
+            "qwen",
+            "Qwen",
+            false,
+            ".qwen",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
         // Zoo Code 接手已停服的 Roo Code，配置目录沿用 .roo
-        ("zoo", "Zoo Code", false, ".roo", None, "skills", "AGENTS.md", true),
+        (
+            "zoo",
+            "Zoo Code",
+            false,
+            ".roo",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
         // MiMo Code 全局 ~/.config/mimocode/，项目级 .mimocode/
-        ("mimocode", "MiMo Code", false, ".config/mimocode", Some(".mimocode"), "skills", "AGENTS.md", true),
+        (
+            "mimocode",
+            "MiMo Code",
+            false,
+            ".config/mimocode",
+            Some(".mimocode"),
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
         // agentty 兼容 .agents/ 规范目录，全局与项目级路径均为 .agentty
-        ("agentty", "Agentty", false, ".agentty", None, "skills", "AGENTS.md", true),
+        (
+            "agentty",
+            "Agentty",
+            false,
+            ".agentty",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
         // hermes（Hermes Agent）兼容 .agents/ 规范目录
-        ("hermes", "Hermes Agent", false, ".hermes", None, "skills", "AGENTS.md", true),
+        (
+            "hermes",
+            "Hermes Agent",
+            false,
+            ".hermes",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
     ];
 
     let mut map = HashMap::new();
@@ -226,13 +478,12 @@ pub fn default_config() -> Config {
         schema: default_schema_url(),
         platforms: default_platforms(),
         sources: vec![],
-        recommended: vec![],
         cache: CacheConfig {
             enabled: false,
             ttl: DEFAULT_CACHE_TTL_SECS,
         },
         registry: RegistryConfig {
-            enabled: false,
+            enabled: true,
             url: DEFAULT_REGISTRY_URL.to_string(),
         },
         // init 时补全 proxy 键，值为空字符串（不生效，仅占位以便用户填写）
@@ -252,7 +503,7 @@ impl Default for CacheConfig {
 impl Default for RegistryConfig {
     fn default() -> Self {
         Self {
-            enabled: false,
+            enabled: true,
             url: DEFAULT_REGISTRY_URL.to_string(),
         }
     }
@@ -264,7 +515,6 @@ impl Default for Config {
             schema: default_schema_url(),
             platforms: HashMap::new(),
             sources: vec![],
-            recommended: vec![],
             cache: CacheConfig::default(),
             registry: RegistryConfig::default(),
             proxy: None,
@@ -437,7 +687,7 @@ impl Config {
         }
 
         // 提取 host 之后的路径部分
-        let after_proto = url.splitn(2, "://").nth(1).unwrap_or("");
+        let after_proto = url.split_once("://").map(|x| x.1).unwrap_or("");
 
         match after_proto.find('/') {
             // 无路径（纯域名如 https://example.com）
@@ -463,13 +713,23 @@ impl Config {
     }
 
     /// 保存配置到 settings.json
+    ///
+    /// 写盘前统一对内置渠道做精简规范化（仅 name/enabled/builtin），
+    /// 所有保存路径（config init/edit/set、sources 系列、platforms reset 等）
+    /// 由此处保证，调用方无需各自处理。
     pub fn save(&self) -> Result<()> {
         let path = Self::config_path();
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)
                 .with_context(|| format!("Failed to create directory: {}", parent.display()))?;
         }
-        let json = serde_json::to_string_pretty(self).context("Failed to serialize config")?;
+        let normalized = {
+            let mut c = self.clone();
+            c.normalize_platforms_for_save();
+            c
+        };
+        let json =
+            serde_json::to_string_pretty(&normalized).context("Failed to serialize config")?;
         fs::write(&path, json)
             .with_context(|| format!("Failed to write config file: {}", path.display()))?;
         Ok(())
@@ -556,10 +816,8 @@ impl Platform {
     /// - 全局模式（`global=true`）：使用 `path`（如 `.omp/agent`）
     /// - 项目级模式（`global=false`）：优先使用 `local_path`，未设置时回退到 `path`
     pub fn effective_path(&self, global: bool) -> &str {
-        if !global {
-            if let Some(local) = &self.local_path {
-                return local;
-            }
+        if !global && let Some(local) = &self.local_path {
+            return local;
         }
         &self.path
     }
@@ -578,7 +836,11 @@ impl Platform {
         if self.skills.is_empty() {
             None
         } else {
-            Some(base_dir.join(self.effective_path(global)).join(&self.skills))
+            Some(
+                base_dir
+                    .join(self.effective_path(global))
+                    .join(&self.skills),
+            )
         }
     }
 
@@ -756,7 +1018,6 @@ mod tests {
                 source_type: "git".to_string(),
                 url: "https://example.com".to_string(),
             }],
-            recommended: vec![],
             cache: CacheConfig::default(),
             registry: RegistryConfig::default(),
             proxy: None,
@@ -799,7 +1060,20 @@ mod tests {
             .map(|(k, _)| k.as_str())
             .collect();
         assert_eq!(enabled.len(), 12);
-        for key in ["claude", "codex", "antigravity", "zcode", "opencode", "codebuddy", "qoder", "qoder-cn", "pi", "omp", "dsh", "workbuddy"] {
+        for key in [
+            "claude",
+            "codex",
+            "antigravity",
+            "zcode",
+            "opencode",
+            "codebuddy",
+            "qoder",
+            "qoder-cn",
+            "pi",
+            "omp",
+            "dsh",
+            "workbuddy",
+        ] {
             assert!(
                 platforms[key].enabled,
                 "expected {} to be enabled by default",
@@ -993,6 +1267,53 @@ mod tests {
     }
 
     #[test]
+    fn test_save_normalizes_builtin_platforms_on_disk() {
+        // save() 统一精简：内存中全字段的内置渠道，落盘文件应仅三字段
+        let _guard = test_env_lock().lock().unwrap_or_else(|e| e.into_inner());
+        let tmp = tempfile::tempdir().unwrap();
+        let cfg_path = tmp.path().join("settings.json");
+        // SAFETY: 单线程测试进程中修改测试专用环境变量
+        unsafe { std::env::set_var("XSKILL_CONFIG", &cfg_path) };
+
+        // 模拟 load 后的内存状态：内置渠道补全为全字段 + 用户覆盖 name + 自定义渠道
+        let mut config = default_config();
+        {
+            let claude = config.platforms.get_mut("claude").unwrap();
+            claude.name = Some("My Claude".to_string());
+            claude.path = ".tampered".to_string();
+            claude.skills = "tampered".to_string();
+        }
+        let custom = make_platform(".my-custom", "skills", "CUSTOM.md");
+        config.platforms.insert("my-custom".to_string(), custom);
+
+        config.save().unwrap();
+
+        let content = std::fs::read_to_string(&cfg_path).unwrap();
+        let value: serde_json::Value = serde_json::from_str(&content).unwrap();
+        let platforms = value["platforms"].as_object().unwrap();
+
+        // 内置渠道仅三字段，用户覆盖的 name 保留
+        let claude = platforms["claude"].as_object().unwrap();
+        let mut keys: Vec<_> = claude.keys().cloned().collect();
+        keys.sort();
+        assert_eq!(keys, vec!["builtin", "enabled", "name"]);
+        assert_eq!(claude["name"], "My Claude");
+
+        // 自定义渠道字段原样保留，builtin 语义为 false（false 时按约定省略键，读回默认 false）
+        let custom = platforms["my-custom"].as_object().unwrap();
+        assert_eq!(custom["path"], ".my-custom");
+        assert_eq!(custom["skills"], "skills");
+        assert!(
+            custom
+                .get("builtin")
+                .is_none_or(|v| v == &serde_json::Value::Bool(false))
+        );
+
+        // 清理
+        unsafe { std::env::remove_var("XSKILL_CONFIG") };
+    }
+
+    #[test]
     fn test_enforce_builtin_platforms() {
         let mut config = default_config();
 
@@ -1044,7 +1365,7 @@ mod tests {
         let config = default_config();
         assert!(!config.cache.enabled);
         assert_eq!(config.cache.ttl, 86400);
-        assert!(!config.registry.enabled);
+        assert!(config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
         assert_eq!(config.platforms.len(), 28);
         // init 时 proxy 键占位为空字符串（不生效，供用户填写）
@@ -1053,6 +1374,8 @@ mod tests {
 
     #[test]
     fn test_apply_proxy_env() {
+        // 进程级环境变量（代理 + XSKILL_CONFIG 等）被本测试修改，须与其他测试串行
+        let _guard = test_env_lock().lock().unwrap_or_else(|e| e.into_inner());
         // Save & restore existing env to avoid leaking into other tests.
         let saved: Vec<(String, Option<String>)> = [
             "HTTP_PROXY",

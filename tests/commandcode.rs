@@ -17,7 +17,11 @@ fn bin() -> &'static str {
 }
 
 /// 在指定工作目录运行 xskill，传入环境变量（隔离用户真实配置）
-fn run_xskill(workdir: &Path, args: &[&str], extra_env: &[(String, String)]) -> std::process::Output {
+fn run_xskill(
+    workdir: &Path,
+    args: &[&str],
+    extra_env: &[(String, String)],
+) -> std::process::Output {
     let mut cmd = Command::new(bin());
     cmd.current_dir(workdir);
     for (k, v) in extra_env {
@@ -36,7 +40,9 @@ fn isolated_config_env(tmp: &Path) -> Vec<(&'static str, String)> {
 
 /// 将 (&str, String) 转为 (String, String) 以供 run_xskill 借用
 fn as_refs(env: &[(&str, String)]) -> Vec<(String, String)> {
-    env.iter().map(|(k, v)| ((*k).to_string(), v.clone())).collect()
+    env.iter()
+        .map(|(k, v)| ((*k).to_string(), v.clone()))
+        .collect()
 }
 
 /// 创建测试用的 skill 项目（通过 `xskill new`）
@@ -47,7 +53,13 @@ fn create_skill_project(workdir: &Path, skill_name: &str) -> std::path::PathBuf 
     let env = isolated_config_env(workdir);
     let out = run_xskill(
         workdir,
-        &["new", "--name", skill_name, "--description", "integration test skill"],
+        &[
+            "new",
+            "--name",
+            skill_name,
+            "--description",
+            "integration test skill",
+        ],
         &as_refs(&env),
     );
     assert!(

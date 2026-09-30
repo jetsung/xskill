@@ -27,6 +27,10 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
     // Determine update scope
     let is_global = global;
 
+    // 导出代理环境变量，使后续 git clone 走配置的代理；
+    // update 不依赖配置数据，配置加载失败不阻塞更新
+    let _ = crate::config::Config::load();
+
     // Load lock file
     let lock_file = LockFile::load(is_global)?;
 
@@ -141,10 +145,10 @@ pub fn run(global: bool, skill: Option<&str>) -> Result<()> {
                 "Description".cyan().bold(),
                 meta.display_description()
             );
-            if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
-                if !version.is_empty() {
-                    println!("    {}: {}", "Version".cyan().bold(), version);
-                }
+            if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone())
+                && !version.is_empty()
+            {
+                println!("    {}: {}", "Version".cyan().bold(), version);
             }
 
             // Copy skill to destination (root-level skill: exclude .git etc.)
@@ -211,7 +215,7 @@ mod tests {
     #[test]
     fn test_lock_file_skill_lookup() {
         let mut lock = LockFile::default();
-        assert!(lock.skills.get("vue").is_none());
+        assert!(!lock.skills.contains_key("vue"));
 
         lock.upsert_skill(
             "vue",
@@ -226,7 +230,7 @@ mod tests {
             },
         );
 
-        assert!(lock.skills.get("vue").is_some());
+        assert!(lock.skills.contains_key("vue"));
         assert_eq!(lock.skills["vue"].source, "test");
     }
 }

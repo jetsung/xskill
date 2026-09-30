@@ -604,73 +604,6 @@ xskill find --from https://github.com/example/skills
 
 **Note:** Requires a populated cache. Run `xskill cache update` first if you haven't already. When using a URL with `--from`, the skill list is fetched and cached automatically.
 
-### `rec` — Manage recommended skills
-
-Manage recommended skills sources with list, add, and remove operations.
-
-```bash
-xskill rec <COMMAND>
-```
-
-#### `rec list`
-
-List all recommended sources:
-
-```bash
-xskill rec list
-```
-
-Output format:
-```
-SOURCE  NAME   URL                                  SKILLS
-true    antfu  https://github.com/antfu/skills       vue, react
-false   foo    invalid                              bar
-```
-
-- `SOURCE` column: `true` if the name matches a configured source with consistent URL, `false` otherwise.
-- `URL` shows `invalid` (red) when the name exists in sources but URL doesn't match, or when no URL can be resolved.
-
-#### `rec add`
-
-Add skills to a recommended source. If the entry already exists, new skills are appended (duplicates ignored).
-
-```bash
-xskill rec add [-n <name>] [-u <url>] -s <skills>
-```
-
-Options:
-- `-n, --name` — Source name (must exist in sources if `--url` not provided)
-- `-u, --url` — Source URL (when name exists in sources and url matches, only name is saved)
-- `-s, --skills` — Comma-separated list of skill names (required)
-
-Parameter combination logic:
-- **Only `-n` and `-s`**: Validate `-n` exists in sources, save name + skills
-- **`-n`, `-u`, and `-s`**:
-  - If `-n` exists in sources AND url matches `-u`: save only name + skills (no url needed)
-  - If `-n` exists in sources BUT url doesn't match: error
-  - If `-n` doesn't exist in sources: save url + skills (name becomes url)
-- **Only `-u` and `-s`**: Save url + skills
-
-Append behavior: If entry "antfu" already has skills `vue`, running `rec add -n antfu -s react,angular` results in `vue,react,angular`.
-
-#### `rec remove`
-
-Remove a recommended source or specific skills:
-
-```bash
-xskill rec remove [-n <name>] [-u <url>] [-s <skills>]
-```
-
-Options:
-- `-n, --name` — Source name (used to identify entry, or with `-u`/`-s` for specific removal)
-- `-u, --url` — Source URL (when both `-n` and `-u` provided, `-u` takes priority)
-- `-s, --skills` — Comma-separated list of skill names to remove (removes specific skills instead of entire entry)
-
-Priority logic:
-- When both `-n` and `-u` provided: prioritize `-u` (fallback to `-n` if url not found)
-- When only `-n`: delete entire entry with that name
-- When `-n` and `-s`: delete specific skills from entry with that name
-- When `-u` and `-s`: delete specific skills from entry with that url
 
 ### `cache` — Manage skills cache
 
@@ -709,38 +642,40 @@ Options:
 View or modify the global configuration file.
 
 ```bash
-xskill config [OPTIONS]
+xskill config <COMMAND>
 ```
 
-Options:
-- `-i, --init` — Initialize config file with default values (default platforms, cache, registry). Built-in platform entries are saved in minimal form (`name`/`enabled`/`builtin` only), consistent with `platforms reset`.
-- `-e, --edit` — Open config in `$EDITOR` (defaults to `vi`)
-- `-g, --get <key>` — Get a config value by dot path (e.g., `cache.enabled`)
-- `-s, --set <key=value>` — Set a config value by dot path (e.g., `cache.enabled=true`)
-- `-w, --show` — Print the full loaded configuration as pretty JSON (merges defaults, e.g. fills in missing platforms). Output is uncolored and pipe-friendly.
-- `-V, --validate` — Validate the config file. Performs JSON syntax + strong-type structure checks, then full JSON Schema validation. Tries local schema files first (`$XSKILL_SCHEMA`, `<config_dir>/schemas/xskill.schema.json`, walk-up from the executable, `<exe_dir>/../share/xskill/xskill.schema.json`); if none found, fetches the schema from `https://xskill.gcli.cn/xskill.schema.json` (honoring the proxy config). Prints `Valid <path> (schema: <source>)` on success, or each error with its JSON path on failure (exit 1).
+Subcommands:
+- `init` — Initialize config file with default values (default platforms, cache, registry). Built-in platform entries are saved in minimal form (`name`/`enabled`/`builtin` only) — guaranteed for **all** commands that write the config by `Config::save()`.
+- `edit` — Open config in `$EDITOR` (defaults to `vi`)
+- `get <key>` — Get a config value by dot path (e.g., `cache.enabled`)
+- `set <key=value>` — Set a config value by dot path (e.g., `cache.enabled=true`)
+- `show` — Print the full loaded configuration as pretty JSON (merges defaults, e.g. fills in missing platforms). Output is uncolored and pipe-friendly.
+- `validate` — Validate the config file. Performs JSON syntax + strong-type structure checks, then full JSON Schema validation. Tries local schema files first (`$XSKILL_SCHEMA`, `<config_dir>/schemas/xskill.schema.json`, walk-up from the executable, `<exe_dir>/../share/xskill/xskill.schema.json`); if none found, fetches the schema from `https://xskill.gcli.cn/xskill.schema.json` (honoring the proxy config). Prints `Valid <path> (schema: <source>)` on success, or each error with its JSON path on failure (exit 1).
+
+> `--verbose` and `--help` remain global flags; only the config actions are subcommands. Running `xskill config` without a subcommand prints help.
 
 Example — read/set the proxy:
 ```bash
-xskill config --get proxy
-xskill config --set proxy=socks5h://127.0.0.1:40027
-xskill config --validate
+xskill config get proxy
+xskill config set proxy=socks5h://127.0.0.1:40027
+xskill config validate
 ```
 
 #### Examples
 
 ```bash
 # Initialize config with defaults
-xskill config --init
+xskill config init
 
 # Open config in editor
-xskill config --edit
+xskill config edit
 
 # Read a value
-xskill config --get cache.enabled
+xskill config get cache.enabled
 
 # Set a value
-xskill config --set cache.enabled=true
+xskill config set cache.enabled=true
 ```
 
 ### `new` — Create a skill project
@@ -774,7 +709,6 @@ There is no project-level configuration. Only one global config file is used.
   "$schema": "https://xskill.gcli.cn/xskill.schema.json",
   "platforms": { ... },
   "sources": [ ... ],
-  "recommended": [ ... ],
   "cache": { ... },
   "registry": { ... }
 }
@@ -814,12 +748,6 @@ There is no project-level configuration. Only one global config file is used.
     {
       "name": "mattpocock",
       "url": "https://github.com/mattpocock/skills"
-    }
-  ],
-  "recommended": [
-    {
-      "name": "antfu",
-      "skills": ["vue", "react"]
     }
   ],
   "cache": {
@@ -876,14 +804,6 @@ Sources define where skills are fetched from.
 | `type` | No | `"git"` | Source type: `git` or `api` |
 | `url` | Yes | — | Repository URL (must start with `http://` or `https://`) |
 
-### Recommended
-
-Recommended skills are managed by the `rec` command for easy installation.
-
-| Field | Required | Description |
-|-------|----------|-------------|
-| `name` | Yes | Source name (must match a configured source) |
-| `skills` | Yes | Array of skill names to recommend |
 
 ### Cache
 
@@ -900,7 +820,7 @@ The registry is an optional JSON API that provides a curated skill index. When e
 
 | Field | Required | Default | Description |
 |-------|----------|---------|-------------|
-| `registry.enabled` | No | `false` | Enable registry lookup |
+| `registry.enabled` | No | `true` | Enable registry lookup |
 | `registry.url` | No | `https://xskill.gcli.cn/skills.json` | Registry URL |
 
 URL resolution rules:
@@ -917,13 +837,13 @@ Deduplication (URL-normalized, local takes priority):
 Examples:
 ```bash
 # Enable registry
-xskill config --set registry.enabled=true
+xskill config set registry.enabled=true
 
 # Use a custom registry URL (bare domain)
-xskill config --set registry.url=https://example.com
+xskill config set registry.url=https://example.com
 
 # Use a custom registry URL (with path)
-xskill config --set registry.url=https://example.com/api/v1/
+xskill config set registry.url=https://example.com/api/v1/
 ```
 
 ### `--from` parameter resolution
@@ -1071,10 +991,9 @@ For `~/.xskill/settings.json`. Defines the full configuration structure.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `$schema` | `string` | No | JSON Schema URL for editor validation. Auto-generated by `config --init` |
+| `$schema` | `string` | No | JSON Schema URL for editor validation. Auto-generated by `config init` |
 | `platforms` | `object<string, Platform>` | No | Platform configurations keyed by platform identifier (e.g. `"claude"`, `"codex"`) |
 | `sources` | `Source[]` | No | Skill source repositories |
-| `recommended` | `RecommendedSource[]` | No | Recommended skill sets grouped by source |
 | `cache` | `CacheConfig` | No | Cache settings for skills list caching |
 | `registry` | `RegistryConfig` | No | Registry settings for skill discovery |
 | `proxy` | `string` | No | Proxy URL for network access (e.g. `http://127.0.0.1:7890`, `socks5h://127.0.0.1:1080`). When set, `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY` are exported so `git clone` and `curl`/`wget` use the proxy. Scheme may be `http`, `https`, `socks5`, `socks5h`, `socks4`, `socks4a`. Note: `socks5h`/`socks4a` resolve DNS at the proxy. |
@@ -1097,13 +1016,6 @@ For `~/.xskill/settings.json`. Defines the full configuration structure.
 | `type` | `string` | No | `"git"` | Source type. Enum: `"git"`, `"api"` |
 | `url` | `string` | Yes | — | Source repository URL. Must be a valid URI starting with `http://` or `https://` |
 
-**RecommendedSource** (`recommended[]`):
-
-| Field | Type | Required | Default | Description |
-|-------|------|----------|---------|-------------|
-| `name` | `string` | No | `""` | Source name referencing a `sources` entry, or custom label |
-| `url` | `string` | No | `""` | Direct source URL (overrides name reference when name not found in sources) |
-| `skills` | `string[]` | Yes | — | List of recommended skill names. Minimum 1 item |
 
 **CacheConfig** (`cache`):
 
@@ -1116,7 +1028,7 @@ For `~/.xskill/settings.json`. Defines the full configuration structure.
 
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
-| `enabled` | `boolean` | No | `false` | Enable registry lookup. When enabled, `query` and `find` also query the registry |
+| `enabled` | `boolean` | No | `true` | Enable registry lookup. When enabled, `query` and `find` also query the registry |
 | `url` | `string` | No | `"https://xskill.gcli.cn/skills.json"` | Registry URL. Supports bare domain, directory path, or full file path |
 
 ### `registry.schema.json` — Registry index
@@ -1150,7 +1062,7 @@ For the registry API response (`skills.json`). Defines the skills index data str
 
 ### Editor integration
 
-`xskill config --init` automatically adds a `$schema` field to `settings.json`:
+`xskill config init` automatically adds a `$schema` field to `settings.json`:
 
 ```json
 {
@@ -1210,7 +1122,6 @@ xskill/
 │       ├── query.rs        # Query remote/cache skills
 │       ├── sources.rs      # Manage sources (CRUD)
 │       ├── platforms.rs    # List platforms
-│       ├── rec.rs          # Manage recommended skills (list/add/remove)
 │       ├── cache.rs        # Cache management
 │       ├── config.rs       # Config management
 │       └── new.rs          # Create skill project

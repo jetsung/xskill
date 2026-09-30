@@ -106,12 +106,7 @@ fn symlink_skill_to_platform(
     };
 
     if platform.agents_compat {
-        println!(
-            "{}: {} ({})",
-            "Skipped".dimmed(),
-            platform_name,
-            "agents_compat"
-        );
+        println!("{}: {} (agents_compat)", "Skipped".dimmed(), platform_name);
         return Ok(());
     }
 
@@ -375,7 +370,17 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "claude".to_string(),
-            Platform { name: None, enabled: true, path: tmp.path().join(".claude").to_string_lossy().to_string(), local_path: None, skills: "skills".to_string(), agents: "CLAUDE.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
+            Platform {
+                name: None,
+                enabled: true,
+                path: tmp.path().join(".claude").to_string_lossy().to_string(),
+                local_path: None,
+                skills: "skills".to_string(),
+                agents: "CLAUDE.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+                builtin: false,
+            },
         );
 
         // 执行链接（使用全局模式，symlink 指向 ~/.agents/skills/ 即真实 home 目录）
@@ -397,7 +402,17 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "zcode".to_string(),
-            Platform { name: None, enabled: true, path: tmp.path().join(".zcode").to_string_lossy().to_string(), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: true, builtin: false },
+            Platform {
+                name: None,
+                enabled: true,
+                path: tmp.path().join(".zcode").to_string_lossy().to_string(),
+                local_path: None,
+                skills: "skills".to_string(),
+                agents: "AGENTS.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: true,
+                builtin: false,
+            },
         );
 
         // 应该跳过，不报错
@@ -424,16 +439,46 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "claude".to_string(),
-            Platform { name: None, enabled: true, path: tmp.path().join(".claude").to_string_lossy().to_string(), local_path: None, skills: "skills".to_string(), agents: "CLAUDE.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
+            Platform {
+                name: None,
+                enabled: true,
+                path: tmp.path().join(".claude").to_string_lossy().to_string(),
+                local_path: None,
+                skills: "skills".to_string(),
+                agents: "CLAUDE.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+                builtin: false,
+            },
         );
         config.platforms.insert(
             "codebuddy".to_string(),
-            Platform { name: None, enabled: true, path: tmp.path().join(".codebuddy").to_string_lossy().to_string(), local_path: None, skills: "skills".to_string(), agents: "CODEBUDDY.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
+            Platform {
+                name: None,
+                enabled: true,
+                path: tmp.path().join(".codebuddy").to_string_lossy().to_string(),
+                local_path: None,
+                skills: "skills".to_string(),
+                agents: "CODEBUDDY.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+                builtin: false,
+            },
         );
         // agents_compat 平台，应被跳过
         config.platforms.insert(
             "zcode".to_string(),
-            Platform { name: None, enabled: true, path: tmp.path().join(".zcode").to_string_lossy().to_string(), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: true, builtin: false },
+            Platform {
+                name: None,
+                enabled: true,
+                path: tmp.path().join(".zcode").to_string_lossy().to_string(),
+                local_path: None,
+                skills: "skills".to_string(),
+                agents: "AGENTS.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: true,
+                builtin: false,
+            },
         );
 
         symlink_skill_to_all_platforms(&config, "test-skill", true).unwrap();
@@ -461,11 +506,21 @@ mod tests {
         let mut config = Config::default();
         config.platforms.insert(
             "newplatform".to_string(),
-            Platform { name: None, enabled: true, path: tmp
-                .path()
-                .join(".newplatform")
-                .to_string_lossy()
-                .to_string(), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
+            Platform {
+                name: None,
+                enabled: true,
+                path: tmp
+                    .path()
+                    .join(".newplatform")
+                    .to_string_lossy()
+                    .to_string(),
+                local_path: None,
+                skills: "skills".to_string(),
+                agents: "AGENTS.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+                builtin: false,
+            },
         );
 
         symlink_skill_to_platform(&config, "test-skill", "newplatform", true).unwrap();

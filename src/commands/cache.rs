@@ -19,27 +19,28 @@ pub fn run_update(from: Option<&str>) -> Result<()> {
     let config = Config::load()?;
 
     // Handle --from with URL not in sources: save to URL cache
-    if let Some(src) = from {
-        if is_url(src) && config.get_source(src).is_none() {
-            let url = normalize_url(src);
-            let (skills, commit_hash) = collect_source_skills(&url, src)?;
-            let count = skills.len();
-            // Normalize URL: strip .git suffix for consistent source name
-            let normalized = src.strip_suffix(".git").unwrap_or(src);
-            let data = CacheData {
-                updated_at: Utc::now().format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string(),
-                sources: vec![SourceCache {
-                    source: normalized.to_string(),
-                    url: Some(url),
-                    registry_url: None,
-                    commit_hash,
-                    skills,
-                }],
-            };
-            cache::save_url_cache(src, &data)?;
-            println!("{}: {} {}", normalized, count, "skills".cyan());
-            return Ok(());
-        }
+    if let Some(src) = from
+        && is_url(src)
+        && config.get_source(src).is_none()
+    {
+        let url = normalize_url(src);
+        let (skills, commit_hash) = collect_source_skills(&url, src)?;
+        let count = skills.len();
+        // Normalize URL: strip .git suffix for consistent source name
+        let normalized = src.strip_suffix(".git").unwrap_or(src);
+        let data = CacheData {
+            updated_at: Utc::now().format("%Y-%m-%dT%H:%M:%S%.3fZ").to_string(),
+            sources: vec![SourceCache {
+                source: normalized.to_string(),
+                url: Some(url),
+                registry_url: None,
+                commit_hash,
+                skills,
+            }],
+        };
+        cache::save_url_cache(src, &data)?;
+        println!("{}: {} {}", normalized, count, "skills".cyan());
+        return Ok(());
     }
 
     if config.sources.is_empty() {
@@ -49,7 +50,7 @@ pub fn run_update(from: Option<&str>) -> Result<()> {
                 "No local sources configured. Registry will be used for skill discovery.".yellow()
             );
         } else {
-            println!("{}", "No sources configured. Add sources with 'xskill sources add' or enable registry with 'xskill config --set registry.enabled=true'.".yellow());
+            println!("{}", "No sources configured. Add sources with 'xskill sources add' or enable registry with 'xskill config set registry.enabled=true'.".yellow());
         }
         return Ok(());
     }
@@ -206,10 +207,7 @@ fn collect_skills_from_repo(repo_root: &Path, dir: &Path) -> Result<Vec<CachedSk
     if dir == repo_root && dir.join("SKILL.md").exists() {
         let meta = SkillMeta::from_file(dir).unwrap_or_default();
         skills.push(CachedSkill {
-            name: meta
-                .name
-                .clone()
-                .unwrap_or_else(|| "SKILL.md".to_string()),
+            name: meta.name.clone().unwrap_or_else(|| "SKILL.md".to_string()),
             path: "SKILL.md".to_string(),
             description: meta.display_description(),
             version: meta.display_version(),

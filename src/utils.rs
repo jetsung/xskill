@@ -197,12 +197,11 @@ pub fn canonical_skills_dir(global: bool) -> PathBuf {
 /// - 自动创建父目录
 pub fn create_relative_symlink(target: &Path, link_path: &Path) -> Result<bool> {
     // 防止自引用/冗余链接：链接路径与目标指向同一目录（或链接位于目标内部）
-    if let Some(canon_link) = canonicalize_light(link_path) {
-        if let Some(canon_target) = canonicalize_light(target) {
-            if canon_link == canon_target || canon_link.starts_with(&canon_target) {
-                return Ok(true); // 自身即目标，无需（也不应）创建链接
-            }
-        }
+    if let Some(canon_link) = canonicalize_light(link_path)
+        && let Some(canon_target) = canonicalize_light(target)
+        && (canon_link == canon_target || canon_link.starts_with(&canon_target))
+    {
+        return Ok(true); // 自身即目标，无需（也不应）创建链接
     }
 
     // 如果链接已存在
@@ -538,6 +537,10 @@ mod tests {
 
     #[test]
     fn test_canonical_skills_dir_local() {
+        // 本地模式基于进程 cwd，cwd 会被其他测试临时切换，须与那些测试串行
+        let _guard = crate::config::test_env_lock()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         let dir = canonical_skills_dir(false);
         assert!(dir.ends_with(".agents/skills"));
         // 本地模式使用 cwd 作为基础

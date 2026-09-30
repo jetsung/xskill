@@ -15,8 +15,8 @@ fn resolve_source_index(
         return sources
             .iter()
             .position(|s| {
-                let name_match = name.map_or(true, |n| s.effective_name() == n);
-                let url_match = url.map_or(true, |u| s.url == u);
+                let name_match = name.is_none_or(|n| s.effective_name() == n);
+                let url_match = url.is_none_or(|u| s.url == u);
                 name_match && url_match
             })
             .ok_or_else(|| anyhow::anyhow!("No matching source found."));
@@ -70,12 +70,12 @@ fn normalize_url(url: &str) -> String {
 }
 
 /// Extract path from URL as default source name.
-/// e.g. "https://github.com/user/repo.git" -> "user/repo"
-///      "https://example.com/group/sub/repo" -> "group/sub/repo"
+/// e.g. `https://github.com/user/repo.git` -> `user/repo`
+///      `https://example.com/group/sub/repo` -> `group/sub/repo`
 fn extract_name_from_url(url: &str) -> String {
     url.split("://")
         .nth(1)
-        .and_then(|s| s.splitn(2, '/').nth(1))
+        .and_then(|s| s.split_once('/').map(|x| x.1))
         .map(|p| p.trim_end_matches(".git").trim_end_matches('/'))
         .filter(|p| !p.is_empty())
         .unwrap_or(url)

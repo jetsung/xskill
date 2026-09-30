@@ -81,7 +81,7 @@
 
 | 字段 | 必填 | 默认值 | 说明 |
 |------|------|--------|------|
-| `$schema` | 否 | `https://xskill.gcli.cn/xskill.schema.json` | JSON Schema URL，用于编辑器校验和自动补全。`config --init` 自动生成 |
+| `$schema` | 否 | `https://xskill.gcli.cn/xskill.schema.json` | JSON Schema URL，用于编辑器校验和自动补全。`config init` 自动生成 |
 | `proxy` | 否 | `""`（空字符串） | 代理地址。支持 HTTP 与 SOCKS 协议，协议由地址本身的 scheme 决定，git clone 与 curl/wget 拉取注册中心均自动识别并走代理。设置后导出 `HTTP_PROXY`/`HTTPS_PROXY`/`ALL_PROXY`（含小写形式）环境变量，适用于 GitHub 等网络受限场景。为空或未设置时不导出任何变量（沿用系统已有代理设置）。**协议格式**：`http://host:port`、`https://host:port`、`socks5://host:port`、`socks5h://host:port`、`socks4://host:port`、`socks4a://host:port`。**DNS 解析提示**：`socks5`/`socks4` 在本地解析域名后隧道传输；若本地 DNS 也无法访问目标（如 GitHub），应使用 `socks5h`/`socks4a`（由代理端解析域名），否则会卡在域名解析。示例：`"proxy": "socks5h://127.0.0.1:1080"` |
 
 ### Cache 配置说明
@@ -95,7 +95,7 @@
 
 | 字段 | 必填 | 默认值 | 说明 |
 |------|------|--------|------|
-| `registry.enabled` | 否 | `false` | 是否启用注册中心。启用后 `query` / `find` 会额外查询注册中心 |
+| `registry.enabled` | 否 | `true` | 是否启用注册中心。启用后 `query` / `find` 会额外查询注册中心 |
 | `registry.url` | 否 | `https://xskill.gcli.cn/skills.json` | 注册中心地址。支持裸域名（如 `https://xskill.gcli.cn`）、目录路径（如 `https://xskill.gcli.cn/`）或完整文件路径 |
 
 URL 解析规则：
@@ -195,25 +195,19 @@ URL 解析规则：
       "url": "https://gitcode.com/gh_mirrors/skills11/skills.git"
     }
   ],
-  "recommended": [
-    {
-      "name": "antfu2",
-      "skills": ["antfu-design"]
-    }
-  ],
   "cache": {
     "enabled": true,
     "ttl": 86400
   },
   "registry": {
-    "enabled": false,
+    "enabled": true,
     "url": "https://xskill.gcli.cn/skills.json"
   },
   "proxy": "http://127.0.0.1:7890"
 }
 ```
 
-> **说明**：上例中内置渠道（`builtin: true`）采用精简保存格式——仅包含 `name`、`enabled`、`builtin` 三个字段，`path`、`skills` 等字段由内置渠道保护逻辑在配置加载时自动恢复默认值；自定义渠道（如 `my-custom`）需写全量字段。详见 [Platform 字段说明](#platform-字段说明)。
+> **说明**：上例中内置渠道（`builtin: true`）采用精简保存格式——仅包含 `name`、`enabled`、`builtin` 三个字段，`path`、`skills` 等字段由内置渠道保护逻辑在配置加载时自动恢复默认值；自定义渠道（如 `my-custom`）需写全量字段。该精简格式由 `Config::save()` 对**所有**写配置的命令路径统一保证，不限于 `config init` 与 `platforms reset`。详见 [Platform 字段说明](#platform-字段说明)。
 
 ---
 
@@ -313,6 +307,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
   - `skills/<path>/SKILL.md`：技能位于 `skills/` 子目录下（如 `skills/vue/SKILL.md`、`skills/engineering/grill-with-docs/SKILL.md`）
   - `<name>/SKILL.md`：技能位于仓库根目录级别（如 `my-skill/SKILL.md`）
   - `SKILL.md`：仓库本身即技能（根级 skill，如 [bybit-exchange/svg-diagram](https://github.com/bybit-exchange/svg-diagram)）
+- **`source` 字段归一化**：安装来源为 `owner/repo` 简写形式且**未匹配 `settings.json` 中任何已配置渠道**时，`source` 记录归一化后的完整 GitHub URL（如 `tt-a1i/archify` → `https://github.com/tt-a1i/archify`），与 `source_url` 一致；来源为已配置渠道名或完整 URL 时保持源名或原 URL。加载锁文件时对存量记录做幂等归一化，但 `source` 与任一已配置渠道的有效名称一致时保持不变（避免渠道名形如 `owner/repo` 时被误改）。
 
 ### 锁文件格式
 
@@ -558,7 +553,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
     * **互斥约束**：`--replace` 与 `--merge` 同时提供时报错（`the argument '--replace' cannot be used with '--merge'`，退出码非 0），不执行重置。
     * **两旗标均缺省**：打印用法帮助（说明两种旗标含义与互斥约束），退出码 0，不执行重置、不修改配置文件。
     * 若存在自定义平台，会先打印提示。
-    * **保存规范化**：重置写入 `~/.xskill/settings.json` 前对平台条目做规范化（`normalize_platforms_for_save`）：
+    * **保存规范化**：写入 `~/.xskill/settings.json` 时由 `Config::save()` 统一对平台条目做精简规范化：
       * 内置渠道（key 在内置列表中）仅保存 `name`、`enabled`、`builtin`（值为 `true`）三个字段，`path`/`skills` 等其余字段不写入——加载时由内置渠道保护逻辑自动恢复默认值；
       * 自定义渠道（key 不在内置列表中）`builtin` 强制为 `false`（无论用户是否设置该字段或设置为何值），其余字段原样保留。
     * 其他配置字段（`sources`、`cache`、`proxy` 等）不受影响。
@@ -573,7 +568,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
     * **省略 key**：进入全屏自绘多选 TUI（↑/↓ 或 j/k 移动、空格/TAB 勾选、Enter 确认、Esc 或 Ctrl-C 取消），列出**全部渠道**并**按当前启用状态预勾选**（启用的渠道勾选 `[x]`、禁用的渠道 `[ ]`）。每行前置勾选框；**已勾选（启用）的渠道名称以绿色显示**，未勾选为默认色；光标所在行名称加粗并带 `❯` 指示符。列表项格式为 `[x] 名称  [key]`（key 部分暗灰色），按显示名称排序，**全部渠道一次性完全显示**（无窗口滚动）。
     * **确认语义**：Enter 后**按勾选状态设置**各渠道的 `enabled`（非翻转）——仅状态发生变化的渠道被记录并保存；TUI 中取消勾选已启用的渠道即表示禁用它。
     * **输出**：每个状态发生变化的渠道输出一行 `<显示名称>: enabled`（绿色）或 `<显示名称>: disabled`（红色）；无变化时输出 `No changes.`（黄色）。
-    * **保存规范化**：与 `reset` 一致，写入前调用 `normalize_platforms_for_save`（内置渠道精简保存，自定义渠道 `builtin` 恒 `false`）。
+    * **保存规范化**：与所有保存路径一致，由 `Config::save()` 写盘前统一精简（内置渠道仅 `name`/`enabled`/`builtin`，自定义渠道 `builtin` 恒 `false`）。
     * **边界情况**：
       * key 不存在时报错并列出有效渠道（`Invalid platform: <key>` + `Valid platforms: ...`）。
       * 省略 key 且非交互终端时报错 `'platforms toggle' requires an interactive terminal or platform keys.`。
@@ -821,70 +816,6 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 * **边界情况**：
   * 无已安装 skill 时输出 "No skills installed"（黑灰色/bright black）。
 
-### `rec` — 管理推荐 skills
-
-* **行为**：管理配置中的推荐 skills 源，支持列表、添加和移除操作。
-* **子命令**：
-
-#### `rec list` — 列出推荐源
-
-* **行为**：以表格形式打印配置中所有推荐源，交叉验证 `sources` 配置。
-* **输出格式**：
-  ```
-  SOURCE  NAME   URL                              SKILLS
-  true    antfu  https://github.com/antfu/skills  vue, react
-  false   foo    invalid                          bar
-  ```
-* **列顺序**：`SOURCE → NAME → URL → SKILLS`。
-* **列说明**：
-  * `SOURCE`：验证状态，`true` 表示该推荐源的 name 存在于 `sources` 配置中且 URL 一致，`false` 表示不匹配或 name 不存在于 sources。
-  * `URL`：始终显示，按以下规则解析。
-* **URL 解析规则**：
-  * 若 `name` 存在于 `sources` 且 `url` 为空 → 从 source 获取 URL，`SOURCE` 显示 `true`。
-  * 若 `name` 存在于 `sources` 且 `url` 与 source 一致 → 正常显示 URL，`SOURCE` 显示 `true`。
-  * 若 `name` 存在于 `sources` 但 `url` 与 source 不一致 → URL 显示 `invalid`（红色），`SOURCE` 显示 `false`。
-  * 若 `name` 不存在于 `sources` 且 `url` 有值 → 显示原始 `url`，`SOURCE` 显示 `false`。
-  * 若 `name` 不存在于 `sources` 且 `url` 为空 → URL 显示 `invalid`（红色），`SOURCE` 显示 `false`。
-* **边界情况**：推荐源为空时输出 "No recommended skills configured"。空字段显示 ` - `。
-
-#### `rec add` — 添加推荐技能
-
-* **行为**：向推荐源添加技能，写入 `~/.xskill/settings.json`。若推荐源已存在则追加技能（去重）。
-* **参数**：
-  * `-n, --name`：源名称（可选，必须存在于 sources 中）。
-  * `-u, --url`：源地址（可选）。
-  * `-s, --skills`：逗号分隔的技能名称列表（必填）。
-* **参数组合逻辑**：
-  * 仅 `-n` 和 `-s`：验证 `-n` 存在于 sources 中，保存 `name` + `skills`。
-  * `-n`、`-u` 和 `-s`：
-    * 若 `-n` 存在于 sources 中且 `url` 与 `-u` 匹配：仅保存 `name` + `skills`（无需 url）。
-    * 若 `-n` 存在于 sources 中但 `url` 与 `-u` 不匹配：报错。
-    * 若 `-n` 不存在于 sources 中：使用 `url` + `skills` 保存（name 为 url 值）。
-  * 仅 `-u` 和 `-s`：使用 `url` + `skills` 保存。
-* **追加逻辑**：若推荐源已存在且已有技能 `a`，本次使用 `-s b,c`，则最终值为 `a,b,c`。
-* **边界情况**：
-  * 未指定 `-n` 或 `-u` 时报错。
-  * `-n` 不存在于 sources 中且未指定 `-u` 时报错。
-  * 技能列表为空时报错。
-  * 所有技能已存在时输出提示信息。
-
-#### `rec remove` — 移除推荐源或特定技能
-
-* **行为**：移除推荐源或从推荐源中移除特定技能。
-* **参数**：
-  * `-n, --name`：源名称（可选，用于标识条目，或与 `-u`/`-s` 配合使用）。
-  * `-u, --url`：源地址（可选，当同时指定 `-n` 和 `-u` 时，优先以 `-u` 为准）。
-  * `-s, --skills`：逗号分隔的技能名称列表（可选，移除特定技能而非整个条目）。
-* **优先级逻辑**：
-  * 同时指定 `-n` 和 `-u`：优先按 `-u` 查找，若未找到则回退到 `-n`。
-  * 仅指定 `-n`：删除对应名称的整条数据。
-  * 指定 `-n` 和 `-s`：删除该名称下对应的技能。
-  * 指定 `-u` 和 `-s`：删除该 URL 下对应的技能。
-* **边界情况**：
-  * 未指定 `-n` 或 `-u` 时报错。
-  * 指定的源不存在时报错并提示可用推荐源列表。
-  * 指定的技能不存在时输出提示信息。
-
 ### `query` — 查询/列出技能
 
 * **行为**：查询指定的 skill。若 `registry.enabled` 为 `true` 且未指定 `-f`，还会额外查询注册中心。
@@ -972,23 +903,24 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 ### `config` — 管理配置
 
-* **行为**：管理 `~/.xskill/settings.json` 配置文件。无参数时输出用法提示。
+* **行为**：管理 `~/.xskill/settings.json` 配置文件。子命令式接口，动作互斥由 clap 保证；无子命令时显示帮助并以非 0 退出码结束。
 * **参数**：
-  * `-i, --init`：初始化配置文件，生成含默认值的完整配置（含默认平台、缓存、注册中心配置）。内置平台条目与 `platforms reset` 一致做规范化保存——仅写入 `name`、`enabled`、`builtin` 三个字段，其余字段在配置加载时由内置渠道保护逻辑自动补全。若配置文件已存在则提示，不覆盖。
-  * `-e, --edit`：在编辑器中打开配置文件（使用 `$EDITOR` 环境变量，默认 `vi`）。
-  * `-g, --get <key>`：读取单个配置值，使用点号路径（如 `cache.enabled`、`sources`）。
-  * `-s, --set <key=value>`：设置单个配置值，使用点号路径（如 `cache.enabled=true`）。
-  * `-w, --show`：以美化后的 JSON 打印当前加载的完整配置（含 `$schema`、代理、缓存、注册中心等），输出不含颜色，可直接管道给其他工具解析。等价于 `cat ~/.xskill/settings.json`，但会经过 `Config::load()` 合并默认值（如缺失平台时补全默认平台）。
-  * `-V, --validate`：校验配置文件。先做 JSON 语法与强类型结构校验（`Config` 反序列化），再对照 JSON Schema 做完整 Schema 校验。校验通过输出 `Valid <path> (schema: <schema-source>)` 并以 0 退出；失败则打印每条错误（含 JSON 路径）并以 1 退出。Schema 来源解析顺序：本地优先，未找到时回退云端。本地查找顺序：`$XSKILL_SCHEMA` 环境变量 → `<config_dir>/schemas/xskill.schema.json` → 从可执行文件目录向上查找 `schemas/xskill.schema.json` → `<exe_dir>/../share/xskill/xskill.schema.json`；本地均无则自动从 `https://xskill.gcli.cn/xskill.schema.json`（常量 `CONFIG_SCHEMA_URL`）拉取，拉取同样遵循代理配置（走 `HTTPS_PROXY` 等）。输出中的 `<schema-source>` 为本地路径或该云端 URL。
+  * `init`：初始化配置文件，生成含默认值的完整配置（含默认平台、缓存、注册中心配置）。内置平台条目按精简格式保存——仅写入 `name`、`enabled`、`builtin` 三个字段（由 `Config::save()` 对所有保存路径统一保证），其余字段在配置加载时由内置渠道保护逻辑自动补全。若配置文件已存在则提示，不覆盖。
+  * `edit`：在编辑器中打开配置文件（使用 `$EDITOR` 环境变量，默认 `vi`）。
+  * `get <key>`：读取单个配置值，使用点号路径（如 `cache.enabled`、`sources`）。
+  * `set <key=value>`：设置单个配置值，使用点号路径（如 `cache.enabled=true`）。
+  * `show`：以美化后的 JSON 打印当前加载的完整配置（含 `$schema`、代理、缓存、注册中心等），输出不含颜色，可直接管道给其他工具解析。等价于 `cat ~/.xskill/settings.json`，但会经过 `Config::load()` 合并默认值（如缺失平台时补全默认平台）。
+  * `validate`：校验配置文件。先做 JSON 语法与强类型结构校验（`Config` 反序列化），再对照 JSON Schema 做完整 Schema 校验。校验通过输出 `Valid <path> (schema: <schema-source>)` 并以 0 退出；失败则打印每条错误（含 JSON 路径）并以 1 退出。Schema 来源解析顺序：本地优先，未找到时回退云端。本地查找顺序：`$XSKILL_SCHEMA` 环境变量 → `<config_dir>/schemas/xskill.schema.json` → 从可执行文件目录向上查找 `schemas/xskill.schema.json` → `<exe_dir>/../share/xskill/xskill.schema.json`；本地均无则自动从 `https://xskill.gcli.cn/xskill.schema.json`（常量 `CONFIG_SCHEMA_URL`）拉取，拉取同样遵循代理配置（走 `HTTPS_PROXY` 等）。输出中的 `<schema-source>` 为本地路径或该云端 URL。
 * **边界情况**：
-  * 无参数时输出 `Usage: xskill config --init | --edit | --get <key> | --set <key=value> | --show | --validate`。
-  * `--validate` 时配置文件不存在则报错。
-  * `--validate` 时若 JSON 语法错误或字段类型/必填不符，先报结构错误（不进入 Schema 校验）。
-  * `--validate` 时若找不到 Schema 文件，提示设置 `$XSKILL_SCHEMA` 或放置到约定路径。
-  * `--init` 时若配置文件已存在，输出提示信息并退出。
-  * `--get` 路径不存在时报错。
-  * `--set` 值类型不匹配时报错（如将字符串赋给布尔字段）。
+  * 无子命令时 clap 输出用法帮助（列出全部子命令），退出码非 0。
+  * `validate` 时配置文件不存在则报错。
+  * `validate` 时若 JSON 语法错误或字段类型/必填不符，先报结构错误（不进入 Schema 校验）。
+  * `validate` 时若找不到 Schema 文件，提示设置 `$XSKILL_SCHEMA` 或放置到约定路径。
+  * `init` 时若配置文件已存在，输出提示信息并退出。
+  * `get` 路径不存在时报错。
+  * `set` 值类型不匹配时报错（如将字符串赋给布尔字段）。
   * `$EDITOR` 未设置时回退到 `vi`。
+  * `--verbose`、`--help` 为全局旗标，不转为子命令。
 
 ### `new` — 创建 Skill 项目
 

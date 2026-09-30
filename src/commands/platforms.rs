@@ -39,7 +39,9 @@ pub fn run(all: bool) -> Result<()> {
     let mut sorted = shown;
     sorted.sort_by_key(|(name, p)| (p.display_name(name).to_lowercase(), name.to_lowercase()));
 
-    let headers = &["NAME", "KEY", "PATH", "SKILLS", "AGENTS", "COMPAT", "BUILTIN", "ENABLED"];
+    let headers = &[
+        "NAME", "KEY", "PATH", "SKILLS", "AGENTS", "COMPAT", "BUILTIN", "ENABLED",
+    ];
     let rows: Vec<Vec<String>> = sorted
         .iter()
         .map(|(name, platform)| {
@@ -125,7 +127,7 @@ pub fn run_reset_usage() {
 
 /// 重置 platforms（非交互，由 --replace/--merge 旗标指定模式）
 pub fn run_reset(mode: ResetMode) -> Result<()> {
-    // 配置文件不存在时使用与 config --init 相同的默认配置，保证生成字段一致
+    // 配置文件不存在时使用与 config init 相同的默认配置，保证生成字段一致
     let mut config = if Config::config_path().exists() {
         Config::load()?
     } else {
@@ -138,8 +140,6 @@ pub fn run_reset(mode: ResetMode) -> Result<()> {
     }
 
     apply_reset_mode(&mut config, mode);
-    // 保存前规范化：内置渠道精简为 name/enabled/builtin，自定义渠道 builtin 恒 false
-    config.normalize_platforms_for_save();
     config.save()?;
 
     let desc = match mode {
@@ -214,8 +214,6 @@ pub fn run_toggle(keys: &[String]) -> Result<()> {
         return Ok(());
     }
 
-    // 保存前规范化（内置渠道精简保存，自定义渠道 builtin 恒 false）
-    config.normalize_platforms_for_save();
     config.save()?;
 
     for key in &changed {
@@ -237,10 +235,10 @@ pub fn run_toggle(keys: &[String]) -> Result<()> {
 ///
 /// 返回 `None` 表示用户取消（Esc/Ctrl-C）；`Some` 为确认后的 (key, 勾选状态) 列表。
 fn select_toggle_platforms(config: &Config) -> Result<Option<Vec<(String, bool)>>> {
-    use crossterm::event::{self, Event, KeyCode, KeyModifiers, KeyEventKind};
+    use crossterm::event::{self, Event, KeyCode, KeyEventKind, KeyModifiers};
     use crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
     use crossterm::{execute, style::Print};
-    use std::io::{stdout, Write};
+    use std::io::{Write, stdout};
 
     // 按显示名称排序的 (key, name)
     let mut entries: Vec<(String, String)> = config
@@ -248,7 +246,7 @@ fn select_toggle_platforms(config: &Config) -> Result<Option<Vec<(String, bool)>
         .iter()
         .map(|(key, p)| (key.clone(), p.display_name(key)))
         .collect();
-    entries.sort_by(|a, b| a.1.to_lowercase().cmp(&b.1.to_lowercase()));
+    entries.sort_by_key(|a| a.1.to_lowercase());
     let total = entries.len();
 
     terminal::enable_raw_mode()?;
@@ -278,12 +276,7 @@ fn select_toggle_platforms(config: &Config) -> Result<Option<Vec<(String, bool)>
                     name.to_string()
                 };
                 let line = if i == cursor {
-                    format!(
-                        "❯ {} {}  [{}]",
-                        checkbox,
-                        name_text.bold(),
-                        key.dimmed()
-                    )
+                    format!("❯ {} {}  [{}]", checkbox, name_text.bold(), key.dimmed())
                 } else {
                     format!("  {} {}  [{}]", checkbox, name_text, key.dimmed())
                 };
@@ -312,9 +305,7 @@ fn select_toggle_platforms(config: &Config) -> Result<Option<Vec<(String, bool)>
                     checked[cursor] = !checked[cursor];
                 }
                 KeyCode::Up | KeyCode::Char('k') => {
-                    if cursor > 0 {
-                        cursor -= 1;
-                    }
+                    cursor = cursor.saturating_sub(1);
                 }
                 KeyCode::Down | KeyCode::Char('j') => {
                     if cursor + 1 < total {
@@ -332,7 +323,7 @@ fn select_toggle_platforms(config: &Config) -> Result<Option<Vec<(String, bool)>
                 }
                 KeyCode::Esc => return Ok(None),
                 KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                    return Ok(None)
+                    return Ok(None);
                 }
                 _ => continue,
             }
@@ -388,11 +379,8 @@ mod tests {
 
         // 不存在的渠道报错
         let mut config = default_config();
-        let err = apply_enabled_state(
-            &mut config,
-            &[("nonexistent".to_string(), true)],
-        )
-        .unwrap_err();
+        let err =
+            apply_enabled_state(&mut config, &[("nonexistent".to_string(), true)]).unwrap_err();
         let msg = format!("{}", err);
         assert!(msg.contains("Invalid platform: nonexistent"));
         assert!(msg.contains("Valid platforms:"));
@@ -432,7 +420,17 @@ mod tests {
         let mut config = default_config();
         config.platforms.insert(
             "my-custom".to_string(),
-            Platform { name: None, enabled: false, path: ".my-custom".to_string(), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
+            Platform {
+                name: None,
+                enabled: false,
+                path: ".my-custom".to_string(),
+                local_path: None,
+                skills: "skills".to_string(),
+                agents: "AGENTS.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+                builtin: false,
+            },
         );
         apply_toggle(&mut config, &["my-custom".to_string()]).unwrap();
         assert!(config.platforms["my-custom"].enabled);
@@ -440,7 +438,17 @@ mod tests {
 
     #[test]
     fn test_platform_config_fields() {
-        let platform = Platform { name: None, enabled: true, path: ".claude".to_string(), local_path: None, skills: "skills".to_string(), agents: "CLAUDE.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false };
+        let platform = Platform {
+            name: None,
+            enabled: true,
+            path: ".claude".to_string(),
+            local_path: None,
+            skills: "skills".to_string(),
+            agents: "CLAUDE.md".to_string(),
+            source: "AGENTS.md".to_string(),
+            agents_compat: false,
+            builtin: false,
+        };
         assert!(platform.skills_dir().is_some());
         assert!(platform.agents_file().is_some());
         assert!(!platform.agents_compat);
@@ -448,20 +456,50 @@ mod tests {
 
     #[test]
     fn test_platform_agents_compat() {
-        let platform = Platform { name: None, enabled: true, path: ".opencode".to_string(), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: true, builtin: false };
+        let platform = Platform {
+            name: None,
+            enabled: true,
+            path: ".opencode".to_string(),
+            local_path: None,
+            skills: "skills".to_string(),
+            agents: "AGENTS.md".to_string(),
+            source: "AGENTS.md".to_string(),
+            agents_compat: true,
+            builtin: false,
+        };
         assert!(platform.agents_compat);
     }
 
     #[test]
     fn test_platform_no_skills_no_agents() {
-        let platform = Platform { name: None, enabled: true, path: ".gemini".to_string(), local_path: None, skills: String::new(), agents: String::new(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false };
+        let platform = Platform {
+            name: None,
+            enabled: true,
+            path: ".gemini".to_string(),
+            local_path: None,
+            skills: String::new(),
+            agents: String::new(),
+            source: "AGENTS.md".to_string(),
+            agents_compat: false,
+            builtin: false,
+        };
         assert!(platform.skills_dir().is_none());
         assert!(platform.agents_file().is_none());
         assert!(!platform.agents_compat);
     }
 
     fn platform(name: &str) -> Platform {
-        Platform { name: None, enabled: true, path: format!(".{}", name), local_path: None, skills: "skills".to_string(), agents: "AGENTS.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: true, builtin: false }
+        Platform {
+            name: None,
+            enabled: true,
+            path: format!(".{}", name),
+            local_path: None,
+            skills: "skills".to_string(),
+            agents: "AGENTS.md".to_string(),
+            source: "AGENTS.md".to_string(),
+            agents_compat: true,
+            builtin: false,
+        }
     }
 
     fn config_with(extra: &[(&str, Platform)]) -> Config {
@@ -516,7 +554,9 @@ mod tests {
     /// 返回测试专用环境锁的 guard，调用方持有期间断言结果，防止并行测试篡改 XSKILL_CONFIG
     fn run_reset_nontty(mode: ResetMode) -> (std::sync::MutexGuard<'static, ()>, Config) {
         // 跨模块共享锁：串行化所有依赖 XSKILL_CONFIG 的测试
-        let guard = crate::config::test_env_lock().lock().unwrap_or_else(|e| e.into_inner());
+        let guard = crate::config::test_env_lock()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         let tmp = std::env::temp_dir().join(format!(
             "xskill-test-reset-{}-{}-{:?}",
             std::process::id(),
@@ -531,10 +571,9 @@ mod tests {
 
         // 预置含自定义平台的配置文件（save 依赖 XSKILL_CONFIG 解析路径，先设置）
         let mut config = default_config();
-        config.platforms.insert(
-            "my-custom".to_string(),
-            platform("my-custom"),
-        );
+        config
+            .platforms
+            .insert("my-custom".to_string(), platform("my-custom"));
         // SAFETY: 测试专用环境变量，测试进程内串行执行
         unsafe { std::env::set_var("XSKILL_CONFIG", &cfg_path) };
         config.save().unwrap();

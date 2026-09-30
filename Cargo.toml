@@ -1,6 +1,6 @@
 [package]
 name = "xskill"
-version = "0.3.1-preview.2"
+version = "0.4.0-preview.1"
 edition = "2024"
 description = "A skills management tool for discovering, installing, and managing reusable agent skill packs."
 license = "Apache-2.0"
@@ -12,6 +12,9 @@ categories = ["command-line-utilities"]
 
 [workspace]
 members = [".", "crates/*"]
+
+[lints.rustdoc]
+all = "deny"
 
 [dependencies]
 clap = { version = "4.6", features = ["derive"] }

@@ -66,7 +66,9 @@ fn resolve_restore_target(global: bool, agent: Option<&str>) -> Result<Vec<PathB
                 // agents_compat 平台直接读取规范目录，无需 restore symlink
                 return Ok(targets);
             }
-            let skills_dir = platform.skills_dir_with_base(&base_dir, global).ok_or_else(|| {
+            let skills_dir = platform
+                .skills_dir_with_base(&base_dir, global)
+                .ok_or_else(|| {
                     anyhow::anyhow!(
                         "Platform {} has no skills directory configured",
                         agent_value
@@ -176,10 +178,9 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
             );
         } else {
             println!(
-                "{:<name_w$}  {:<source_w$}  {}",
+                "{:<name_w$}  {:<source_w$}  TARGET",
                 "NAME",
                 "SOURCE",
-                "TARGET",
                 name_w = name_w,
                 source_w = source_w
             );
@@ -278,10 +279,10 @@ pub fn run(global: bool, agent: Option<&str>, dry_run: bool) -> Result<()> {
                 "Description".cyan().bold(),
                 meta.display_description()
             );
-            if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
-                if !version.is_empty() {
-                    println!("  {}: {}", "Version".cyan().bold(), version);
-                }
+            if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone())
+                && !version.is_empty()
+            {
+                println!("  {}: {}", "Version".cyan().bold(), version);
             }
 
             // Copy to each target directory
@@ -354,9 +355,9 @@ mod tests {
         lock.upsert_skill("vue", make_entry("vue"));
         lock.upsert_skill("react", make_entry("react"));
 
-        assert!(lock.skills.get("vue").is_some());
-        assert!(lock.skills.get("react").is_some());
-        assert!(lock.skills.get("angular").is_none());
+        assert!(lock.skills.contains_key("vue"));
+        assert!(lock.skills.contains_key("react"));
+        assert!(!lock.skills.contains_key("angular"));
         assert_eq!(lock.skills["vue"].source_url, "https://example.com/vue.git");
     }
 
@@ -379,6 +380,10 @@ mod tests {
 
     #[test]
     fn test_resolve_restore_targets_default() {
+        // 经 Config::load 读取 XSKILL_CONFIG，须与改写该变量的测试串行
+        let _guard = crate::config::test_env_lock()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         let targets = resolve_restore_target(false, None).unwrap();
         assert_eq!(targets.len(), 1);
         assert!(targets[0].to_string_lossy().contains(".agents/skills"));
@@ -386,6 +391,10 @@ mod tests {
 
     #[test]
     fn test_resolve_restore_targets_global() {
+        // 经 Config::load 读取 XSKILL_CONFIG，须与改写该变量的测试串行
+        let _guard = crate::config::test_env_lock()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         let targets = resolve_restore_target(true, None).unwrap();
         assert_eq!(targets.len(), 1);
         assert!(targets[0].to_string_lossy().contains(".agents/skills"));
@@ -393,6 +402,11 @@ mod tests {
 
     #[test]
     fn test_resolve_restore_targets_invalid_platform() {
+        // 经 Config::load 读取 XSKILL_CONFIG，须与改写该变量的测试串行，
+        // 否则并行读到临时配置文件时错误信息不同导致断言偶发失败
+        let _guard = crate::config::test_env_lock()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         let result = resolve_restore_target(false, Some("nonexistent-platform"));
         assert!(result.is_err());
         let err_msg = result.unwrap_err().to_string();
@@ -464,8 +478,11 @@ mod tests {
     #[test]
     fn test_copy_skill_to_dest_missing_source() {
         let dst = tempfile::tempdir().unwrap();
-        let result =
-            copy_skill_to_dest(&PathBuf::from("/nonexistent/path"), &dst.path().join("vue"), false);
+        let result = copy_skill_to_dest(
+            &PathBuf::from("/nonexistent/path"),
+            &dst.path().join("vue"),
+            false,
+        );
         assert!(result.is_err());
     }
 
@@ -525,6 +542,10 @@ mod tests {
 
     #[test]
     fn test_restore_does_not_modify_lock_file() {
+        // 本测试切换进程工作目录，须与其他依赖 cwd/XSKILL_CONFIG 的测试串行
+        let _guard = crate::config::test_env_lock()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         // restore 只读锁文件：加载再保存，内容应与原始文件逐字节一致
         let tmp = std::env::temp_dir().join(format!(
             "xskill-test-restore-lock-{}-{}",

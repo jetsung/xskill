@@ -112,7 +112,6 @@ xskill -v add -f my-skills -s vue
 | `list` | List installed skills |
 | `query` | Query skills from a source |
 | `find` | Interactively find and install skills (multi-select TUI) |
-| `rec` | Manage recommended skills (list/add/remove) |
 | `cache` | Manage skills cache |
 | `config` | Manage configuration |
 | `new` | Create a new skill project |
@@ -133,7 +132,6 @@ Config file: `~/.xskill/settings.json` (override with `XSKILL_CONFIG` env var).
   "sources": [
     { "name": "antfu", "type": "git", "url": "https://github.com/antfu/skills" }
   ],
-  "recommended": [{ "name": "antfu", "skills": ["vue"] }],
   "cache": { "enabled": true, "ttl": 86400 },
   "registry": { "enabled": false, "url": "https://xskill.gcli.cn/skills.json" },
   "proxy": ""

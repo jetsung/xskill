@@ -50,11 +50,11 @@ pub fn print_table(headers: &[&str], rows: &[Vec<String>]) {
 
     // Print data rows
     for row in rows {
-        for i in 0..num_cols {
+        for (i, val) in row.iter().enumerate().take(num_cols) {
             if i > 0 {
                 print!(" ");
             }
-            let val = row.get(i).map(|s| s.as_str()).unwrap_or("");
+            let val = val.as_str();
             if val.is_empty() {
                 print!("{}", pad_right(EMPTY_PLACEHOLDER, col_widths[i]).dimmed());
             } else {

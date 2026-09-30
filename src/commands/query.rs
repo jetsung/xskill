@@ -41,13 +41,12 @@ pub fn run(skill: &str, source: Option<&str>) -> Result<()> {
         println!("{}: {}", "Skill not found in any source".yellow(), skill);
 
         // Hint: suggest cache update when sources exist but cache may be stale
-        if !config.sources.is_empty() || config.is_registry_enabled() {
-            if config.is_cache_enabled() {
-                println!(
-                    "{}",
-                    "Hint: run `xskill cache update` to refresh skills cache".cyan()
-                );
-            }
+        if (!config.sources.is_empty() || config.is_registry_enabled()) && config.is_cache_enabled()
+        {
+            println!(
+                "{}",
+                "Hint: run `xskill cache update` to refresh skills cache".cyan()
+            );
         }
     }
 
@@ -79,10 +78,10 @@ fn print_skill_table(source_cache: &SourceCache, skills: &[&CachedSkill]) {
             source_cache.source.clone()
         };
         println!("{}: {}", "Source".cyan().bold(), display_source);
-        if let Some(ref registry_url) = source_cache.registry_url {
-            if !registry_url.is_empty() {
-                println!("{}: {}", "Registry".cyan().bold(), registry_url);
-            }
+        if let Some(ref registry_url) = source_cache.registry_url
+            && !registry_url.is_empty()
+        {
+            println!("{}: {}", "Registry".cyan().bold(), registry_url);
         }
         println!("{}: {}", "Name".cyan().bold(), skill.name.yellow());
         if !skill.description.is_empty() && skill.description != "无" {

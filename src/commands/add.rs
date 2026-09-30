@@ -4,8 +4,8 @@ use crate::lock::{LockEntry, LockFile};
 use crate::skill_meta::SkillMeta;
 use crate::skill_resolver;
 use crate::utils::{
-    ResolvedSource, canonical_skills_dir, create_relative_symlink, display_path, remove_symlink, resolve_source,
-    validate_agent,
+    ResolvedSource, canonical_skills_dir, create_relative_symlink, display_path, remove_symlink,
+    resolve_source, validate_agent,
 };
 use anyhow::{Context, Result, bail};
 use colored::Colorize;
@@ -136,10 +136,10 @@ fn install_to_canonical(
         "Description".cyan().bold(),
         meta.display_description()
     );
-    if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
-        if !version.is_empty() {
-            println!("{}: {}", "Version".cyan().bold(), version);
-        }
+    if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone())
+        && !version.is_empty()
+    {
+        println!("{}: {}", "Version".cyan().bold(), version);
     }
     let display_path_str = if skill_path.is_empty() {
         "SKILL.md".to_string()
@@ -175,12 +175,7 @@ fn symlink_to_platform(
     let platform = config.get_platform(platform_name).unwrap();
 
     if platform.agents_compat {
-        println!(
-            "{}: {} ({})",
-            "Skipped".dimmed(),
-            platform_name,
-            "agents_compat"
-        );
+        println!("{}: {} (agents_compat)", "Skipped".dimmed(), platform_name);
         return Ok(());
     }
 
@@ -197,10 +192,9 @@ fn symlink_to_platform(
         .join(&platform.skills);
     if platform_skills_dir == canonical_skills_dir(global) {
         println!(
-            "{}: {} ({})",
+            "{}: {} (same as canonical dir)",
             "Skipped".dimmed(),
-            platform_name,
-            "same as canonical dir"
+            platform_name
         );
         return Ok(());
     }
@@ -386,16 +380,12 @@ fn install_all_skills(
             "Description".cyan().bold(),
             meta.display_description()
         );
-        if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
-            if !version.is_empty() {
-                println!("{}: {}", "Version".cyan().bold(), version);
-            }
+        if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone())
+            && !version.is_empty()
+        {
+            println!("{}: {}", "Version".cyan().bold(), version);
         }
-        println!(
-            "{}: {}",
-            "Path".cyan().bold(),
-            format!("{}/SKILL.md", full_skill_path)
-        );
+        println!("{}: {}/SKILL.md", "Path".cyan().bold(), full_skill_path);
 
         // 获取 tree hash
         let skill_folder_hash =
@@ -475,18 +465,25 @@ fn install_root_skill(
     println!();
 
     // 显示 skill 信息
-    println!("{}: {}", "Name".cyan().bold(), meta.display_name(&dest_name).yellow());
-    println!("{}: {}", "Description".cyan().bold(), meta.display_description());
-    if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone()) {
-        if !version.is_empty() {
-            println!("{}: {}", "Version".cyan().bold(), version);
-        }
+    println!(
+        "{}: {}",
+        "Name".cyan().bold(),
+        meta.display_name(&dest_name).yellow()
+    );
+    println!(
+        "{}: {}",
+        "Description".cyan().bold(),
+        meta.display_description()
+    );
+    if let Some(version) = meta.metadata.as_ref().and_then(|m| m.version.clone())
+        && !version.is_empty()
+    {
+        println!("{}: {}", "Version".cyan().bold(), version);
     }
-    println!("{}: {}", "Path".cyan().bold(), "SKILL.md");
+    println!("{}: SKILL.md", "Path".cyan().bold());
 
     // 获取根 tree hash（HEAD: 等价 HEAD^{tree}）
-    let skill_folder_hash =
-        git::get_skill_folder_hash(repo_root, "").unwrap_or_default();
+    let skill_folder_hash = git::get_skill_folder_hash(repo_root, "").unwrap_or_default();
 
     // 锁文件路径：根级 skill 为 "SKILL.md"
     let now = chrono::Utc::now();
@@ -619,24 +616,23 @@ fn find_skill_with_fallback(
     prefer_source: Option<&str>,
 ) -> Result<(String, String, String, String)> {
     // 1. If preferred source specified, try it first
-    if let Some(src) = prefer_source {
-        if let Ok(resolved) = resolve_source(config, src) {
-            if let Ok(Some((path, dest))) = find_skill_in_repo(&resolved.url, skill_name) {
-                let source_name = config
-                    .get_source(src)
-                    .map(|s| s.effective_name())
-                    .unwrap_or_else(|| src.to_string());
-                // 根级 skill：dest 为空表示仓库本身是 skill
-                let dest = if dest.is_empty() {
-                    crate::utils::repo_name_from_url(&resolved.url)
-                } else {
-                    dest
-                };
-                return Ok((source_name, resolved.url, path, dest));
-            }
-        }
-        // Source not resolvable or skill not found — fall through to broader search
+    if let Some(src) = prefer_source
+        && let Ok(resolved) = resolve_source(config, src)
+        && let Ok(Some((path, dest))) = find_skill_in_repo(&resolved.url, skill_name)
+    {
+        let source_name = config
+            .get_source(src)
+            .map(|s| s.effective_name())
+            .unwrap_or_else(|| resolved.url.clone());
+        // 根级 skill：dest 为空表示仓库本身是 skill
+        let dest = if dest.is_empty() {
+            crate::utils::repo_name_from_url(&resolved.url)
+        } else {
+            dest
+        };
+        return Ok((source_name, resolved.url, path, dest));
     }
+    // Source not resolvable or skill not found — fall through to broader search
 
     // 2. Search all sources (cache → configured → registry)
     let matches = skill_resolver::find_all_skills(config, skill_name, prefer_source);
@@ -676,7 +672,8 @@ fn find_skill_with_fallback(
                 );
             }
             let selected = run_source_select_tui(skill_name, &matches)?;
-            let (skill_path, dest_name) = extract_skill_path(&selected.skill_path, &selected.source_url);
+            let (skill_path, dest_name) =
+                extract_skill_path(&selected.skill_path, &selected.source_url);
             Ok((
                 selected.source_name,
                 selected.source_url,
@@ -789,7 +786,7 @@ fn run_source_select_tui(
 /// Extract (dir_path, dir_name) from "skills/rel_path/SKILL.md" or "rel_path/SKILL.md"
 ///
 /// 根级 skill（"SKILL.md"）→ dir_path 为空，dir_name 取源 URL 的仓库名
-/// （如 https://github.com/bybit-exchange/svg-diagram → svg-diagram）
+/// （如 `https://github.com/bybit-exchange/svg-diagram` → svg-diagram）
 fn extract_skill_path(full_path: &str, source_url: &str) -> (String, String) {
     if crate::utils::is_root_skill(full_path) {
         return (String::new(), crate::utils::repo_name_from_url(source_url));
@@ -800,7 +797,11 @@ fn extract_skill_path(full_path: &str, source_url: &str) -> (String, String) {
         .unwrap_or(full_path)
         .to_string();
     // Get the last component as the directory name
-    let dest_name = dir_path.split('/').last().unwrap_or(&dir_path).to_string();
+    let dest_name = dir_path
+        .split('/')
+        .next_back()
+        .unwrap_or(&dir_path)
+        .to_string();
     (dir_path, dest_name)
 }
 
@@ -880,14 +881,14 @@ fn collect_matching_skills(
 
             // 检查是否有 SKILL.md 且 name 匹配
             let skill_md = path.join("SKILL.md");
-            if skill_md.exists() {
-                if let Ok(meta) = SkillMeta::from_file(&path) {
-                    let display = meta.display_name(&dir_name);
-                    if display == target || dir_name == target {
-                        matches.push((rel_path.clone(), dir_name.clone()));
-                        *current_path = saved;
-                        continue;
-                    }
+            if skill_md.exists()
+                && let Ok(meta) = SkillMeta::from_file(&path)
+            {
+                let display = meta.display_name(&dir_name);
+                if display == target || dir_name == target {
+                    matches.push((rel_path.clone(), dir_name.clone()));
+                    *current_path = saved;
+                    continue;
                 }
             }
 
@@ -1024,10 +1025,8 @@ mod tests {
     #[test]
     fn test_extract_skill_path_root() {
         // 根级 skill：SKILL.md 位于仓库根目录，安装名取仓库名
-        let (path, dest) = extract_skill_path(
-            "SKILL.md",
-            "https://github.com/bybit-exchange/svg-diagram",
-        );
+        let (path, dest) =
+            extract_skill_path("SKILL.md", "https://github.com/bybit-exchange/svg-diagram");
         assert_eq!(path, "");
         assert_eq!(dest, "svg-diagram");
 

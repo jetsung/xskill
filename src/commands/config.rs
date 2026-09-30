@@ -41,14 +41,12 @@ pub fn run_init() -> Result<()> {
         );
         println!(
             "{}",
-            "Use --edit to modify, or delete the file first.".dimmed()
+            "Use `config edit` to modify, or delete the file first.".dimmed()
         );
         return Ok(());
     }
 
-    let mut config = default_config();
-    // 与 platforms reset 一致：内置渠道精简为 name/enabled/builtin 三字段
-    config.normalize_platforms_for_save();
+    let config = default_config();
     config.save()?;
 
     println!("{}: {}", "Config file initialized".green(), path.display());
@@ -255,9 +253,9 @@ fn get_nested_value<'a>(value: &'a Value, path: &str) -> Option<&'a Value> {
     let mut current = value;
 
     for part in parts {
-        match current.get(part) {
-            Some(v) => current = v,
-            None => return None,
+        {
+            let v = current.get(part)?;
+            current = v
         }
     }
 
@@ -285,7 +283,7 @@ fn set_nested_value(value: &mut Value, path: &str, new_value: Value) -> Result<(
             }
         } else {
             // Intermediate part: navigate into object
-            if current.get(part).is_none() || current.get(part).map_or(false, |v| v.is_null()) {
+            if current.get(part).is_none() || current.get(part).is_some_and(|v| v.is_null()) {
                 // Create missing intermediate object (or replace null)
                 if let Some(obj) = current.as_object_mut() {
                     obj.insert(part.to_string(), Value::Object(serde_json::Map::new()));
@@ -420,6 +418,10 @@ mod tests {
 
     #[test]
     fn test_run_init_platforms_minimal_fields() {
+        // 本测试修改进程级 XSKILL_CONFIG，须与依赖该变量的测试串行
+        let _guard = crate::config::test_env_lock()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
         // 临时目录 + XSKILL_CONFIG 指向不存在的配置文件
         let tmp = std::env::temp_dir().join(format!(
             "xskill-test-init-{}-{}",
@@ -443,9 +445,15 @@ mod tests {
         let platforms = value["platforms"].as_object().expect("platforms 应为对象");
         assert!(!platforms.is_empty());
         for (key, entry) in platforms {
-            let keys: Vec<&str> = entry.as_object().unwrap().keys().map(String::as_str).collect();
+            let keys: Vec<&str> = entry
+                .as_object()
+                .unwrap()
+                .keys()
+                .map(String::as_str)
+                .collect();
             assert_eq!(
-                keys, ["builtin", "enabled", "name"],
+                keys,
+                ["builtin", "enabled", "name"],
                 "内置平台 {key} 应仅含 name/enabled/builtin 三字段，实际: {keys:?}"
             );
         }

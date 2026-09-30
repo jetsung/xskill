@@ -260,16 +260,16 @@ fn install_skills(
                 crate::utils::display_path(&canonical_dir)
             );
             // 显示 skill 在仓库中的路径
-            eprintln!("{}: {}", "Path".cyan().bold(), &item.skill.path);
+            eprintln!("{}: {}", "Path".cyan().bold(), item.skill.path);
 
             // 2. Create symlinks for selected platforms
             let mut linked: Vec<String> = Vec::new();
             for platform in platforms {
-                if let Some(p) = config.platforms.get(platform.as_str()) {
-                    if p.agents_compat {
-                        linked.push(platform.to_string());
-                        continue;
-                    }
+                if let Some(p) = config.platforms.get(platform.as_str())
+                    && p.agents_compat
+                {
+                    linked.push(platform.to_string());
+                    continue;
                 }
                 let dest_dir = match resolve_platform_dest(config, platform, &dest_name, global) {
                     Some(dir) => dir,
@@ -280,7 +280,7 @@ fn install_skills(
                     }
                 };
 
-                if let Err(e) = fs::create_dir_all(&dest_dir.parent().unwrap_or(&dest_dir)) {
+                if let Err(e) = fs::create_dir_all(dest_dir.parent().unwrap_or(&dest_dir)) {
                     all_failed.push(format!("{}: {} ({})", skill_name, platform, e));
                     continue;
                 }
@@ -392,7 +392,7 @@ fn run_platform_tui(config: &Config) -> Result<Vec<String>> {
             config
                 .platforms
                 .get(**name)
-                .map_or(false, |p| p.agents_compat && p.enabled)
+                .is_some_and(|p| p.agents_compat && p.enabled)
         })
         .map(|s| s.to_string())
         .collect();
@@ -579,9 +579,9 @@ fn collect_items(cache_data: &CacheData, source: Option<&str>) -> Vec<FindItem> 
 }
 
 /// Format display string for fuzzy matching.
-/// Normal: "name [source]"
-/// Registry: "name [registry] [source]"
-/// Registry + name collision (source empty): "name [registry] [source_url]"
+/// Normal: "name \[source\]"
+/// Registry: "name \[registry\] \[source\]"
+/// Registry + name collision (source empty): "name \[registry\] \[source_url\]"
 fn format_display(
     skill: &CachedSkill,
     source: &str,
@@ -603,7 +603,7 @@ fn format_display(
 /// Extract (sparse_skill_path, leaf_name) from CachedSkill.path.
 /// e.g. "skills/engineering/grill/SKILL.md" → ("engineering/grill", "grill")
 /// e.g. "skills/vue/SKILL.md" → ("vue", "vue")
-/// Root-level skill ("SKILL.md" or "") → ("", <repo name from source_url>)
+/// Root-level skill ("SKILL.md" or "") → ("", `<repo name from source_url>`)
 fn extract_skill_path(full_path: &str, source_url: &str) -> (String, String) {
     // 根级 skill：仓库本身就是一个 skill，安装名取仓库名
     if crate::utils::is_root_skill(full_path) {
@@ -618,7 +618,11 @@ fn extract_skill_path(full_path: &str, source_url: &str) -> (String, String) {
     if let Some(s) = stripped.strip_suffix("/SKILL.md") {
         stripped = s;
     }
-    let dest_name = stripped.split('/').last().unwrap_or(stripped).to_string();
+    let dest_name = stripped
+        .split('/')
+        .next_back()
+        .unwrap_or(stripped)
+        .to_string();
     (stripped.to_string(), dest_name)
 }
 
@@ -735,8 +739,7 @@ mod tests {
 
     #[test]
     fn test_extract_skill_path_deeply_nested() {
-        let (path, name) =
-            extract_skill_path("skills/a/b/c/SKILL.md", "https://example.com/repo");
+        let (path, name) = extract_skill_path("skills/a/b/c/SKILL.md", "https://example.com/repo");
         assert_eq!(path, "a/b/c");
         assert_eq!(name, "c");
     }
@@ -744,10 +747,8 @@ mod tests {
     #[test]
     fn test_extract_skill_path_root() {
         // 根级 skill：SKILL.md 位于仓库根目录，安装名取仓库名
-        let (path, name) = extract_skill_path(
-            "SKILL.md",
-            "https://github.com/bybit-exchange/svg-diagram",
-        );
+        let (path, name) =
+            extract_skill_path("SKILL.md", "https://github.com/bybit-exchange/svg-diagram");
         assert_eq!(path, "");
         assert_eq!(name, "svg-diagram");
 
@@ -783,7 +784,6 @@ mod tests {
         let _ = std::fs::remove_dir_all(&tmp);
         let workdir = tmp.join("repo");
         let skill_dir = workdir.join("git-commit");
-
 
         let resolved = resolve_skill_source_dir(&workdir, "git-commit");
         assert_eq!(resolved, skill_dir);
@@ -1112,7 +1112,17 @@ mod tests {
         let mut platforms = HashMap::new();
         platforms.insert(
             "claude".to_string(),
-            Platform { name: None, enabled: true, path: ".claude".to_string(), local_path: None, skills: "skills".to_string(), agents: "CLAUDE.md".to_string(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
+            Platform {
+                name: None,
+                enabled: true,
+                path: ".claude".to_string(),
+                local_path: None,
+                skills: "skills".to_string(),
+                agents: "CLAUDE.md".to_string(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+                builtin: false,
+            },
         );
         let config = Config {
             platforms,
@@ -1140,7 +1150,17 @@ mod tests {
         let mut platforms = HashMap::new();
         platforms.insert(
             "minimal".to_string(),
-            Platform { name: None, enabled: true, path: ".minimal".to_string(), local_path: None, skills: String::new(), agents: String::new(), source: "AGENTS.md".to_string(), agents_compat: false, builtin: false },
+            Platform {
+                name: None,
+                enabled: true,
+                path: ".minimal".to_string(),
+                local_path: None,
+                skills: String::new(),
+                agents: String::new(),
+                source: "AGENTS.md".to_string(),
+                agents_compat: false,
+                builtin: false,
+            },
         );
         let config = Config {
             platforms,
