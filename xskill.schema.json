@@ -23,13 +23,6 @@
         "$ref": "#/$defs/Source"
       }
     },
-    "recommended": {
-      "description": "Recommended skill sets grouped by source.",
-      "type": "array",
-      "items": {
-        "$ref": "#/$defs/RecommendedSource"
-      }
-    },
     "cache": {
       "description": "Cache settings for skills list caching.",
       "$ref": "#/$defs/CacheConfig"
@@ -93,7 +86,9 @@
           "default": false
         }
       },
-      "required": ["path"],
+      "required": [
+        "path"
+      ],
       "additionalProperties": false
     },
     "Source": {
@@ -109,7 +104,10 @@
         "type": {
           "description": "Source type.",
           "type": "string",
-          "enum": ["git", "api"],
+          "enum": [
+            "git",
+            "api"
+          ],
           "default": "git"
         },
         "url": {
@@ -118,33 +116,9 @@
           "format": "uri"
         }
       },
-      "required": ["url"],
-      "additionalProperties": false
-    },
-    "RecommendedSource": {
-      "description": "A group of recommended skills from a specific source.",
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "Source name referencing a Source entry, or custom label.",
-          "type": "string",
-          "default": ""
-        },
-        "url": {
-          "description": "Direct source URL (overrides name reference). Empty string means the entry is referenced by 'name' only.",
-          "type": "string",
-          "default": ""
-        },
-        "skills": {
-          "description": "List of recommended skill names.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "minItems": 1
-        }
-      },
-      "required": ["skills"],
+      "required": [
+        "url"
+      ],
       "additionalProperties": false
     },
     "CacheConfig": {
@@ -170,9 +144,9 @@
       "type": "object",
       "properties": {
         "enabled": {
-          "description": "Enable or disable registry. Default is false.",
+          "description": "Enable or disable registry. Default is true.",
           "type": "boolean",
-          "default": false
+          "default": true
         },
         "url": {
           "description": "Registry URL. Default is https://xskill.gcli.cn/skills.json.",
