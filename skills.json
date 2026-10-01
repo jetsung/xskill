@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-09-30T21:41:17.713Z",
+  "updated_at": "2026-10-01T03:14:00.324Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "e62be9667aff87958ed94bee2b396433897d1529",
+      "commit_hash": "d6131471b85fbb4799e64175ebc42c9309ecc28a",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -3292,7 +3292,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "cd4f9e4a5f99e7b48f2c452ef0fa3769db4dde4a",
+      "commit_hash": "3a34ea309d80df7c5defb388133eceacb4aeba17",
       "skills": [
         {
           "name": "openspec-update-change",
@@ -4297,7 +4297,7 @@
     {
       "source": "thedaviddias/Front-End-Checklist",
       "url": "https://github.com/thedaviddias/Front-End-Checklist",
-      "commit_hash": "30756a79b2f7d4363ac592710146c8e28fa9f1b5",
+      "commit_hash": "2e0e6b5f77931fc6e85cd5fd3973645e5b00fdcc",
       "skills": [
         {
           "name": "image-redundant-alt",
@@ -5293,6 +5293,12 @@
           "name": "form-validation",
           "path": "skills/form-validation/SKILL.md",
           "description": "Use when reviewing templates, rendered HTML, or shared components related to Validate forms accessibly. Validate the final browser-facing markup, not just the source framework abstraction. Distinguish between browser-posted forms and client-handled React forms so you do not over-report missing `method` or `action` as accessibility defects.",
+          "version": ""
+        },
+        {
+          "name": "video-optimization",
+          "path": "skills/video-optimization/SKILL.md",
+          "description": "Use when reviewing <video> elements, background/hero video, or embedded media assets. Check encoded bitrate, resolution relative to the rendered player size, codec/container choice, and whether a poster/thumbnail avoids blocking on the first frame.",
           "version": ""
         },
         {
