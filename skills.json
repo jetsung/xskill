@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-02T03:15:11.230Z",
+  "updated_at": "2026-10-02T11:37:04.826Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -2906,7 +2906,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "633ff8261f6f6d0ce502ceb9688cf556d957abae",
+      "commit_hash": "9d0c60d406b454a78ccc0a175b19932047aa4dac",
       "skills": [
         {
           "name": "idea-refine",
@@ -3292,7 +3292,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "760584ba9a6e2aa5906edf082ecd465a53cf6618",
+      "commit_hash": "bfa670eda91c6cd998d42248ceab2b565db932ff",
       "skills": [
         {
           "name": "openspec-update-change",
