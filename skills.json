@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-01T22:09:10.834Z",
+  "updated_at": "2026-10-02T03:15:11.230Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "d6131471b85fbb4799e64175ebc42c9309ecc28a",
+      "commit_hash": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -2906,7 +2906,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "2686b620fc1fed2e8f60c704839c766b8594c6b6",
+      "commit_hash": "633ff8261f6f6d0ce502ceb9688cf556d957abae",
       "skills": [
         {
           "name": "idea-refine",
@@ -6650,7 +6650,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f",
+      "commit_hash": "ef648e01899ba3e8dc6371642deaaf64b4477775",
       "skills": [
         {
           "name": "blueprint",
@@ -8269,7 +8269,7 @@
         {
           "name": "ecc-guide",
           "path": "skills/ecc-guide/SKILL.md",
-          "description": "Answer questions about Everything Claude Code by reading the live repo surface — agents, skills, commands, hooks, rules, install profiles, and docs — instead of memory. Use when the user asks what ECC includes, how to install or reset it, which skill or command fits a task, or how project onboarding works.",
+          "description": "Answer questions about ECC by reading the live repo surface — agents, skills, commands, hooks, rules, install profiles, and docs — instead of memory. Use when the user asks what ECC includes, how to install or reset it, which skill or command fits a task, or how project onboarding works.",
           "version": ""
         },
         {
