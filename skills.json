@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-05T13:05:40.990Z",
+  "updated_at": "2026-10-05T23:30:09.740Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -59,7 +59,7 @@
     {
       "source": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
-      "commit_hash": "8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4",
+      "commit_hash": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
       "skills": [
         {
           "name": "slack-gif-creator",
@@ -3298,7 +3298,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "2500d6da971336167548b53731a35b2127df35ac",
+      "commit_hash": "87c3595ace6a2e22957f39ebe5b74c2f2316e0cb",
       "skills": [
         {
           "name": "openspec-update-change",
