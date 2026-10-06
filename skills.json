@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-05T23:30:09.740Z",
+  "updated_at": "2026-10-06T03:58:29.095Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3298,7 +3298,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "87c3595ace6a2e22957f39ebe5b74c2f2316e0cb",
+      "commit_hash": "9111a7654d7800391459431fff4eaf66e33a3d2e",
       "skills": [
         {
           "name": "openspec-update-change",
