@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-06T12:27:48.710Z",
+  "updated_at": "2026-10-06T22:02:51.968Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "143a3d976b3c1603cc8932984d5e1f28501cb5fc",
+      "commit_hash": "ff784ad85c37d6f93c0194ea16602197693b5786",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -3063,7 +3063,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "c665c5559e8be56a12271a620ae44aa1ada535ed",
+      "commit_hash": "6fd947921b935b7e1e69293a200400f0fdd5c15f",
       "skills": [
         {
           "name": "setup-pre-commit",
@@ -4303,7 +4303,7 @@
     {
       "source": "thedaviddias/Front-End-Checklist",
       "url": "https://github.com/thedaviddias/Front-End-Checklist",
-      "commit_hash": "8cad7dd3945858d1ce18ac0590d7248afe1d18b3",
+      "commit_hash": "e8d14d049010e2ce25afcd5e8609dfcbbe63e47e",
       "skills": [
         {
           "name": "image-redundant-alt",
