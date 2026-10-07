@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-10-07T12:21:20.789Z",
+  "updated_at": "2026-10-07T22:27:27.240Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "649efd8ab5abfca73171713831136ab26f7ab617",
+      "commit_hash": "fe5358601b3885625986988ef4361cb762495c10",
       "skills": [
         {
           "name": "incremental-translate",
@@ -27,8 +27,8 @@
         {
           "name": "flarum-publish",
           "path": "skills/flarum-publish/SKILL.md",
-          "description": "通过 Flarum REST API 把内容发布到 Flarum 论坛。当用户要求发布/投稿文章（主题/讨论）到 Flarum 论坛、同步内容到论坛、转存图片到论坛图床（fof/upload），或给出 GitHub 项目链接要求整理成中文文章发布时，使用本 skill——即使没有明说「Flarum」，只要是发帖到论坛即适用。支持按名称匹配标签（缓存于 ~/.cache/flarum_idev_tags，含默认/AI 标签组，按项目语言自动追加语言标签）。可选功能：项目文章发布后，仅当用户以关键词（如「整理教程」「生成使用教程」）触发时，把 GitHub 项目整理为基础使用教程并以回帖（POST /api/posts）回复到之前已创建的文章；agent 不得主动触发。",
-          "version": "1.13.0"
+          "description": "通过 Flarum REST API 把内容发布到 Flarum 论坛。当用户要求发布/投稿文章（主题/讨论）到 Flarum 论坛、同步内容到论坛、转存图片到论坛图床（fof/upload），或给出 GitHub 项目链接要求整理成中文文章发布时，使用本 skill——即使没有明说「Flarum」，只要是发帖到论坛即适用。支持按名称匹配标签（缓存于 ~/.cache/flarum/tags.json，含默认/AI 标签组，按项目语言自动追加语言标签）。可选功能：项目文章发布后，仅当用户以关键词（如「整理教程」「生成使用教程」）触发时，把 GitHub 项目整理为基础使用教程并以回帖（POST /api/posts）回复到之前已创建的文章；agent 不得主动触发。",
+          "version": "1.15.0"
         },
         {
           "name": "huawei-deveco-studio-fetch",
@@ -39,8 +39,8 @@
         {
           "name": "model-channel-sync",
           "path": "skills/model-channel-sync/SKILL.md",
-          "description": "管理 AI 模型渠道（provider）配置：①提取真正可用的免费/零价模型（抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论）； ②以 pi 等平台配置为基准，同步/更新渠道、模型、APIKEY 到多个 agent 工具（pi、zcode、dsh、omp、opencode、qoder、codebuddy、dbx 等）的配置文件。 凡用户提到\"获取/提取/列出 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、\"有哪些免费模型可用\"、 \"给 XX 渠道加免费模型\"、\"这个免费模型能用吗/测试一下\"、\"把模型更新到 pi/omp/opencode/dsh/zcode/qoder/codebuddy/dbx\"、 \"以 pi 为基准更新 XX 渠道\"、\"同步渠道/模型/APIKEY 到 XX\"、\"更新 XX 的 APIKEY\"时，都应使用此技能。 支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。",
-          "version": "1.0.0"
+          "description": "管理 AI 模型渠道（provider）配置：①提取真正可用的免费/零价模型（抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论）； ②以 pi 等平台配置为基准，同步/更新渠道、模型、APIKEY 到多个 agent 工具（pi、zcode、dsh、omp、opencode、mimocode、qoder、codebuddy、dbx 等）的配置文件。 凡用户提到\"获取/提取/列出 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、\"有哪些免费模型可用\"、 \"给 XX 渠道加免费模型\"、\"这个免费模型能用吗/测试一下\"、\"把模型更新到 pi/omp/opencode/mimocode/dsh/zcode/qoder/codebuddy/dbx\"、 \"以 pi 为基准更新 XX 渠道\"、\"同步渠道/模型/APIKEY 到 XX\"、\"更新 XX 的 APIKEY\"、 \"同步到 mimocode / 覆盖 mimocode 的提供商 / pi 同步到 mimocode\"时，都应使用此技能。 支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。",
+          "version": "1.1.0"
         },
         {
           "name": "atuin",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "3a685010a7afdc0dbd4c83b7fbda6c316aa516e5",
+      "commit_hash": "b55f76ed9b0f74bb4c62524282aad25b32d3cf88",
       "skills": [
         {
           "name": "qdrant-search-quality",
