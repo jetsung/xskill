@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-07T03:25:59.791Z",
+  "updated_at": "2026-10-07T12:21:20.789Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -180,7 +180,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "db8300f72f2ae32e332514f1b4c50d0a00af2ad7",
+      "commit_hash": "3a685010a7afdc0dbd4c83b7fbda6c316aa516e5",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -833,7 +833,7 @@
         {
           "name": "foundry-hosted-agent-copilotkit",
           "path": "skills/foundry-hosted-agent-copilotkit/SKILL.md",
-          "description": "Ongoing development guidance for agentic web apps that pair a CopilotKit frontend with Microsoft Agent Framework agents on Azure AI Foundry hosted agents over the AG-UI protocol - add and gate agent tools, wire human-in-the-loop approvals, build generative UI and shared state, debug the event stream, upgrade pre-1.0 packages safely, and deploy hosted agent updates.",
+          "description": "Build and evolve agentic web apps that pair a CopilotKit React frontend with a Microsoft Agent Framework agent running as a Microsoft Foundry hosted agent, connected over the AG-UI protocol. Covers choosing the wiring, using Foundry-native primitives instead of hand-rolled plumbing, agent tools, human-in-the-loop approvals, generative UI and shared state, local run and azd deploy, debugging the event stream, and safe upgrades.",
           "version": ""
         },
         {
@@ -1151,7 +1151,7 @@
         {
           "name": "mcp-security-audit",
           "path": "skills/mcp-security-audit/SKILL.md",
-          "description": "Audit MCP (Model Context Protocol) server configurations for security issues. Use this skill when:\n- Reviewing .mcp.json files for security risks\n- Checking MCP server args for hardcoded secrets or shell injection patterns\n- Validating that MCP servers use pinned versions (not @latest)\n- Detecting unpinned dependencies in MCP server configurations\n- Auditing which MCP servers a project registers and whether they're on an approved list\n- Checking for environment variable usage vs. hardcoded credentials in MCP configs\n- Any request like \"is my MCP config secure?\", \"audit my MCP servers\", or \"check .mcp.json\"\nkeywords: [mcp, security, audit, secrets, shell-injection, supply-chain, governance]",
+          "description": "Audit MCP (Model Context Protocol) server configurations for security issues. Use this skill when:\n- Reviewing .mcp.json files for security risks\n- Checking MCP server args for hardcoded secrets or shell injection patterns\n- Validating that MCP package-runner dependencies use exact reviewed versions, not bare names, @latest, or ranges\n- Detecting mutable npm/npx, bunx, pnpm dlx, yarn dlx, and npm exec references in MCP configurations\n- Auditing which MCP servers a project registers and whether they're on an approved list\n- Checking for environment variable usage vs. hardcoded credentials in MCP configs\n- Any request like \"is my MCP config secure?\", \"audit my MCP servers\", or \"check .mcp.json\"\nkeywords: [mcp, security, audit, secrets, shell-injection, supply-chain, governance]",
           "version": ""
         },
         {
@@ -1332,6 +1332,12 @@
           "name": "react19-source-patterns",
           "path": "skills/react19-source-patterns/SKILL.md",
           "description": "Reference for React 19 source-file migration patterns, including API changes, ref handling, and context updates.",
+          "version": ""
+        },
+        {
+          "name": "make-blog-post",
+          "path": "skills/make-blog-post/SKILL.md",
+          "description": "Turn code from the current session into a blog post written in the voice of its author. Covers one function, script, class, or tool as a focused walkthrough with a generalized sample and a usage example, learns tone and structure from existing posts or writing samples by the same author, takes the destination from what the user names or the blog repository in use instead of assumed folders, and saves no file until the draft is approved. Use when asked to write, draft, or turn code into a blog post, article, tutorial, or gist, or when invoked as /make-blog-post at the end of a turn.",
           "version": ""
         },
         {
@@ -3063,7 +3069,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "6fd947921b935b7e1e69293a200400f0fdd5c15f",
+      "commit_hash": "f3fc5632f401156837ee3872f14fe33ccf1024ea",
       "skills": [
         {
           "name": "setup-pre-commit",
