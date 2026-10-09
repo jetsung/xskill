@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-08T22:40:46.986Z",
+  "updated_at": "2026-10-09T03:46:04.939Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -186,7 +186,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "7cce7cfb4b61196c36d7e8eb8475ae84b356b126",
+      "commit_hash": "87b76d88f0a98a8e4c39cd339bccd9461477b263",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -2453,7 +2453,7 @@
         {
           "name": "python-mcp-server-generator",
           "path": "skills/python-mcp-server-generator/SKILL.md",
-          "description": "Generate a complete MCP server project in Python with tools, resources, and proper configuration",
+          "description": "Use this skill when the user wants to create a new Model Context Protocol (MCP) server in Python. Also use it to expose Python functions, an API, or a database to AI clients as MCP tools. The skill makes a uv project with the MCP Python SDK v2 (MCPServer), typed tools, in-memory tests, and client configuration. Do not use it for an MCP client or for a server in another language.",
           "version": ""
         },
         {
