@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-10-09T12:19:31.424Z",
+  "updated_at": "2026-10-09T22:02:13.501Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "199868b666f0fef283b63fefe1a5d6cb18d186cb",
+      "commit_hash": "0b815434ce837669b1759c5177aed4933abd7e44",
       "skills": [
         {
           "name": "navi",
@@ -22,7 +22,7 @@
           "name": "git-commit-me",
           "path": "skills/git-commit-me/SKILL.md",
           "description": "Generates standardized git commit messages following the Conventional Commits format with Chinese descriptions. Use when committing changes, creating git commits, or writing commit messages.",
-          "version": "1.2.1"
+          "version": "1.3.0"
         },
         {
           "name": "incremental-translation",
@@ -46,7 +46,7 @@
           "name": "model-channel-sync",
           "path": "skills/model-channel-sync/SKILL.md",
           "description": "管理 AI 模型渠道（provider）配置：①提取真正可用的免费/零价模型（抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论）； ②以 pi 等平台配置为基准，同步/更新渠道、模型、APIKEY 到多个 agent 工具（pi、zcode、dsh、omp、opencode、mimocode、qoder、codebuddy、dbx 等）的配置文件。 凡用户提到\"获取/提取/列出 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、\"有哪些免费模型可用\"、 \"给 XX 渠道加免费模型\"、\"这个免费模型能用吗/测试一下\"、\"把模型更新到 pi/omp/opencode/mimocode/dsh/zcode/qoder/codebuddy/dbx\"、 \"以 pi 为基准更新 XX 渠道\"、\"同步渠道/模型/APIKEY 到 XX\"、\"更新 XX 的 APIKEY\"、 \"同步到 mimocode / 覆盖 mimocode 的提供商 / pi 同步到 mimocode\"时，都应使用此技能。 支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。",
-          "version": "1.1.0"
+          "version": "1.3.0"
         },
         {
           "name": "atuin",
@@ -65,7 +65,7 @@
     {
       "source": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
-      "commit_hash": "9d630808e4add0a7146de4af9384155d5dee350a",
+      "commit_hash": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
       "skills": [
         {
           "name": "slack-gif-creator",
@@ -6668,7 +6668,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "ef648e01899ba3e8dc6371642deaaf64b4477775",
+      "commit_hash": "5cc14d7c3155c7dcd4059c94b89df4b6303b7cd6",
       "skills": [
         {
           "name": "blueprint",
@@ -8035,7 +8035,7 @@
         {
           "name": "plan-orchestrate",
           "path": "skills/plan-orchestrate/SKILL.md",
-          "description": "Read a plan document, decompose it into steps, design a per-step agent chain from the ECC catalogue, and emit ready-to-paste /orchestrate custom prompts. Generative only — never invokes /orchestrate itself. Use when the user has a multi-step plan and wants to drive it through orchestrate without composing chains by hand.",
+          "description": "Read a plan document, decompose it into steps, classify each step, and emit the ready-to-paste ECC slash command for that step, carrying the step identifier and scope in the command's own documented argument form. Generative only — never invokes commands itself and never claims to control what a command runs internally. Steps whose command cannot carry plan scope fail closed instead of being emitted. Use when the user has a multi-step plan and wants the right command for each step without picking it by hand.",
           "version": ""
         },
         {
