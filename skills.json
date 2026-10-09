@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-09T03:46:04.939Z",
+  "updated_at": "2026-10-09T12:19:31.424Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -65,7 +65,7 @@
     {
       "source": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
-      "commit_hash": "683bc88e56f3e09ba94f7055977f3d3aa499f202",
+      "commit_hash": "9d630808e4add0a7146de4af9384155d5dee350a",
       "skills": [
         {
           "name": "slack-gif-creator",
@@ -186,7 +186,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "87b76d88f0a98a8e4c39cd339bccd9461477b263",
+      "commit_hash": "82701c24b99488536ca399ff4789a458b7a05db7",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -2845,7 +2845,7 @@
     {
       "source": "antfu/skills",
       "url": "https://github.com/antfu/skills",
-      "commit_hash": "e53a142a2420e8cd812cfe9ed0484ab01bc856aa",
+      "commit_hash": "feb0f3aba6566426f12230e7fc7a10d97c1293bb",
       "skills": [
         {
           "name": "nuxt",
@@ -2899,7 +2899,7 @@
           "name": "antfu-create-pr",
           "path": "skills/antfu-create-pr/SKILL.md",
           "description": "Create a reviewable GitHub pull request from the current branch with a Conventional Commits title, a concise evidence-based body, and before/after screenshots for UI changes. Use when asked to open, create, publish, or prepare a PR.",
-          "version": "2026.09.30"
+          "version": "2026.10.09"
         },
         {
           "name": "antfu",
@@ -3075,7 +3075,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "b0618bc436ad893b3c5e84e55fba86586d34a404",
+      "commit_hash": "49dd158d1076134a641b33efb035946536778336",
       "skills": [
         {
           "name": "setup-pre-commit",
