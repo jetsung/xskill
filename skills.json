@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-10T20:54:50.363Z",
+  "updated_at": "2026-10-11T03:02:15.464Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -6668,7 +6668,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "4eb71d92a39cab44ad40ac9d8a6a5ccb4029d6c2",
+      "commit_hash": "2d515e4fc2ddef97354769812cf3f7b9ec4e5124",
       "skills": [
         {
           "name": "blueprint",
@@ -6818,6 +6818,12 @@
           "name": "openclaw-persona-forge",
           "path": "skills/openclaw-persona-forge/SKILL.md",
           "description": "为 OpenClaw AI Agent 锻造完整的龙虾灵魂方案。根据用户偏好或随机抽卡， 输出身份定位、灵魂描述(SOUL.md)、角色化底线规则、名字和头像生图提示词。 如当前环境提供已审核的生图 skill，可自动生成统一风格头像图片。 当用户需要创建、设计或定制 OpenClaw 龙虾灵魂时使用。 不适用于：微调已有 SOUL.md、非 OpenClaw 平台的角色设计、纯工具型无性格 Agent。 触发词：龙虾灵魂、虾魂、OpenClaw 灵魂、养虾灵魂、龙虾角色、龙虾定位、 龙虾剧本杀角色、龙虾游戏角色、龙虾 NPC、龙虾性格、龙虾背景故事、 lobster soul、lobster character、抽卡、随机龙虾、龙虾 SOUL、gacha。 Use when creating, designing, or customizing an OpenClaw lobster persona — identity, SOUL.md, name, or avatar prompt.",
+          "version": ""
+        },
+        {
+          "name": "brownfield-retrospective",
+          "path": "skills/brownfield-retrospective/SKILL.md",
+          "description": "Run the ECC engineering process retroactively against an existing project slice. Audit current state, reconstruct past decisions, produce a four-axis gap register (thinking, coding practice, missing features, technology selection), then execute fixes forward through the plan-TDD-review pipeline. Use when adopting ECC mid-project, taking over an inherited codebase, or asking what was missed and what would have been built differently from day one.",
           "version": ""
         },
         {
@@ -7507,7 +7513,7 @@
         {
           "name": "gateguard",
           "path": "skills/gateguard/SKILL.md",
-          "description": "PreToolUse fact-forcing gate that denies the first Edit/Write/Bash (including MultiEdit) attempt until the agent presents concrete facts (importers, data schemas, verbatim user instruction), then allows retry; A/B-tested at +2.25 quality points. Use when enabling or configuring the GateGuard hook, exempting paths via env vars, or handling first-touch denials.",
+          "description": "PreToolUse fact-forcing gate that denies the first Edit/Write/Bash (including MultiEdit and NotebookEdit) attempt until the agent presents concrete facts (importers, data schemas, verbatim user instruction), then allows retry; A/B-tested at +2.25 quality points. Use when enabling or configuring the GateGuard hook, exempting paths via env vars, or handling first-touch denials.",
           "version": ""
         },
         {
@@ -8165,6 +8171,12 @@
           "version": ""
         },
         {
+          "name": "deepseek-harness-setup",
+          "path": "skills/deepseek-harness-setup/SKILL.md",
+          "description": "Install and operate Everything Claude Code (ECC) on the DeepSeek Harness (DSH): native skill roots (~/.dsh/skills, .agents/skills), the @deepseek-ai/dsh-hooks-claude-code bridge for command hooks, bare-insert patch mounting, generator usage, event-support limits, and update workflow. Use when setting up ECC on DeepSeek Harness, wiring ECC hooks into a DSH profile, or debugging why ECC skills or hooks do not appear in a DSH session.",
+          "version": ""
+        },
+        {
           "name": "search-first",
           "path": "skills/search-first/SKILL.md",
           "description": "Research-before-coding workflow: search npm/PyPI, MCP servers, skills, and GitHub for existing tools before writing custom code, then adopt, extend, or build. Launches the researcher agent for non-trivial needs. Use when starting a feature, adding a dependency or integration, or about to write a utility that may already exist.",
@@ -8180,6 +8192,12 @@
           "name": "videodb",
           "path": "skills/videodb/SKILL.md",
           "description": "Ingest, index, search, edit, and monitor video and audio with the VideoDB Python SDK — upload from files, URLs, or RTSP feeds, build spoken and scene indexes with timestamped search and playable clips, transcode and reframe, do timeline edits (subtitles, overlays, dubbing), and run real-time alerts on live streams or desktop capture. Use when working with video search, transcription, clipping, transcoding, streaming, or live video alerts.",
+          "version": ""
+        },
+        {
+          "name": "skill-host-compat",
+          "path": "skills/skill-host-compat/SKILL.md",
+          "description": "Lint ECC skills for Codex/Cursor-safe frontmatter and Claude-only substitutions before a skill PR.",
           "version": ""
         },
         {
@@ -8414,6 +8432,12 @@
           "name": "intent-driven-development",
           "path": "skills/intent-driven-development/SKILL.md",
           "description": "Turn ambiguous or high-impact product and engineering changes into scoped, verifiable acceptance criteria before or alongside implementation. Use when a user asks to clarify a feature, define acceptance criteria, de-risk a security/data/migration/integration change, prepare implementation requirements for another agent, or make a complex request testable. Do not trigger for trivial edits, straightforward fixes, active debugging, code review, or implementation requests whose acceptance conditions are already clear unless the user explicitly invokes this skill.",
+          "version": ""
+        },
+        {
+          "name": "agent-runtime-gateway-smoke-test",
+          "path": "skills/agent-runtime-gateway-smoke-test/SKILL.md",
+          "description": "Verify a local agent API, temporary gateway tunnel, and remote sandbox callback with a tool-free task, then restore the original app connection.",
           "version": ""
         },
         {
