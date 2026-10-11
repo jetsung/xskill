@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-11T03:02:15.464Z",
+  "updated_at": "2026-10-11T11:50:44.230Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -6668,7 +6668,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "2d515e4fc2ddef97354769812cf3f7b9ec4e5124",
+      "commit_hash": "8ce348fbea0d66f5c49c7b35e8ba8bb143b15132",
       "skills": [
         {
           "name": "blueprint",
@@ -7015,7 +7015,7 @@
         {
           "name": "context-budget",
           "path": "skills/context-budget/SKILL.md",
-          "description": "Audits Claude Code context window consumption across agents, skills, MCP servers, and rules. Identifies bloat, redundant components, and produces prioritized token-savings recommendations. Use when the context window is filling up too fast and the agents, skills, MCP servers, or rules consuming it need to be identified.",
+          "description": "Routes live context checks to the native Codex or Claude Code meter without scanning files, and performs a bounded static component audit only when explicitly requested. Use for context-budget requests about remaining capacity or installed context overhead.",
           "version": ""
         },
         {
@@ -7451,6 +7451,12 @@
           "version": ""
         },
         {
+          "name": "test-collaboration",
+          "path": "skills/test-collaboration/SKILL.md",
+          "description": "Inventory and govern a project's test assets. Connect requirements, business rules, risks, bugs, and cross-boundary contracts to stable TEST-IDs and executable evidence in the repository's existing test registry or TESTS.md. Use for test inventory, test gap analysis, unit/integration/contract/E2E/smoke classification, bug-to-test regression protection, consumer/provider contract testing, test-necessity review, and pre-delivery evidence review.",
+          "version": ""
+        },
+        {
           "name": "frontend-slides",
           "path": "skills/frontend-slides/SKILL.md",
           "description": "Create stunning, animation-rich HTML presentations from scratch or by converting PowerPoint files. Use when the user wants to build a presentation, convert a PPT/PPTX to web, or create slides for a talk/pitch. Helps non-designers discover their aesthetic through visual exploration rather than abstract choices.",
@@ -7526,6 +7532,12 @@
           "name": "dynamic-workflow-mode",
           "path": "skills/dynamic-workflow-mode/SKILL.md",
           "description": "Design task-local harnesses, eval gates, and reusable skill extraction for Claude dynamic workflow mode and other adaptive agent harnesses. Use when building a task-local harness, adding eval gates, or extracting a reusable skill from ad-hoc work.",
+          "version": ""
+        },
+        {
+          "name": "change-impact",
+          "path": "skills/change-impact/SKILL.md",
+          "description": "Perform evidence-backed impact analysis before changing code, data, interfaces, or governance documents, then compare the planned impact with the actual diff after implementation. Covers call paths, data and schema, API contracts, tests, documentation, ADRs, deployment, migration, and rollback. Use for cross-module or high-risk changes, database migrations, authentication, public interfaces, blast-radius questions, pre-change checks, and post-implementation alignment.",
           "version": ""
         },
         {
@@ -7853,6 +7865,12 @@
           "version": ""
         },
         {
+          "name": "context-and-decisions",
+          "path": "skills/context-and-decisions/SKILL.md",
+          "description": "Govern stable domain context with a narrowly scoped CONTEXT.md when needed, and route hard-to-reverse decisions to ECC's existing architecture-decision-records skill. Use when domain terms require repeated explanation, one term has multiple meanings, unclear language causes module-boundary mistakes, or domain semantics must remain separate from architecture decisions.",
+          "version": ""
+        },
+        {
           "name": "quarkus-security",
           "path": "skills/quarkus-security/SKILL.md",
           "description": "Quarkus security implementation patterns: JWT and OIDC authentication, @RolesAllowed RBAC and SecurityIdentity checks, Bean Validation and custom validators, parameterized Panache queries, BCrypt password hashing, CORS and security headers, rate limiting, audit logging, Vault or environment-variable secrets, and dependency CVE scanning. Use when adding authentication or authorization, validating input, managing secrets, or hardening a Quarkus application.",
@@ -7898,6 +7916,12 @@
           "name": "agent-security-hardening",
           "path": "skills/agent-security-hardening/SKILL.md",
           "description": "Security hardening guidance for AI agent frameworks that process untrusted content, invoke tools, write workspace files, manage runtime identifiers, or handle credentials. Use when building or reviewing an agent runtime, autonomous worker, tool gateway, memory service, or multi-tenant agent deployment. Do not use for general web application security or offensive testing.",
+          "version": ""
+        },
+        {
+          "name": "story-lifecycle",
+          "path": "skills/story-lifecycle/SKILL.md",
+          "description": "Manage a file-based epic → story → sprint development loop without requiring an external project management tool. Creates and tracks epics, breaks them into user stories, assigns them to sprints, and drives implementation story by story. Use when starting a new feature initiative or when the team has no Jira/Linear/Taiga but needs structured delivery tracking.",
           "version": ""
         },
         {
@@ -8144,6 +8168,12 @@
           "name": "laravel-verification",
           "path": "skills/laravel-verification/SKILL.md",
           "description": "Verification loop for Laravel projects: env checks, linting, static analysis, tests with coverage, security scans, and deployment readiness. Use when verifying a Laravel project before merge or deploy — lint, static analysis, tests, coverage, security.",
+          "version": ""
+        },
+        {
+          "name": "module-regression",
+          "path": "skills/module-regression/SKILL.md",
+          "description": "Govern cross-module regression in large repositories with a REGRESSION.md ledger that records each module's downstream consumers and executable acceptance command. After a change, run the changed module and every affected downstream command, and use observed exit codes as regression evidence under the project's delivery policy. Use for module regression, regression ledgers, impact audits, downstream verification, and changes where modifying A may break B.",
           "version": ""
         },
         {
