@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-11T21:16:30.518Z",
+  "updated_at": "2026-10-12T03:25:31.029Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -186,7 +186,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "82701c24b99488536ca399ff4789a458b7a05db7",
+      "commit_hash": "5187452f33f9379c617f8af94040eb2627bdd352",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -6668,7 +6668,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "d4a44ded8c150aac89b37c1f665b5a749fe52b02",
+      "commit_hash": "b92f181b3b748d1abbc2afd94af6aa7d8c8fca29",
       "skills": [
         {
           "name": "blueprint",
