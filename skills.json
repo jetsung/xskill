@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-12T23:58:31.503Z",
+  "updated_at": "2026-10-13T05:37:28.582Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -186,7 +186,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "70ddff7fab9d4d49743d221b56d761cff58048d0",
+      "commit_hash": "156736fb63e965b2f547a1460f3b5972c46e6b24",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -228,6 +228,12 @@
           "name": "tm7-threat-model",
           "path": "skills/tm7-threat-model/SKILL.md",
           "description": "Creates valid Microsoft Threat Modeling Tool (.tm7) files compatible with the Microsoft Threat Modeling Tool v7.3+. Use this skill whenever asked to create, generate, or modify a .tm7 threat model file, or when performing STRIDE threat modeling that should output a .tm7 file that opens cleanly in the Microsoft Threat Modeling Tool.",
+          "version": ""
+        },
+        {
+          "name": "cypress-flake-fixer",
+          "path": "skills/cypress-flake-fixer/SKILL.md",
+          "description": "Find and fix flake-prone anti-patterns in an existing Cypress suite, and APIs removed in Cypress 12 to 16. Bundles a zero-dependency scanner for fixed cy.wait() delays, assigned command return values, async/await, force: true, chaining after actions, one-shot expect() inside .then(), conditional testing, and removed APIs such as Cypress.env(), cy.exec(), cy.server()/cy.route(). Use when asked to fix flaky Cypress tests, remove cy.wait, stabilize or harden a Cypress suite, audit Cypress specs, debug \"detached from the DOM\" errors, or prepare an upgrade to Cypress 15 or 16.",
           "version": ""
         },
         {
@@ -2784,6 +2790,12 @@
           "name": "cosmosdb-datamodeling",
           "path": "skills/cosmosdb-datamodeling/SKILL.md",
           "description": "Step-by-step guide for capturing key application requirements for NoSQL use-case and produce Azure Cosmos DB Data NoSQL Model design using best practices and common patterns, artifacts_produced: \"cosmosdb_requirements.md\" file and \"cosmosdb_data_model.md\" file",
+          "version": ""
+        },
+        {
+          "name": "rebase-current-branch",
+          "path": "skills/rebase-current-branch/SKILL.md",
+          "description": "Rebase the currently checked out feature branch onto the latest upstream default branch. Use when asked to update a branch with main or master, rebase the current branch onto the default branch, or sync a feature branch before review. Detects whether the repository uses main or master and guides safe conflict handling.",
           "version": ""
         },
         {
