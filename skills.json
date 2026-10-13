@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-13T05:37:28.582Z",
+  "updated_at": "2026-10-13T22:06:30.126Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -2930,7 +2930,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "1be8e34187e34647bb83adc3a1323b26ae6f6abe",
+      "commit_hash": "aeac41d4d005999432bb7312f7ff06383a91d59d",
       "skills": [
         {
           "name": "idea-refine",
@@ -3007,7 +3007,7 @@
         {
           "name": "test-driven-development",
           "path": "skills/test-driven-development/SKILL.md",
-          "description": "Drives development with tests using the red-green-refactor loop. Use when implementing any logic, fixing any bug, or changing any behavior. Use when you need to prove that code works, when a bug report arrives, or when you're about to modify existing functionality.",
+          "description": "Drives development with tests using the red-green-refactor loop. Use when implementing any logic, fixing any bug, or changing any behavior. Use when you need to prove that code works, when a bug report arrives, or when you're about to modify existing functionality. Use when asked to add tests to a function, fix a bug in it or change its behavior, even when the code is pasted inline and the request does not mention tests.",
           "version": ""
         },
         {
