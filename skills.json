@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-13T22:06:30.126Z",
+  "updated_at": "2026-10-14T02:48:58.328Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -186,7 +186,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "156736fb63e965b2f547a1460f3b5972c46e6b24",
+      "commit_hash": "f25421d3f1b8b3bb217f78a7c0567cf7ec117cd8",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -2405,7 +2405,7 @@
         {
           "name": "java-mcp-server-generator",
           "path": "skills/java-mcp-server-generator/SKILL.md",
-          "description": "Generate a complete Model Context Protocol server project in Java using the official MCP Java SDK with reactive streams and optional Spring Boot integration.",
+          "description": "Use this skill when the user wants to create a Model Context Protocol (MCP) server in Java or in a Spring Boot app. Also use it when the user wants AI agents, such as GitHub Copilot or Claude, to use Java code, an API, or a database. Use it even if the user does not say \"MCP\". The skill makes a Maven or Gradle project with the MCP Java SDK 2.x, tools, JUnit tests, and client configuration. Do not use it for an MCP client or for a server in another language.",
           "version": ""
         },
         {
