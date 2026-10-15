@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T21:07:54.035Z",
+  "updated_at": "2026-10-15T02:28:22.964Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -186,7 +186,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "f25421d3f1b8b3bb217f78a7c0567cf7ec117cd8",
+      "commit_hash": "3cf7c7e8fe9cc1e7c3fd1319e8d01babf388cd6b",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -2457,6 +2457,12 @@
           "version": ""
         },
         {
+          "name": "batch-script-progress",
+          "path": "skills/batch-script-progress/SKILL.md",
+          "description": "Design and verify runtime output when creating or modifying Python, PowerShell, or Node.js scripts that process multiple files, records, or API requests. Use for batch scripts, bulk operations, silent long-running loops, progress reporting, per-item failures, final counts, stdout separation, or exit-status consistency. Not for UI progress bars, monitoring infrastructure, or progress updates in the AI conversation.",
+          "version": ""
+        },
+        {
           "name": "python-mcp-server-generator",
           "path": "skills/python-mcp-server-generator/SKILL.md",
           "description": "Use this skill when the user wants to create a new Model Context Protocol (MCP) server in Python. Also use it to expose Python functions, an API, or a database to AI clients as MCP tools. The skill makes a uv project with the MCP Python SDK v2 (MCPServer), typed tools, in-memory tests, and client configuration. Do not use it for an MCP client or for a server in another language.",
@@ -3322,7 +3328,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "7701149db3cf4086f617968894e2801c5ab3fd12",
+      "commit_hash": "f80d860fc510ba4f51180c8ddde35b91b32de657",
       "skills": [
         {
           "name": "openspec-update-change",
