@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-15T20:44:51.664Z",
+  "updated_at": "2026-10-16T02:22:28.578Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -186,7 +186,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "36e95dfda72140a68f577d5c894a551607606bd3",
+      "commit_hash": "bebb02d4c3c845b9c4cef398568a1084e4129e57",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -414,6 +414,12 @@
           "name": "mcp-create-declarative-agent",
           "path": "skills/mcp-create-declarative-agent/SKILL.md",
           "description": "Skill converted from mcp-create-declarative-agent.prompt.md",
+          "version": ""
+        },
+        {
+          "name": "java-upgrade",
+          "path": "skills/java-upgrade/SKILL.md",
+          "description": "Upgrade a Java project to a newer JDK (11 to 17, 17 to 21, 21 to 25) and adopt the new language and library features. Detects the current Java version from the build files, then loads only the matching per-version guide. Use when the user asks to upgrade Java, modernize Java code, or adopt records, sealed classes, pattern matching, virtual threads or other new Java features. For automated end-to-end upgrades see the modernize-java plugin.",
           "version": ""
         },
         {
@@ -705,6 +711,12 @@
           "version": ""
         },
         {
+          "name": "quarkus-dev-services-and-testing",
+          "path": "skills/quarkus-dev-services-and-testing/SKILL.md",
+          "description": "Quarkus Dev Services and testing: zero-config containers, @QuarkusTest, @QuarkusIntegrationTest, test resources, RestAssured, @InjectMock, profiles and continuous testing. Use when writing or fixing tests in a Quarkus project.",
+          "version": ""
+        },
+        {
           "name": "legacy-circuit-mockups",
           "path": "skills/legacy-circuit-mockups/SKILL.md",
           "description": "Generate breadboard circuit mockups and visual diagrams using HTML5 Canvas drawing techniques. Use when asked to create circuit layouts, visualize electronic component placements, draw breadboard diagrams, mockup 6502 builds, generate retro computer schematics, or design vintage electronics projects. Supports 555 timers, W65C02S microprocessors, 28C256 EEPROMs, W65C22 VIA chips, 7400-series logic gates, LEDs, resistors, capacitors, switches, buttons, crystals, and wires.",
@@ -797,7 +809,7 @@
         {
           "name": "javax-to-jakarta-migration",
           "path": "skills/javax-to-jakarta-migration/SKILL.md",
-          "description": "Migrate Java code from javax.* to jakarta.* namespace. Use when upgrading to Tomcat 11, Jakarta EE 10, or when javax imports are detected in the codebase.",
+          "description": "Migrate Java code from javax.* to jakarta.* namespace. Use only when the user explicitly asks for a javax to jakarta namespace or framework migration (for example to Tomcat 10+/11 or Jakarta EE), or when java-upgrade or spring-boot-4-migration delegates it. Finding javax imports alone does not authorize a migration.",
           "version": ""
         },
         {
@@ -822,6 +834,12 @@
           "name": "flowstudio-power-automate-debug",
           "path": "skills/flowstudio-power-automate-debug/SKILL.md",
           "description": "Debug failing Power Automate cloud flows using the FlowStudio MCP server. The Graph API only shows top-level status codes. This skill gives your agent action-level inputs and outputs to find the actual root cause. Load this skill when asked to: debug a flow, investigate a failed run, why is this flow failing, inspect action outputs, find the root cause of a flow error, fix a broken Power Automate flow, diagnose a timeout, trace a DynamicOperationRequestFailure, check connector auth errors, read error details from a run, or troubleshoot expression failures. Requires a FlowStudio MCP subscription — see https://mcp.flowstudio.app",
+          "version": ""
+        },
+        {
+          "name": "create-quarkus-project",
+          "path": "skills/create-quarkus-project/SKILL.md",
+          "description": "Create a new Quarkus project (Maven or Gradle) with the Quarkus CLI, code.quarkus.io API or Maven plugin, choose extensions, and run it in dev mode. Use when asked to scaffold, bootstrap or start a Quarkus application or REST API.",
           "version": ""
         },
         {
@@ -1881,6 +1899,12 @@
           "version": ""
         },
         {
+          "name": "quarkus-native-and-container",
+          "path": "skills/quarkus-native-and-container/SKILL.md",
+          "description": "Build Quarkus native executables (Mandrel/GraalVM), fix native failures with reflection registration, test the native binary, and produce container images and Kubernetes/OpenShift manifests. Use for native, Docker, Jib or Kubernetes work in a Quarkus project.",
+          "version": ""
+        },
+        {
           "name": "exam-ready",
           "path": "skills/exam-ready/SKILL.md",
           "description": "Activate this skill when a student provides study material (PDF or pasted notes) and a syllabus, and wants to prepare for an exam. Extracts key definitions, points, keywords, diagrams, exam-ready sentences, and practice questions strictly from the provided material.",
@@ -2004,6 +2028,12 @@
           "name": "integrate-context-matic",
           "path": "skills/integrate-context-matic/SKILL.md",
           "description": "Discovers and integrates third-party APIs using the context-matic MCP server. Uses `fetch_api` to find available API SDKs, `ask` for integration guidance, `model_search` and `endpoint_search` for SDK details. Use when the user asks to integrate a third-party API, add an API client, implement features with an external API, or work with any third-party API or SDK.",
+          "version": ""
+        },
+        {
+          "name": "quarkus-application-development",
+          "path": "skills/quarkus-application-development/SKILL.md",
+          "description": "Write Quarkus application code: REST with Quarkus REST, validation, exception mappers, OpenAPI, configuration, CDI (ArC), Hibernate ORM with Panache, Mutiny and virtual threads, Reactive Messaging with Kafka, OIDC security, health, metrics, OpenTelemetry, fault tolerance, REST Client, scheduler and cache. Use when implementing or changing features in an existing Quarkus project.",
           "version": ""
         },
         {
