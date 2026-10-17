@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-10-17T14:41:48.086Z",
+  "updated_at": "2026-10-17T19:52:51.074Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "3a0e7c246e1c9df4669a7d120c36b791b6ddfb4b",
+      "commit_hash": "d5a46a927d5f27320d570dd70e02fa53e4eeff22",
       "skills": [
         {
           "name": "navi",
@@ -47,6 +47,12 @@
           "path": "skills/model-channel-sync/SKILL.md",
           "description": "管理 AI 模型渠道（provider）配置：①提取真正可用的免费/零价模型（抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论）； ②以 pi 等平台配置为基准，同步/更新渠道、模型、APIKEY 到多个 agent 工具（pi、zcode、dsh、omp、opencode、mimocode、qoder、codebuddy、dbx 等）的配置文件。 凡用户提到\"获取/提取/列出 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、\"有哪些免费模型可用\"、 \"给 XX 渠道加免费模型\"、\"这个免费模型能用吗/测试一下\"、\"把模型更新到 pi/omp/opencode/mimocode/dsh/zcode/qoder/codebuddy/dbx\"、 \"以 pi 为基准更新 XX 渠道\"、\"同步渠道/模型/APIKEY 到 XX\"、\"更新 XX 的 APIKEY\"、 \"同步到 mimocode / 覆盖 mimocode 的提供商 / pi 同步到 mimocode\"时，都应使用此技能。 支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。",
           "version": "1.3.1"
+        },
+        {
+          "name": "just",
+          "path": "skills/just/SKILL.md",
+          "description": "使用 just 编写、运行和维护 justfile 命令集。当用户需要创建或修改 justfile、管理配方（recipes）、参数与依赖、配置 shell/环境变量、使用模块与导入、或查询 just CLI/设置/属性/函数时使用本 skill。",
+          "version": "1.0.3"
         },
         {
           "name": "atuin",
