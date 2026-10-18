@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-10-18T15:07:49.093Z",
+  "updated_at": "2026-10-18T19:53:18.113Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "d5a46a927d5f27320d570dd70e02fa53e4eeff22",
+      "commit_hash": "9cfa90da9d849948e6b6125d68ab78d2d66d7401",
       "skills": [
         {
           "name": "navi",
@@ -33,8 +33,8 @@
         {
           "name": "flarum-publish",
           "path": "skills/flarum-publish/SKILL.md",
-          "description": "通过 Flarum REST API 把内容发布到 Flarum 论坛。当用户要求发布/投稿文章（主题/讨论）到 Flarum 论坛、同步内容到论坛、转存图片到论坛图床（fof/upload），或给出 GitHub 项目链接要求整理成中文文章发布时，使用本 skill——即使没有明说「Flarum」，只要是发帖到论坛即适用。支持按名称匹配标签（缓存于 ~/.cache/flarum/tags.json，含默认/AI 标签组，按项目语言自动追加语言标签）。可选功能：项目文章发布后，仅当用户以关键词（如「整理教程」「生成使用教程」）触发时，把 GitHub 项目整理为基础使用教程并以回帖（POST /api/posts）回复到之前已创建的文章；agent 不得主动触发。",
-          "version": "1.16.0"
+          "description": "通过 Flarum REST API 把文章发布为论坛讨论（主题）。当用户要求把内容/文件发布或投稿到 Flarum 论坛、给出 GitHub 项目链接要求整理成中文文章发帖、转存图片到论坛图床（fof/upload）时使用——即使未明说「Flarum」，只要是往论坛发帖即适用。可选：文章发布后，用户以关键词（如「整理教程」「生成使用教程」）触发，把项目整理为基础使用教程并回帖到该文章下（agent 不得主动触发）。",
+          "version": "1.18.0"
         },
         {
           "name": "huawei-deveco-studio-fetch",
