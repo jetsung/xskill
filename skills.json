@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-19T11:38:05.107Z",
+  "updated_at": "2026-10-19T17:59:45.044Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3129,7 +3129,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "49dd158d1076134a641b33efb035946536778336",
+      "commit_hash": "5beb35b040e3de97e54fa9e386d7e42d15c295c2",
       "skills": [
         {
           "name": "setup-pre-commit",
