@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-21T16:20:29.097Z",
+  "updated_at": "2026-10-21T21:03:29.293Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -4272,7 +4272,7 @@
     {
       "source": "obra/superpowers",
       "url": "https://github.com/obra/superpowers",
-      "commit_hash": "b739a8af570e10a95898f2bdf6cec97467fa6c12",
+      "commit_hash": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
       "skills": [
         {
           "name": "subagent-driven-development",
