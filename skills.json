@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-20T21:01:38.861Z",
+  "updated_at": "2026-10-21T02:37:12.106Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -6722,7 +6722,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "30b68924ae9729159f44326aa3134b1d9d67c0e2",
+      "commit_hash": "90606c8315ee09cafc303515c5f33024db6b9882",
       "skills": [
         {
           "name": "blueprint",
