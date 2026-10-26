@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-25T20:10:47.753Z",
+  "updated_at": "2026-10-26T02:24:52.453Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -192,7 +192,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "d85f762d6e521abf5fe16703946e9b38adc42da7",
+      "commit_hash": "1ce2a78feb497ab276fc4073607996f5b08138cb",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -324,6 +324,12 @@
           "name": "game-engine",
           "path": "skills/game-engine/SKILL.md",
           "description": "Expert skill for building web-based game engines and games using HTML5, Canvas, WebGL, and JavaScript. Use when asked to create games, build game engines, implement game physics, handle collision detection, set up game loops, manage sprites, add game controls, or work with 2D/3D rendering. Covers techniques for platformers, breakout-style games, maze games, tilemaps, audio, multiplayer via WebRTC, and publishing games.",
+          "version": ""
+        },
+        {
+          "name": "azure-logic-apps-standard-cli",
+          "path": "skills/azure-logic-apps-standard-cli/SKILL.md",
+          "description": "Create, inspect, validate, test, run, debug, package, and deploy Azure Logic Apps Standard projects using the Azure CLI logicapp extension. Use for Standard workflow authoring, optional workspaces, connector discovery, identity-based connections, local runtimes, native workflow tests, and approved cloud lifecycle operations. Not for Consumption-only workflow development.",
           "version": ""
         },
         {
@@ -1116,6 +1122,12 @@
           "name": "react19-concurrent-patterns",
           "path": "skills/react19-concurrent-patterns/SKILL.md",
           "description": "Preserve React 18 concurrent patterns and adopt React 19 APIs (useTransition, useDeferredValue, Suspense, use(), useOptimistic, Actions) during migration.",
+          "version": ""
+        },
+        {
+          "name": "foundry-agentic-loop",
+          "path": "skills/foundry-agentic-loop/SKILL.md",
+          "description": "Build agentic solutions on Microsoft Foundry, GitHub and Azure: hosted agents, toolbox tools and skills, Foundry IQ grounding and a React/FastAPI app. Three modes: rapid prototyping in an existing Foundry project; spec-driven development (SDD), where the foundry-agentic-loop-workflow runs Specify, Implement, Verify and Deploy to create the Foundry project and deploy with azd, or one phase runs alone; and Improve, which refines this skill and the workflow from past runs. Use for Agentic Loop requests and canvas actions, or end-to-end agent solutions from architecture to Azure deployment. Not for isolated Azure administration or unrelated UI edits.",
           "version": ""
         },
         {
@@ -2159,7 +2171,7 @@
         {
           "name": "webmcpify",
           "path": "skills/webmcpify/SKILL.md",
-          "description": "Make a web app agent-ready — propose a WebMCP tool manifest, integrate, verify in a real browser, heal; unrelated code stays untouched. Use for \"webmcpify\", \"add WebMCP\", or \"expose app actions to AI agents\".",
+          "description": "WebMCP agent skill for curated core coverage or route-by-route parity — inventory an existing web app, integrate approved tools, then inspect, verify and heal them in a real browser. Use for \"webmcpify\", \"add WebMCP\", or \"expose app actions to AI agents\".",
           "version": ""
         },
         {
@@ -2251,6 +2263,12 @@
           "path": "skills/structured-autonomy-implement/SKILL.md",
           "description": "Structured Autonomy Implementation Prompt",
           "version": ""
+        },
+        {
+          "name": "globestudio",
+          "path": "skills/globestudio/SKILL.md",
+          "description": "Creates, edits and embeds dotted world maps and animated 3D globes with Globestudio (globestudio.app), a free open source studio with 21 looks. Use when the user wants a dotted map, a dotted or 3D globe, a spinning earth or a stylized world map for a website hero, background, slide, social post or video; when they paste a globestudio.app link or a ?c= config; or when code uses @globestudio/react, @globestudio/element, the globe-studio web component or globestudio.app/embed. Also use it to highlight a country, continent or region, plot points and arcs, match brand colors, or prepare PNG, SVG, GLB, MP4, WebM or GIF exports. Not for interactive tiled maps, routing, geocoding or GIS analysis (Mapbox, MapLibre, deck.gl), or for ordinary charts.",
+          "version": "1.1.4"
         },
         {
           "name": "github-actions-efficiency",
@@ -6770,7 +6788,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "e49479937753c8aca5a09aa76dbe2eea1b68f187",
+      "commit_hash": "f3904009440af24f00617343910ee89714df8be3",
       "skills": [
         {
           "name": "blueprint",
