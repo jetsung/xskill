@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-26T02:24:52.453Z",
+  "updated_at": "2026-10-26T11:55:18.344Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -192,7 +192,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "1ce2a78feb497ab276fc4073607996f5b08138cb",
+      "commit_hash": "b1a00457c0b8794243883f387e7de71e88800e3e",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -2370,6 +2370,12 @@
           "name": "azure-resource-health-diagnose",
           "path": "skills/azure-resource-health-diagnose/SKILL.md",
           "description": "Analyze Azure resource health, diagnose issues from logs and telemetry, and create a remediation plan for identified problems.",
+          "version": ""
+        },
+        {
+          "name": "markdown-to-word-mermaid",
+          "path": "skills/markdown-to-word-mermaid/SKILL.md",
+          "description": "Export Markdown containing Mermaid code fences to Word (.docx) with embedded SVG diagrams and PNG fallbacks. Use when diagram sharpness, Office-compatible labels, or page-aware placement matters. Not for Word-to-Markdown conversion, editable Office shapes, or general slide creation.",
           "version": ""
         },
         {
@@ -6788,7 +6794,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "f3904009440af24f00617343910ee89714df8be3",
+      "commit_hash": "25278e7d7b6cf6e6a4e7a6c8e10f14ff22f0eb5b",
       "skills": [
         {
           "name": "blueprint",
