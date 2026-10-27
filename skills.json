@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-26T22:19:25.172Z",
+  "updated_at": "2026-10-27T03:00:14.996Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -192,7 +192,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "b1a00457c0b8794243883f387e7de71e88800e3e",
+      "commit_hash": "920e3b927a553642834af13097f53f6f716947db",
       "skills": [
         {
           "name": "qdrant-search-quality",
@@ -996,6 +996,12 @@
           "name": "conventional-commit",
           "path": "skills/conventional-commit/SKILL.md",
           "description": "Prompt and workflow for generating conventional commit messages using a structured XML format. Guides users to create standardized, descriptive commit messages in line with the Conventional Commits specification, including instructions, examples, and validation.",
+          "version": ""
+        },
+        {
+          "name": "caption-qa",
+          "path": "skills/caption-qa/SKILL.md",
+          "description": "Check SRT or WebVTT captions and subtitles against published standards (Netflix English, BBC subtitle guidelines, DCMP Captioning Key) for reading speed, line length, line count, time on screen, gaps and overlaps, then fix failures by retiming before rewording. Use when asked to QA, lint or validate captions, check whether subtitles read too fast, prepare captions for Netflix, broadcast or educational delivery, or add a caption check to CI.",
           "version": ""
         },
         {
