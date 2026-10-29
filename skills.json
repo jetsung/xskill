@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-29T03:36:31.956Z",
+  "updated_at": "2026-10-29T11:59:24.329Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3062,7 +3062,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "aeac41d4d005999432bb7312f7ff06383a91d59d",
+      "commit_hash": "eb07f19f52c2669f2364897aaa293e2aaddd7b1c",
       "skills": [
         {
           "name": "security-and-hardening",
@@ -3097,7 +3097,7 @@
         {
           "name": "code-simplification",
           "path": "skills/code-simplification/SKILL.md",
-          "description": "Simplifies code for clarity. Use when refactoring code for clarity without changing behavior. Use when code works but is harder to read, maintain, or extend than it should be. Use when reviewing code that has accumulated unnecessary complexity.",
+          "description": "Simplifies code for clarity. Use when refactoring code for clarity without changing behavior. Use when code works but is harder to read, maintain, or extend than it should be. Use when reviewing code that has accumulated unnecessary complexity. Use when asked to simplify, clean up, or reduce the nesting of a function or module that already works, even when the code is pasted inline and nothing else needs to change.",
           "version": ""
         },
         {
@@ -3219,7 +3219,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "59db609eb1e18aaf59b63284d0e52255aff0c63c",
+      "commit_hash": "a496f5513d4a4cf889bc48e189e579f4b0bdf6aa",
       "skills": [
         {
           "name": "to-questionnaire",
