@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-28T22:01:13.400Z",
+  "updated_at": "2026-10-29T03:36:31.956Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -198,7 +198,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "0fe6545b950671641b2b14b44eb56678fea6c6b4",
+      "commit_hash": "b6483db44fb602654bca6a097185fcaddb305f97",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -378,6 +378,12 @@
           "name": "update-avm-modules-in-bicep",
           "path": "skills/update-avm-modules-in-bicep/SKILL.md",
           "description": "Update Azure Verified Modules (AVM) to latest versions in Bicep files.",
+          "version": ""
+        },
+        {
+          "name": "pr-artifact-explorer",
+          "path": "skills/pr-artifact-explorer/SKILL.md",
+          "description": "Open, share, and inspect GitHub PRs, issues, workflow runs (including scheduled, manual and other runs with no PR), Actions artifacts, and local or HTTP(S) web previews in the Artifact Explorer canvas, with viewport presets, zoom, screenshots, and recoverable download jobs.",
           "version": ""
         },
         {
