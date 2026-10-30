@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-30T17:29:41.459Z",
+  "updated_at": "2026-10-30T21:49:17.346Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -2983,13 +2983,25 @@
     {
       "source": "antfu/skills",
       "url": "https://github.com/antfu/skills",
-      "commit_hash": "8886fe2d385d3644cbb47e46ae9cb1cf09307d3b",
+      "commit_hash": "7de210b51c8d48cc405a4eac3e17cbb1396c653b",
       "skills": [
         {
           "name": "nuxt",
           "path": "skills/nuxt/SKILL.md",
           "description": "Nuxt full-stack Vue framework with SSR, auto-imports, and file-based routing. Use when working with Nuxt apps, server routes, useFetch, middleware, or hybrid rendering.",
           "version": "2026.9.25"
+        },
+        {
+          "name": "antfu-simplify",
+          "path": "skills/antfu-simplify/SKILL.md",
+          "description": "Simplify the changes of the current PR or working tree with an ablation study - remove each piece of the diff and keep only what is proven needed - so the result has just-right abstraction, minimal clean code, and stays robust and universal. Use when asked to simplify, slim down, clean up, or reduce the current changes or PR.",
+          "version": "2026.10.31"
+        },
+        {
+          "name": "antfu-query",
+          "path": "skills/antfu-query/SKILL.md",
+          "description": "Interview the user relentlessly about a plan, decision, or idea until reaching a shared understanding, using the agent's interactive question tool (not plain text). Use when the user wants to stress-test their thinking, clarify requirements, or says \"grill me\" or \"query me\".",
+          "version": "2026.10.31"
         },
         {
           "name": "vitepress",
@@ -3454,7 +3466,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "6d04a1b58dedc95729d34e4f223d9d483aae210a",
+      "commit_hash": "dc37609827c8c3aba49e49347745f47aaa65cb1b",
       "skills": [
         {
           "name": "openspec-bulk-archive-change",
