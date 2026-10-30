@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-29T18:10:25.883Z",
+  "updated_at": "2026-10-30T03:39:41.467Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -198,7 +198,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "b6483db44fb602654bca6a097185fcaddb305f97",
+      "commit_hash": "5269f7ea2d6c3a9bfda5ed878b6726cf509121fd",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -6812,7 +6812,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "25278e7d7b6cf6e6a4e7a6c8e10f14ff22f0eb5b",
+      "commit_hash": "b38be6a7f6350964d59328b52f0624e1d1d552d1",
       "skills": [
         {
           "name": "google-workspace-ops",
@@ -7373,6 +7373,12 @@
           "version": ""
         },
         {
+          "name": "issue-review",
+          "path": "skills/issue-review/SKILL.md",
+          "description": "Review a GitHub issue the way /code-review reviews a PR. Fetches the issue with the gh CLI, checks the report against the current codebase, searches for duplicates and prior fixes, scores completeness, assigns severity, and writes a triage report plus a draft reply. Posting comments or labels is opt-in only. Use when the user asks to check, triage, validate, or review a GitHub issue.",
+          "version": ""
+        },
+        {
           "name": "uncloud",
           "path": "skills/uncloud/SKILL.md",
           "description": "Use when managing an Uncloud cluster — deploying services, configuring Caddy ingress, adding static proxy routes for non-cluster devices, publishing ports, scaling, inspecting logs, or managing machines and volumes with the `uc` CLI.",
@@ -7442,6 +7448,12 @@
           "name": "council",
           "path": "skills/council/SKILL.md",
           "description": "Convene a four-voice council for ambiguous decisions, tradeoffs, and go/no-go calls. Use when multiple valid paths exist and you need structured disagreement before choosing.",
+          "version": ""
+        },
+        {
+          "name": "module-governance",
+          "path": "skills/module-governance/SKILL.md",
+          "description": "Establish or maintain a business module's local agent instructions, domain-context links, and interface ownership when implementing a new module or changing its responsibilities. Reuse project-level rules and existing ECC workflows; ordinary bug fixes, styling, and read-only design discussions do not start module documentation setup.",
           "version": ""
         },
         {
@@ -7645,7 +7657,7 @@
         {
           "name": "parallel-execution-optimizer",
           "path": "skills/parallel-execution-optimizer/SKILL.md",
-          "description": "Speed up a task by turning it into a dependency graph of parallel lanes with a lane matrix, batched reads and checks, write surfaces isolated by file, worktree, branch, or service, and a final verification table. Use when the user wants a task done much faster through parallel work, concurrent agents, batched tool calls, isolated worktrees, or many independent verification lanes without losing correctness.",
+          "description": "Speed up a task by turning it into a dependency graph of parallel lanes with a lane matrix, batched reads and checks, write surfaces isolated by file, worktree, branch, or service, and a final verification table. Use when the user wants a task done much faster through parallel work, concurrent agents, batched tool calls, isolated worktrees, many independent verification lanes, or bounded homogeneous work that reuses shared preparation while record operations remain sequential, without losing correctness.",
           "version": ""
         },
         {
@@ -8120,6 +8132,12 @@
           "name": "react-native-patterns",
           "path": "skills/react-native-patterns/SKILL.md",
           "description": "React Native and Expo app patterns — Expo Router navigation, state separation (server/client/route/form), TanStack Query data fetching with Zod, performant lists, NativeWind/StyleSheet styling, native APIs, and secure storage. Use when building or editing React Native / Expo screens, components, navigation, or data layers.",
+          "version": ""
+        },
+        {
+          "name": "typescript-patterns",
+          "path": "skills/typescript-patterns/SKILL.md",
+          "description": "TypeScript patterns for strict, type-safe, maintainable code in modern TypeScript and JavaScript applications. Covers strict compiler configuration, type design, narrowing, discriminated unions, generics, async and error handling, module boundaries, dependency hygiene, and type-level testing. Use when writing or reviewing TypeScript or JavaScript code.",
           "version": ""
         },
         {
