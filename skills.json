@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-31T11:27:15.429Z",
+  "updated_at": "2026-10-31T16:33:39.054Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3231,7 +3231,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "a496f5513d4a4cf889bc48e189e579f4b0bdf6aa",
+      "commit_hash": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
       "skills": [
         {
           "name": "to-questionnaire",
@@ -3297,6 +3297,12 @@
           "name": "writing-fragments",
           "path": "skills/in-progress/writing-fragments/SKILL.md",
           "description": "Writing, explore: mine raw fragments, no structure yet.",
+          "version": ""
+        },
+        {
+          "name": "software-factory",
+          "path": "skills/in-progress/software-factory/SKILL.md",
+          "description": "N/A",
           "version": ""
         },
         {
