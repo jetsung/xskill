@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-02T03:33:20.161Z",
+  "updated_at": "2026-11-02T14:16:28.180Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -198,7 +198,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "dc55abe59a0fb48920c9070f0c48afd4709428e3",
+      "commit_hash": "61fa1fa8fcc63d6dbd2f07a75aeb8e214df5acfb",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -905,7 +905,7 @@
         {
           "name": "copilot-sdk",
           "path": "skills/copilot-sdk/SKILL.md",
-          "description": "Build agentic applications with GitHub Copilot SDK. Use when embedding AI agents in apps, creating custom tools, implementing streaming responses, managing sessions, connecting to MCP servers, or creating custom agents. Triggers on Copilot SDK, GitHub SDK, agentic app, embed Copilot, programmable agent, MCP server, custom agent.",
+          "description": "Build agentic applications with the Microsoft Copilot SDK, transitioning from GitHub Copilot SDK. Use when embedding AI agents in apps, creating custom tools, implementing streaming responses, managing sessions, connecting to MCP servers, or creating custom agents. Triggers on Copilot SDK, Microsoft Copilot SDK, GitHub Copilot SDK, agentic app, embed Copilot, programmable agent, MCP server, custom agent.",
           "version": ""
         },
         {
