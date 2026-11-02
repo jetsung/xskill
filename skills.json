@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-01T21:30:41.760Z",
+  "updated_at": "2026-11-02T03:33:20.161Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -198,7 +198,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "5269f7ea2d6c3a9bfda5ed878b6726cf509121fd",
+      "commit_hash": "dc55abe59a0fb48920c9070f0c48afd4709428e3",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -957,6 +957,12 @@
           "version": ""
         },
         {
+          "name": "openapi-to-application-java-spring-boot",
+          "path": "skills/openapi-to-application-java-spring-boot/SKILL.md",
+          "description": "Generate a Spring Boot (Java) application from an OpenAPI 3 specification using the spec-first approach: openapi-generator (Maven or Gradle) produces API interfaces and DTOs, you implement controllers, services, persistence, security and tests. Use when asked to build, scaffold or implement a Spring Boot API from an OpenAPI/Swagger file.",
+          "version": ""
+        },
+        {
           "name": "vscode-ext-localization",
           "path": "skills/vscode-ext-localization/SKILL.md",
           "description": "Guidelines for proper localization of VS Code extensions, following VS Code extension development guidelines, libraries and good practices",
@@ -991,6 +997,12 @@
           "path": "skills/onboard-context-matic/SKILL.md",
           "description": "Interactive onboarding tour for the context-matic MCP server. Walks the user through what the server does, shows all available APIs, lets them pick one to explore, explains it in their project language, demonstrates model_search and endpoint_search live, and ends with a menu of things the user can ask the agent to do. USE FOR: first-time setup; \"what can this MCP do?\"; \"show me the available APIs\"; \"onboard me\"; \"how do I use the context-matic server\"; \"give me a tour\". DO NOT USE FOR: actually integrating an API end-to-end (use integrate-context-matic instead).",
           "version": ""
+        },
+        {
+          "name": "lightweight-charts-react-components",
+          "path": "skills/lightweight-charts-react-components/SKILL.md",
+          "description": "lightweight-charts-react-components recipes for TradingView lightweight-charts in React. Candlestick, line, and area series; volume and indicator panes; realtime WebSocket updates; infinite history on scroll; crosshair OHLC legends and tooltips; trade markers and price lines; synchronized charts; numeric options and yield-curve axes. Use when adding or fixing a financial or trading chart in a React app, or when the user mentions lightweight-charts, TradingView charts in React, or this package.",
+          "version": "1.0"
         },
         {
           "name": "java-helidon",
@@ -1341,6 +1353,12 @@
           "version": ""
         },
         {
+          "name": "ponder",
+          "path": "skills/ponder/SKILL.md",
+          "description": "Convergent deliberation loop - repeated grading passes over one subject until the answer stops changing, with coverage enforced so no unit is silently skipped. Use when the user says \"ponder <anything>\" (\"ponder the UI\", \"ponder our error handling\"), \"think this over properly\", \"keep thinking until it converges\", \"keep looping until it converges\", \"loop on this until it stops changing\", \"go through all the screens and grade them\", \"audit/rate/grade every X\", or asks for any broad sweep-and-grade across many units where a single pass would miss things. Also use to resume or recover a ponder already in flight - \"where were we\", \"carry on pondering\", a lost thread mid-loop, or a .ponder/ directory in the project - where the move is to run ponder status rather than start over.",
+          "version": ""
+        },
+        {
           "name": "add-educational-comments",
           "path": "skills/add-educational-comments/SKILL.md",
           "description": "Add educational comments to the file specified, or prompt asking for file to comment if one is not provided.",
@@ -1433,7 +1451,7 @@
         {
           "name": "mcp-security-audit",
           "path": "skills/mcp-security-audit/SKILL.md",
-          "description": "Audit MCP (Model Context Protocol) server configurations for security issues. Use this skill when:\n- Reviewing .mcp.json files for security risks\n- Checking MCP server args for hardcoded secrets or shell injection patterns\n- Validating that MCP package-runner dependencies use exact reviewed versions, not bare names, @latest, or ranges\n- Detecting mutable npm/npx, bunx, pnpm dlx, yarn dlx, and npm exec references in MCP configurations\n- Auditing which MCP servers a project registers and whether they're on an approved list\n- Checking for environment variable usage vs. hardcoded credentials in MCP configs\n- Any request like \"is my MCP config secure?\", \"audit my MCP servers\", or \"check .mcp.json\"\nkeywords: [mcp, security, audit, secrets, shell-injection, supply-chain, governance]",
+          "description": "Audit MCP (Model Context Protocol) server configurations for security issues. Use this skill when:\n- Reviewing .mcp.json files for security risks\n- Checking MCP server args for hardcoded secrets or shell injection patterns\n- Validating that MCP package-runner dependencies use exact reviewed versions, not bare names, @latest, or ranges\n- Detecting mutable npm/npx, bunx, pnpm dlx, yarn dlx, npm exec, uvx, uv tool run, and pipx run references in MCP configurations\n- Auditing which MCP servers a project registers and whether they're on an approved list\n- Checking for environment variable usage vs. hardcoded credentials in MCP configs\n- Any request like \"is my MCP config secure?\", \"audit my MCP servers\", or \"check .mcp.json\"\nkeywords: [mcp, security, audit, secrets, shell-injection, supply-chain, governance]",
           "version": ""
         },
         {
@@ -1464,6 +1482,12 @@
           "name": "copilot-cli-quickstart",
           "path": "skills/copilot-cli-quickstart/SKILL.md",
           "description": "Use this skill when someone wants to learn GitHub Copilot CLI from scratch. Offers interactive step-by-step tutorials with separate Developer and Non-Developer tracks, plus on-demand Q&A. Just say \"start tutorial\" or ask a question! Note: This skill targets GitHub Copilot CLI specifically and uses CLI-specific tools (ask_user, sql, fetch_copilot_cli_documentation).\n",
+          "version": ""
+        },
+        {
+          "name": "spring-observability",
+          "path": "skills/spring-observability/SKILL.md",
+          "description": "Add and review observability in Spring Boot 3/4 apps: Actuator exposure and health probes, Micrometer metrics, Observation API, OpenTelemetry tracing and OTLP/Prometheus export, structured logging with correlation ids, and safe use of heapdump/threaddump. Use when instrumenting, monitoring or troubleshooting a Spring Boot service.",
           "version": ""
         },
         {
@@ -2009,7 +2033,7 @@
         {
           "name": "create-spring-boot-java-project",
           "path": "skills/create-spring-boot-java-project/SKILL.md",
-          "description": "Create Spring Boot Java Project Skeleton",
+          "description": "Create a new Spring Boot Java project (Maven or Gradle) from start.spring.io with sensible defaults for configuration, PostgreSQL, logging, security, testing and Docker. Use when asked to scaffold, bootstrap or generate a Spring Boot application. Detects existing project versions and never upgrades implicitly.",
           "version": ""
         },
         {
@@ -2034,6 +2058,12 @@
           "name": "azure-container-registry-cli",
           "path": "skills/azure-container-registry-cli/SKILL.md",
           "description": "Manage Azure Container Registry via the az acr CLI including registries, images, cloud builds, ACR Tasks, authentication, tokens, geo-replication, and networking. Use when working with ACR, az acr commands, pushing/importing/purging container images in Azure, or when the user mentions Azure Container Registry.",
+          "version": ""
+        },
+        {
+          "name": "embedding-anisotropy-check",
+          "path": "skills/embedding-anisotropy-check/SKILL.md",
+          "description": "Use before reporting any cosine similarity computed over embeddings or transformer hidden states, whether the agent computed the vectors or loaded them. Measures the anisotropy of each side, centres by the population mean, and scores matched pairs against a permuted floor taken from the same comparison. Use when comparing one model's embeddings across precisions, runtimes or layers, when evaluating retrieval, probes or adapters, or before calling a similarity high, two conditions in agreement, or a small gap a null.",
           "version": ""
         },
         {
@@ -2183,7 +2213,7 @@
         {
           "name": "spring-boot-testing",
           "path": "skills/spring-boot-testing/SKILL.md",
-          "description": "Expert Spring Boot 4 testing specialist that selects the best Spring Boot testing techniques for your situation with Junit 6 and AssertJ.",
+          "description": "Expert Spring Boot testing specialist that selects the best testing techniques for your situation: test slices, Testcontainers with @ServiceConnection, Failsafe integration tests, MockitoBean, JUnit and AssertJ. Written for Spring Boot 4 with notes for Boot 3.",
           "version": ""
         },
         {
@@ -2238,6 +2268,12 @@
           "name": "next-intl-add-language",
           "path": "skills/next-intl-add-language/SKILL.md",
           "description": "Add new language to a Next.js + next-intl application",
+          "version": ""
+        },
+        {
+          "name": "spring-security",
+          "path": "skills/spring-security/SKILL.md",
+          "description": "Configure, test and review Spring Security 6/7 in Spring Boot 3/4 apps: SecurityFilterChain lambda DSL, method security, OAuth2 resource server with JWT, OIDC login, CSRF/CORS, password encoding, headers, actuator protection, and MockMvc security tests. Use when adding or auditing authentication and authorization.",
           "version": ""
         },
         {
@@ -2813,7 +2849,7 @@
         {
           "name": "java-springboot",
           "path": "skills/java-springboot/SKILL.md",
-          "description": "Get best practices for developing applications with Spring Boot.",
+          "description": "Write and review application code in an existing Spring Boot 3/4 project: controllers, validation and ProblemDetail errors, Spring Data JPA/JDBC, RestClient and HTTP interfaces, configuration properties, Kafka/AMQP, caching, scheduling, virtual threads, AOT and startup tuning. Use when adding or changing features. To scaffold a new project use create-spring-boot-java-project instead.",
           "version": ""
         },
         {
@@ -2874,6 +2910,12 @@
           "name": "verify-agent-action",
           "path": "skills/verify-agent-action/SKILL.md",
           "description": "Review a proposed AI-agent action or human-approval packet before execution. Use when an agent wants to run a consequential tool, command, deployment, message, purchase, credential operation, or data mutation; when checking whether approval still matches the exact action; or when auditing action evidence for forged results, parameter swaps, replay, correlated reviewers, missing evidence, expiry, or stale monitoring. Produce an evidence-based review only—never execute or authorize the action.",
+          "version": ""
+        },
+        {
+          "name": "spring-boot-4-migration",
+          "path": "skills/spring-boot-4-migration/SKILL.md",
+          "description": "Migrate a Spring Boot 3.x application to Spring Boot 4.0 (Spring Framework 7, Jackson 3, modular starters, JSpecify). Use only for an explicit Boot 3.x to 4 migration, or to fix build or test failures caused by it, or to review one. Not for 3.x patch bumps or 4.0 to 4.1 upgrades; follow the target Boot version release notes and upgrade guide for those. Covers Maven and Gradle (Kotlin DSL, version catalogs).",
           "version": ""
         },
         {
