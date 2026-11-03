@@ -53,9 +53,22 @@ pub fn run_init() -> Result<()> {
     Ok(())
 }
 
+/// 解析 `config show` 应输出的配置：
+/// 配置文件存在时输出加载后的完整配置；不存在时输出与 `config init`
+/// 产物一致的默认配置（default_config + 内置渠道精简规范化）。
+fn show_config() -> Result<Config> {
+    Ok(if Config::config_path().exists() {
+        Config::load()?
+    } else {
+        let mut config = default_config();
+        config.normalize_platforms_for_save();
+        config
+    })
+}
+
 /// Show the full configuration as pretty JSON
 pub fn run_show() -> Result<()> {
-    let config = Config::load()?;
+    let config = show_config()?;
     let json =
         serde_json::to_string_pretty(&config).with_context(|| "Failed to serialize config")?;
     // 直接写 stdout，避免 colored 对 JSON 着色导致不可解析
@@ -338,7 +351,7 @@ mod tests {
 
     #[test]
     fn test_serialize_config_contains_proxy() {
-        // run_show 序列化的是 Config::load() 的结果，proxy 应为 Some/None 之一
+        // 文件存在时 run_show 序列化 Config::load() 的结果，proxy 应为 Some/None 之一
         let config = crate::config::Config::load().unwrap();
         let json = serde_json::to_string_pretty(&config).unwrap();
         // 输出必须是合法 JSON
@@ -348,6 +361,90 @@ mod tests {
             Some(serde_json::Value::String(_)) | None => {}
             other => panic!("unexpected proxy value: {:?}", other),
         }
+    }
+
+    #[test]
+    fn test_run_show_matches_init_when_config_absent() {
+        // 本测试修改进程级 XSKILL_CONFIG，须与依赖该变量的测试串行
+        let _guard = crate::config::test_env_lock()
+            .lock()
+            .unwrap_or_else(|e| e.into_inner());
+        let tmp = std::env::temp_dir().join(format!(
+            "xskill-test-show-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&tmp).unwrap();
+        let cfg_path = tmp.join("settings.json");
+        // SAFETY: 单线程测试进程中修改测试专用环境变量
+        unsafe { std::env::set_var("XSKILL_CONFIG", &cfg_path) };
+        assert!(!cfg_path.exists());
+
+        // 无配置文件时执行 config init，取得基准产物
+        run_init().unwrap();
+        let init_content = std::fs::read_to_string(&cfg_path).unwrap();
+        let init_value: Value = serde_json::from_str(&init_content).unwrap();
+
+        // 删除文件后再走 run_show 的无文件分支
+        std::fs::remove_file(&cfg_path).unwrap();
+        let shown: Value =
+            serde_json::from_str(&String::from_utf8(show_output()).unwrap()).unwrap();
+
+        // 顶层字段一致：含 proxy（值为 "" 占位）
+        assert_eq!(
+            shown.get("proxy").and_then(|v| v.as_str()),
+            Some(""),
+            "无配置文件时 show 应输出 proxy: \"\" 占位，与 init 一致"
+        );
+        assert_eq!(
+            shown.get("$schema"),
+            init_value.get("$schema"),
+            "$schema 应与 init 产物一致"
+        );
+        assert_eq!(
+            shown.get("cache"),
+            init_value.get("cache"),
+            "cache 应与 init 产物一致"
+        );
+        assert_eq!(
+            shown.get("registry"),
+            init_value.get("registry"),
+            "registry 应与 init 产物一致"
+        );
+        // 内置渠道条目字段一致：仅 name/enabled/builtin
+        let shown_platforms = shown["platforms"].as_object().unwrap();
+        let init_platforms = init_value["platforms"].as_object().unwrap();
+        assert_eq!(
+            shown_platforms.len(),
+            init_platforms.len(),
+            "渠道数量应与 init 产物一致"
+        );
+        for (key, entry) in shown_platforms {
+            let keys: Vec<&str> = entry
+                .as_object()
+                .unwrap()
+                .keys()
+                .map(String::as_str)
+                .collect();
+            assert_eq!(
+                keys,
+                ["builtin", "enabled", "name"],
+                "渠道 {key} 应仅含 name/enabled/builtin 三字段，实际: {keys:?}"
+            );
+        }
+
+        // 清理
+        unsafe { std::env::remove_var("XSKILL_CONFIG") };
+        std::fs::remove_dir_all(&tmp).unwrap();
+    }
+
+    /// 生成 run_show 将输出的 JSON（测试断言用，走与 run_show 相同的 show_config 路径）
+    fn show_output() -> Vec<u8> {
+        let config = show_config().unwrap();
+        serde_json::to_string_pretty(&config).unwrap().into_bytes()
     }
 
     #[test]
