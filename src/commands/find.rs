@@ -225,9 +225,20 @@ fn install_skills(
                 continue;
             }
 
-            // 在克隆存活期间计算 tree hash（避免 update_lock_file 再次克隆）
+            // 在克隆存活期间计算 tree hash（避免 update_lock_file 再次克隆）。
+            // hash 路径必须与 resolve_skill_source_dir 的目录判定一致：
+            // skill_path 已剥离 "skills/" 前缀，若仓库内实际位于 skills/ 下，
+            // rev-parse 需要补回前缀，否则 HEAD:<path> 找不到对应 tree，
+            // 静默返回空 hash（锁文件 skill_folder_hash 为空）。
+            let hash_path = if skill_path.is_empty() {
+                String::new()
+            } else if workdir.join("skills").join(&skill_path).exists() {
+                format!("skills/{}", skill_path)
+            } else {
+                skill_path.clone()
+            };
             let skill_folder_hash =
-                git::get_skill_folder_hash(workdir, &skill_path).unwrap_or_default();
+                git::get_skill_folder_hash(workdir, &hash_path).unwrap_or_default();
 
             // 1. Install to canonical .agents directory
             let canonical_dir = if global {
@@ -536,10 +547,11 @@ fn update_lock_file(
         skill_path: skill_path_in_repo,
         skill_folder_hash: skill_folder_hash.to_string(),
         installed_at,
-        updated_at: timestamp,
+        updated_at: timestamp.clone(),
     };
 
     lock_file.upsert_skill(dest_name, entry);
+    lock_file.updated_at = timestamp;
     lock_file.save(global)?;
 
     Ok(())

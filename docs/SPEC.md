@@ -236,6 +236,7 @@ URL 解析规则：
 * **本地源**（`clone_and_collect` 扫描）产出的 `path` 包含 `/SKILL.md` 后缀。
 * **注册中心**（registry）返回的 `path` 可能省略 `/SKILL.md` 后缀（如 `skills/vue`）。安装逻辑必须同时兼容两种形式，不能假设后缀必然存在。
 * 无论是否含后缀，安装时统一通过剥离 `skills/` 前缀与可选的 `/SKILL.md` 后缀得到**叶子路径**（如 `skills/engineering/grill/SKILL.md` → `grill`），再据此定位 skill 目录。
+* **tree hash 计算**：`skill_folder_hash` 的 rev-parse 路径必须与源目录定位使用**同一判定**——叶子路径已剥离 `skills/` 前缀，若仓库内实际位于 `skills/` 下，须补回前缀（`git rev-parse HEAD:skills/<skill_path>`），否则 `HEAD:<skill_path>` 找不到对应 tree，rev-parse 失败会静默返回空 hash（锁文件 `skill_folder_hash` 为空，已知缺陷，已修复）。
 * **根级 skill**（`path` 为 `SKILL.md` 或空）时：叶子路径为空，skill 源目录即仓库根目录本身；安装名（同时是锁文件 key 与规范目录名）取源 URL 的仓库名，而非 frontmatter `name`；锁文件 `skill_path` 记录为 `SKILL.md`；tree hash 使用 `git rev-parse HEAD:`（根 tree）。
 
 ### 判断标准
@@ -882,9 +883,11 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
   3. **安装**：按 source URL 分组，每组仅 clone 一次仓库。对每个 skill：
      * 由 `CachedSkill.path` 提取**叶子路径**：先剥离 `skills/` 前缀，再剥离可选的 `/SKILL.md` 后缀（两者独立处理，缺失任一项都不影响另一项），得到 `skill_path`（如 `skills/engineering/grill/SKILL.md` → `grill`，`skills/vue` → `vue`）。安装名 `<name>` 即 `skill_path` 的最后一段。
      * **定位 skill 源目录**：使用 `workdir/skills/<skill_path>`（仓库无顶层 `skills/` 目录时回退为 `workdir/<skill_path>`）。**严禁**直接对 `CachedSkill.path` 取 `.parent()` 推导源目录——当 `path` 不含 `/SKILL.md` 后缀时，`.parent()` 会多退一层而指向整个 `skills/` 目录，导致把整个仓库复制进单个 skill 文件夹（已知缺陷，已修复）。
+     * **计算 tree hash**：hash 路径与源目录定位使用同一判定——`workdir/skills/<skill_path>` 存在时使用 `skills/<skill_path>`，否则使用 `skill_path`；根级 skill 使用 `HEAD:`（根 tree）。禁止直接以剥离 `skills/` 前缀后的叶子路径执行 `git rev-parse HEAD:<skill_path>`。
      * 安装到规范目录（`.agents/skills/<name>` 或 `-g` 时 `~/.agents/skills/<name>`），输出 `Installed: <path>`。
      * 为第 2 步选中的平台创建相对符号链接，输出 `Symlinked: <platform1>, <platform2>, ...`。符号链接失败时回退为文件复制。
      * 更新锁文件。各 skill 输出之间以空行分隔。失败的平台在最后统一报告（如有）。
+     * **锁文件时间戳**：更新锁文件时，除条目级 `updated_at` 外，还必须同步更新锁文件**顶层** `updated_at` 为当前时间戳（与 `add` 命令行为一致）；条目级 `installed_at` 保留原始首次安装时间。
      * **源解析**：本地源通过 `sources` 配置查找 URL；注册中心源（`[registry]` 标记）直接使用 `source_url` 克隆，不依赖本地 `sources` 配置。
   * 任意步骤按 Esc 或 Ctrl-C 取消，输出 "Cancelled."
 * **子串匹配**：使用 skim exact 模式，仅匹配包含连续子串的项。输入 `git-commit` 时只显示包含 `git-commit` 子串的项，不会匹配 `gtm-board-and-investor-communication` 等非子串项。

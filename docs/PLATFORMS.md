@@ -6,7 +6,7 @@
 
 | 配置 key | 显示名称 | 路径 | 项目级路径 | Skills 目录 | Agents 文件 | 来源 | Agents 兼容 | 默认启用 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| antigravity | Antigravity | `.gemini` | | `skills` | `GEMINI.md` | `AGENTS.md` | ✓ | ✓ |
+| antigravity | Antigravity | `.gemini` | | `skills` | `config/GEMINI.md` | `AGENTS.md` | ✓ | ✓ |
 | claude | Claude Code | `.claude` | | `skills` | `CLAUDE.md` | `AGENTS.md` | ✗ | ✓ |
 | codebuddy | CodeBuddy | `.codebuddy` | | `skills` | `CODEBUDDY.md` | `AGENTS.md` | ✗ | ✓ |
 | codex | Codex | `.codex` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
