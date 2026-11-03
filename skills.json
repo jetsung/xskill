@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-03T13:18:30.569Z",
+  "updated_at": "2026-11-03T22:42:57.385Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -4428,7 +4428,7 @@
     {
       "source": "obra/superpowers",
       "url": "https://github.com/obra/superpowers",
-      "commit_hash": "2ce8aa15d05bd57213e6f746f953aafb7ded7a8b",
+      "commit_hash": "22f0b463e7a5e579904dd6211a520321035526f7",
       "skills": [
         {
           "name": "using-superpowers",
