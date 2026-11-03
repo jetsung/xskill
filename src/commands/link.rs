@@ -105,7 +105,7 @@ fn symlink_skill_to_platform(
         None => bail!("Platform '{}' not found in config", platform_name),
     };
 
-    if platform.agents_compat {
+    if platform.effective_agents_compat(global) {
         println!("{}: {} (agents_compat)", "Skipped".dimmed(), platform_name);
         return Ok(());
     }
@@ -191,8 +191,8 @@ fn symlink_skill_to_all_platforms(config: &Config, skill_name: &str, global: boo
             continue;
         }
 
-        // 跳过 agents_compat 平台
-        if platform.agents_compat {
+        // 跳过 agents_compat 平台（按作用域取有效判定）
+        if platform.effective_agents_compat(global) {
             skipped_platforms.push(name.to_string());
             continue;
         }
@@ -379,6 +379,7 @@ mod tests {
                 agents: "CLAUDE.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -411,6 +412,7 @@ mod tests {
                 agents: "AGENTS.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: true,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -448,6 +450,7 @@ mod tests {
                 agents: "CLAUDE.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -462,6 +465,7 @@ mod tests {
                 agents: "CODEBUDDY.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -477,6 +481,7 @@ mod tests {
                 agents: "AGENTS.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: true,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -519,6 +524,7 @@ mod tests {
                 agents: "AGENTS.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );

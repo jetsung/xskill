@@ -762,6 +762,7 @@ mod tests {
                 agents: "CLAUDE.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );

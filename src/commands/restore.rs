@@ -50,7 +50,7 @@ fn resolve_restore_target(global: bool, agent: Option<&str>) -> Result<Vec<PathB
             // All configured platforms
             for name in config.platform_names() {
                 if let Some(platform) = config.get_platform(name) {
-                    if platform.agents_compat {
+                    if platform.effective_agents_compat(global) {
                         continue;
                     }
                     if let Some(skills_dir) = platform.skills_dir_with_base(&base_dir, global) {
@@ -62,7 +62,7 @@ fn resolve_restore_target(global: bool, agent: Option<&str>) -> Result<Vec<PathB
             // Specific platform
             validate_agent(&config, agent_value)?;
             let platform = config.get_platform(agent_value).unwrap();
-            if platform.agents_compat {
+            if platform.effective_agents_compat(global) {
                 // agents_compat 平台直接读取规范目录，无需 restore symlink
                 return Ok(targets);
             }

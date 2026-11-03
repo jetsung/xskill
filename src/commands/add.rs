@@ -174,7 +174,7 @@ fn symlink_to_platform(
     validate_agent(config, platform_name)?;
     let platform = config.get_platform(platform_name).unwrap();
 
-    if platform.agents_compat {
+    if platform.effective_agents_compat(global) {
         println!("{}: {} (agents_compat)", "Skipped".dimmed(), platform_name);
         return Ok(());
     }
@@ -266,7 +266,7 @@ fn symlink_to_all_platforms(config: &Config, dest_name: &str, global: bool) -> R
             continue;
         }
 
-        if platform.agents_compat {
+        if platform.effective_agents_compat(global) {
             continue;
         }
 

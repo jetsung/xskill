@@ -53,7 +53,8 @@ pub fn run(all: bool) -> Result<()> {
                 .agents_file()
                 .map(|p| p.to_string_lossy().into_owned())
                 .unwrap_or_default();
-            let compat = compat_str(platform.agents_compat);
+            // COMPAT 列按全局语义展示（全局判定与项目级不同的平台，如 antigravity，显示全局值）
+            let compat = compat_str(platform.effective_agents_compat(true));
             let builtin = compat_str(platform.builtin);
             let enabled = if platform.enabled {
                 "✓".green().to_string()
@@ -429,6 +430,7 @@ mod tests {
                 agents: "AGENTS.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -447,6 +449,7 @@ mod tests {
             agents: "CLAUDE.md".to_string(),
             source: "AGENTS.md".to_string(),
             agents_compat: false,
+            global_agents_compat: None,
             builtin: false,
         };
         assert!(platform.skills_dir().is_some());
@@ -465,6 +468,7 @@ mod tests {
             agents: "AGENTS.md".to_string(),
             source: "AGENTS.md".to_string(),
             agents_compat: true,
+            global_agents_compat: None,
             builtin: false,
         };
         assert!(platform.agents_compat);
@@ -481,6 +485,7 @@ mod tests {
             agents: String::new(),
             source: "AGENTS.md".to_string(),
             agents_compat: false,
+            global_agents_compat: None,
             builtin: false,
         };
         assert!(platform.skills_dir().is_none());
@@ -498,6 +503,7 @@ mod tests {
             agents: "AGENTS.md".to_string(),
             source: "AGENTS.md".to_string(),
             agents_compat: true,
+            global_agents_compat: None,
             builtin: false,
         }
     }

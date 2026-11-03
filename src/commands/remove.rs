@@ -153,7 +153,7 @@ fn remove_from_platform(
     validate_agent(config, platform_name)?;
     let platform = config.get_platform(platform_name).unwrap();
 
-    if platform.agents_compat {
+    if platform.effective_agents_compat(global) {
         println!("{}: {} (agents_compat)", "Skipped".dimmed(), platform_name);
         return Ok(0);
     }
@@ -202,7 +202,7 @@ fn remove_from_all_platforms(config: &Config, skill: &str, global: bool) -> Resu
         if !platform.enabled {
             continue;
         }
-        if platform.agents_compat {
+        if platform.effective_agents_compat(global) {
             continue;
         }
         let platform_path = base_dir.join(platform.effective_path(global));
@@ -228,7 +228,7 @@ fn remove_all_from_platform(config: &Config, platform_name: &str, global: bool) 
     validate_agent(config, platform_name)?;
     let platform = config.get_platform(platform_name).unwrap();
 
-    if platform.agents_compat {
+    if platform.effective_agents_compat(global) {
         println!("{}: {} (agents_compat)", "Skipped".dimmed(), platform_name);
         return Ok(0);
     }
@@ -265,7 +265,7 @@ fn remove_platform_symlinks(config: &Config, skill: &str, global: bool) -> Resul
         if !platform.enabled {
             continue;
         }
-        if platform.agents_compat {
+        if platform.effective_agents_compat(global) {
             continue;
         }
         let platform_path = base_dir.join(platform.effective_path(global));
@@ -315,7 +315,7 @@ fn remove_all_platform_symlinks(config: &Config, global: bool) -> Result<usize> 
         if !platform.enabled {
             continue;
         }
-        if platform.agents_compat {
+        if platform.effective_agents_compat(global) {
             continue;
         }
         let platform_path = base_dir.join(platform.effective_path(global));
@@ -364,7 +364,7 @@ fn remove_all_from_all_platforms(config: &Config, global: bool) -> Result<usize>
         if !platform.enabled {
             continue;
         }
-        if platform.agents_compat {
+        if platform.effective_agents_compat(global) {
             continue;
         }
         let platform_path = base_dir.join(platform.effective_path(global));

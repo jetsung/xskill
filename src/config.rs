@@ -101,6 +101,13 @@ pub struct Platform {
     /// 是否兼容 .agents/ 资源（可复用项目级 agents 配置）
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub agents_compat: bool,
+    /// 全局模式下的 agents 兼容声明（可选）
+    ///
+    /// 少数平台项目级兼容 .agents/ 规范目录、全局级不兼容（如 antigravity：
+    /// 项目级直接复用 .agents/skills/，全局需软链接到 ~/.gemini/config/skills/）。
+    /// 缺省时全局判定回退到 `agents_compat`。
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub global_agents_compat: Option<bool>,
     /// 是否为内置渠道（由 default_platforms 生成，用户配置中不可修改路径等字段）
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub builtin: bool,
@@ -156,11 +163,13 @@ type PlatformEntry = (
 pub fn default_platforms() -> HashMap<String, Platform> {
     let entries: Vec<PlatformEntry> = vec![
         // 常用渠道（默认启用）
+        // antigravity：全局配置目录为 .gemini/config（GEMINI.md 与 skills 均在其下）；
+        // 项目级走 .agents/ 兼容层，不建链，故 local_path 不需要
         (
             "antigravity",
             "Antigravity",
             true,
-            ".gemini",
+            ".gemini/config",
             None,
             "skills",
             "GEMINI.md",
@@ -458,10 +467,16 @@ pub fn default_platforms() -> HashMap<String, Platform> {
                 agents: agents.to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat,
+                global_agents_compat: None,
                 builtin: true,
             },
         );
     }
+    // antigravity 特例：项目级兼容 .agents/ 规范目录（跳过软链接），
+    // 全局级不兼容（安装/链接时需软链接到 ~/.gemini/config/skills/）
+    map.get_mut("antigravity")
+        .expect("antigravity must be a builtin platform")
+        .global_agents_compat = Some(false);
     map
 }
 
@@ -625,6 +640,7 @@ impl Config {
                     agents: String::new(),
                     source: String::new(),
                     agents_compat: false,
+                    global_agents_compat: None,
                     builtin: true,
                 };
             } else {
@@ -784,6 +800,16 @@ impl Source {
 }
 
 impl Platform {
+    /// 按作用域取 agents 兼容有效判定：
+    /// 项目级取 `agents_compat`；全局级取 `global_agents_compat`（缺省回退 `agents_compat`）
+    pub fn effective_agents_compat(&self, global: bool) -> bool {
+        if global {
+            self.global_agents_compat.unwrap_or(self.agents_compat)
+        } else {
+            self.agents_compat
+        }
+    }
+
     /// 渠道显示名称：优先 name，缺失时回退到配置 key
     pub fn display_name(&self, key: &str) -> String {
         self.name.clone().unwrap_or_else(|| key.to_string())
@@ -868,6 +894,7 @@ mod tests {
             agents: agents.to_string(),
             source: "AGENTS.md".to_string(),
             agents_compat: false,
+            global_agents_compat: None,
             builtin: false,
         }
     }
@@ -1083,16 +1110,23 @@ mod tests {
 
         let antigravity = &platforms["antigravity"];
         assert_eq!(antigravity.name.as_deref(), Some("Antigravity"));
-        assert_eq!(antigravity.path, ".gemini");
+        assert_eq!(antigravity.path, ".gemini/config");
         assert_eq!(antigravity.skills, "skills");
         assert_eq!(antigravity.agents, "GEMINI.md");
         assert!(antigravity.agents_compat);
+        // antigravity：项目级兼容、全局级不兼容（作用域化兼容标记）
+        assert_eq!(antigravity.global_agents_compat, Some(false));
+        assert!(antigravity.effective_agents_compat(false));
+        assert!(!antigravity.effective_agents_compat(true));
 
         let claude = &platforms["claude"];
         assert_eq!(claude.name.as_deref(), Some("Claude Code"));
         assert_eq!(claude.path, ".claude");
         assert_eq!(claude.skills, "skills");
         assert_eq!(claude.agents, "CLAUDE.md");
+        // 未声明全局兼容值的平台：全局判定回退到 agents_compat
+        assert_eq!(claude.global_agents_compat, None);
+        assert_eq!(claude.effective_agents_compat(true), claude.agents_compat);
 
         // kiro 渠道默认禁用且不支持 agents 兼容
         let kiro = &platforms["kiro"];
@@ -1258,6 +1292,10 @@ mod tests {
         keys.sort();
         assert_eq!(keys, vec!["builtin", "enabled", "name"]);
 
+        // 全量条目序列化包含 global_agents_compat（仅显式设置时出现）
+        let antigravity_json = serde_json::to_string(&default_platforms()["antigravity"]).unwrap();
+        assert!(antigravity_json.contains("global_agents_compat"));
+
         // 自定义渠道：builtin 强制 false，其余字段原样保留
         let custom = &config.platforms["my-custom"];
         assert!(!custom.builtin);
@@ -1317,7 +1355,7 @@ mod tests {
     fn test_enforce_builtin_platforms() {
         let mut config = default_config();
 
-        // 用户篡改内置渠道的字段（path/skills/agents_compat），仅 name/enabled 允许覆盖
+        // 用户篡改内置渠道的字段（path/skills/agents_compat/global_agents_compat），仅 name/enabled 允许覆盖
         {
             let claude = config.platforms.get_mut("claude").unwrap();
             claude.name = Some("My Claude".to_string());
@@ -1325,6 +1363,7 @@ mod tests {
             claude.path = ".hacked".to_string();
             claude.skills = "hacked".to_string();
             claude.agents_compat = true;
+            claude.global_agents_compat = Some(false);
         }
 
         config.enforce_builtin_platforms();
@@ -1337,6 +1376,7 @@ mod tests {
         assert_eq!(claude.path, ".claude");
         assert_eq!(claude.skills, "skills");
         assert!(!claude.agents_compat);
+        assert_eq!(claude.global_agents_compat, None);
         assert!(claude.builtin);
 
         // 自定义渠道不受影响

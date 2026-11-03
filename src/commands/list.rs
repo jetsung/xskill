@@ -117,7 +117,7 @@ fn scan_all_skills(config: &Config, global: bool) -> Result<BTreeMap<String, Ins
         if !platform.enabled {
             continue;
         }
-        let is_agents_compat = platform.agents_compat;
+        let is_agents_compat = platform.effective_agents_compat(global);
         let display_name = platform.display_name(pname);
 
         if is_agents_compat {
@@ -176,8 +176,8 @@ fn scan_platform_skills(
     Ok(skills)
 }
 
-/// 根据平台配置解析实际扫描目录列表：
-/// - agents_compat 平台：返回 [规范目录, 平台自身 skills 目录]（规范目录在前）
+/// 根据平台配置解析实际扫描目录列表（按作用域取有效兼容判定）：
+/// - 项目级/全局级判定为 agents_compat 的平台：返回 [规范目录, 平台自身 skills 目录]（规范目录在前）
 /// - 非兼容平台：返回 [平台自身 skills 目录]
 /// - 平台不存在或 skills 目录配置为空：返回 None
 fn platform_skills_dirs(
@@ -199,7 +199,7 @@ fn platform_skills_dirs(
         .join(platform.effective_path(global))
         .join(&platform.skills);
 
-    if platform.agents_compat {
+    if platform.effective_agents_compat(global) {
         Some(vec![canonical_skills_dir(global), platform_skills_dir])
     } else {
         Some(vec![platform_skills_dir])
@@ -333,6 +333,7 @@ mod tests {
                 agents: "CLAUDE.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -475,6 +476,7 @@ mod tests {
                 agents: "AGENTS.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: true,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -517,6 +519,7 @@ mod tests {
                 agents: "CUSTOM.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -541,6 +544,7 @@ mod tests {
                 agents: "CUSTOM.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -565,6 +569,7 @@ mod tests {
                 agents: "CUSTOM.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: true,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -591,6 +596,7 @@ mod tests {
                 agents: "CUSTOM.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: true,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -623,6 +629,7 @@ mod tests {
                 agents: "CUSTOM.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );

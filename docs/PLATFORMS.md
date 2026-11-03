@@ -6,7 +6,7 @@
 
 | 配置 key | 显示名称 | 路径 | 项目级路径 | Skills 目录 | Agents 文件 | 来源 | Agents 兼容 | 默认启用 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| antigravity | Antigravity | `.gemini` | | `skills` | `config/GEMINI.md` | `AGENTS.md` | ✓ | ✓ |
+| antigravity | Antigravity | `.gemini/config` | | `skills` | `config/GEMINI.md` | `AGENTS.md` | ✗ | ✓ |
 | claude | Claude Code | `.claude` | | `skills` | `CLAUDE.md` | `AGENTS.md` | ✗ | ✓ |
 | codebuddy | CodeBuddy | `.codebuddy` | | `skills` | `CODEBUDDY.md` | `AGENTS.md` | ✗ | ✓ |
 | codex | Codex | `.codex` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
@@ -40,9 +40,9 @@
 - **默认启用**（12 个）的渠道会出现在 `xskill platforms`、`find` 的交互选择与 `link --agent '*'` 等批量操作中；未启用渠道可通过 `~/.xskill/settings.json` 中对应条目的 `"enabled": true` 启用（默认 `false`），显式指定渠道名（如 `xskill link claude <skill>`）不受影响。
 - **显示名称**：`name` 字段用于 `platforms`/`find`/`list` 等展示型输出，缺失时回退到配置 key。
 - **路径**：`path` 为全局模式（`-g`）下的配置目录（`~/<path>/skills`）；**项目级路径**（`local_path`）仅当全局与项目级路径不同时填写，缺省时回退到 `path`。例如 `omp` 全局为 `~/.omp/agent/skills`，项目级为 `.omp/skills`。
-- **Agents 兼容**：`agents_compat` 为 `true` 的渠道直接读取规范目录，add/remove/link/restore 跳过 symlink 操作；find TUI 中显示为已选中（`SELECTED`）。
+- **Agents 兼容**：`agents_compat` 为 `true` 的渠道直接读取规范目录，add/remove/link/restore 跳过 symlink 操作；find TUI 中显示为已选中（`SELECTED`）。兼容判定**按作用域生效**：可选字段 `global_agents_compat` 覆盖全局模式（`-g`）下的判定，缺省时回退到 `agents_compat`。`platforms list` 的 COMPAT 列按全局语义展示。
 - **内置渠道**：上表全部渠道均为内置（`builtin: true`），受保护——用户配置仅可覆盖 `name` 与 `enabled`，`path`、`local_path`、`skills` 等其余字段在配置加载时强制恢复内置默认值；自定义渠道（key 不在上表）不受限。
-- `antigravity`（原 Gemini CLI，Google 已更名为 Antigravity CLI，配置目录沿用 `~/.gemini/`）与 `gemini` 为同一平台，内置列表仅保留 `antigravity`。
+- `antigravity`（原 Gemini CLI，Google 已更名为 Antigravity CLI，配置目录沿用 `~/.gemini/`，全局配置位于 `~/.gemini/config/`）与 `gemini` 为同一平台，内置列表仅保留 `antigravity`。它是唯一的**作用域分叉**平台：项目级直接复用 `.agents/skills/` 规范目录（兼容层，add/link/restore 跳过软链接），全局级不兼容——安装到 `~/.agents/skills/` 后需软链接到 `~/.gemini/config/skills/`（`agents_compat=true`、`global_agents_compat=false`）。
 - `zoo`（Zoo Code）接手已停服的 Roo Code，配置目录沿用 `~/.roo/`。
 - `qoder-cn`（Qoder 中国版）与 `qoder`（国际版）为同一产品的不同发行版，配置目录分别为 `~/.qoder-cn/` 与 `~/.qoder/`，互不共享。
 - `mimocode`（MiMo Code）全局配置目录为 `~/.config/mimocode/skills`，项目级为 `.mimocode/skills`（[官方文档](https://mimo.xiaomi.com/zh/mimocode/skills)）。

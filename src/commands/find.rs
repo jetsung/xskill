@@ -277,7 +277,7 @@ fn install_skills(
             let mut linked: Vec<String> = Vec::new();
             for platform in platforms {
                 if let Some(p) = config.platforms.get(platform.as_str())
-                    && p.agents_compat
+                    && p.effective_agents_compat(global)
                 {
                     linked.push(platform.to_string());
                     continue;
@@ -395,7 +395,7 @@ fn run_skill_tui(items: Vec<FindItem>, initial_query: Option<&str>) -> Result<Ve
 
 /// Step 2: Select target platforms (multi-select).
 fn run_platform_tui(config: &Config) -> Result<Vec<String>> {
-    // Collect enabled agents_compat platform names
+    // Collect enabled agents_compat platform names（按全局语义判定，与 platforms list 的 COMPAT 列一致）
     let compat_names: Vec<String> = config
         .platform_names()
         .iter()
@@ -403,7 +403,7 @@ fn run_platform_tui(config: &Config) -> Result<Vec<String>> {
             config
                 .platforms
                 .get(**name)
-                .is_some_and(|p| p.agents_compat && p.enabled)
+                .is_some_and(|p| p.effective_agents_compat(true) && p.enabled)
         })
         .map(|s| s.to_string())
         .collect();
@@ -420,7 +420,7 @@ fn run_platform_tui(config: &Config) -> Result<Vec<String>> {
         let Some(platform) = config.platforms.get(name) else {
             continue;
         };
-        if platform.agents_compat || !platform.enabled {
+        if platform.effective_agents_compat(true) || !platform.enabled {
             continue;
         }
         items.push(SelectItem {
@@ -1133,6 +1133,7 @@ mod tests {
                 agents: "CLAUDE.md".to_string(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
@@ -1171,6 +1172,7 @@ mod tests {
                 agents: String::new(),
                 source: "AGENTS.md".to_string(),
                 agents_compat: false,
+                global_agents_compat: None,
                 builtin: false,
             },
         );
