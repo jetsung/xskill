@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-11-02T14:16:28.180Z",
+  "updated_at": "2026-11-03T00:13:35.427Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "74ac3c170ad70f1ebc361648a277648f510d22f6",
+      "commit_hash": "1d5683cadda3eaf492ddf592a10df97ef82c5a49",
       "skills": [
         {
           "name": "huawei-deveco-studio-fetch",
@@ -37,6 +37,12 @@
           "version": "1.0.0"
         },
         {
+          "name": "model-update",
+          "path": "skills/model-update/SKILL.md",
+          "description": "从上游渠道获取模型列表并新增/更新到目标 AI 平台配置：读取 <CHANNEL>_BASE_URL 与 <CHANNEL>_API_KEY，请求 OpenAI 兼容 /models，缓存到 ~/.cache/models/<渠道>.jsonc， 由 AI 依据目标平台格式生成字段映射，再按模型 id 幂等合并、备份并校验写入。 当用户说「添加/更新 <渠道> 渠道到 <平台>」「把 XX 渠道的模型更新到 pi」「给 pi 加 XX 渠道」 或要求从上游渠道同步模型到某平台时使用。",
+          "version": "1.3.0"
+        },
+        {
           "name": "just",
           "path": "skills/just/SKILL.md",
           "description": "使用 just 编写、运行和维护 justfile 命令集。当用户需要创建或修改 justfile、管理配方（recipes）、参数与依赖、配置 shell/环境变量、使用模块与导入、或查询 just CLI/设置/属性/函数时使用本 skill。",
@@ -58,7 +64,7 @@
           "name": "model-channel-sync",
           "path": "skills/model-channel-sync/SKILL.md",
           "description": "管理 AI 模型渠道（provider）配置：①提取真正可用的免费/零价模型（抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论）； ②以 pi 等平台配置为基准，同步/更新渠道、模型、APIKEY 到多个 agent 工具（pi、zcode、dsh、omp、opencode、mimocode、qoder、codebuddy、dbx 等）的配置文件。 凡用户提到\"获取/提取/列出 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、\"有哪些免费模型可用\"、 \"给 XX 渠道加免费模型\"、\"这个免费模型能用吗/测试一下\"、\"把模型更新到 pi/omp/opencode/mimocode/dsh/zcode/qoder/codebuddy/dbx\"、 \"以 pi 为基准更新 XX 渠道\"、\"同步渠道/模型/APIKEY 到 XX\"、\"更新 XX 的 APIKEY\"、 \"同步到 mimocode / 覆盖 mimocode 的提供商 / pi 同步到 mimocode\"时，都应使用此技能。 支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。",
-          "version": "1.5.0"
+          "version": "1.7.0"
         },
         {
           "name": "navi",
@@ -198,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "61fa1fa8fcc63d6dbd2f07a75aeb8e214df5acfb",
+      "commit_hash": "60764df8b04cec728fd106744f98f90e18479105",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -3514,7 +3520,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "27c0515724decc633818c735ee596481eec78a8b",
+      "commit_hash": "2bd5bc3be964404657439f538857fcdf550f7398",
       "skills": [
         {
           "name": "openspec-bulk-archive-change",
