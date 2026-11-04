@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T13:30:07.227Z",
+  "updated_at": "2026-11-04T23:00:26.945Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "7e408815ddcb64889a3683799a85399331cfd4ef",
+      "commit_hash": "e9281af1a4b3b8624b882d59e829d2cbf9fb0d72",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -3532,7 +3532,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "2bd5bc3be964404657439f538857fcdf550f7398",
+      "commit_hash": "3e4d5f0769e2857c8eb54f149cbf5e4f703fa04c",
       "skills": [
         {
           "name": "openspec-bulk-archive-change",
