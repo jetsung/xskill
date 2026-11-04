@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T04:00:09.088Z",
+  "updated_at": "2026-11-04T13:30:07.227Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "edbecfa9099c4addae1f500cca1ac067204b30fd",
+      "commit_hash": "7e408815ddcb64889a3683799a85399331cfd4ef",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -2043,6 +2043,12 @@
           "version": ""
         },
         {
+          "name": "adobe-illustrator-integrations",
+          "path": "skills/adobe-illustrator-integrations/SKILL.md",
+          "description": "Build, debug, package, and document Adobe Illustrator integrations: CEP extension panels, C++ SDK plug-ins (.aip), the coming UXP plugins, MCP servers that drive Illustrator, computer-use automation, and OS scripts (batch, PowerShell, bash, AppleScript) that run ExtendScript in Illustrator. Use when creating or fixing an Illustrator extension or plug-in, choosing between a script, extension, or plug-in, connecting an AI tool to Illustrator, automating Illustrator from the command line, or writing install and usage docs for an Illustrator tool someone will publish. Pairs with adobe-illustrator-scripting for the ExtendScript DOM.",
+          "version": ""
+        },
+        {
           "name": "kotlin-mcp-server-generator",
           "path": "skills/kotlin-mcp-server-generator/SKILL.md",
           "description": "Generate a complete Kotlin MCP server project with proper structure, dependencies, and implementation using the official io.modelcontextprotocol:kotlin-sdk library.",
@@ -2760,6 +2766,12 @@
           "name": "create-readme",
           "path": "skills/create-readme/SKILL.md",
           "description": "Create a README.md file for the project",
+          "version": ""
+        },
+        {
+          "name": "diagnose-ci-gate",
+          "path": "skills/diagnose-ci-gate/SKILL.md",
+          "description": "Determine whether a failing CI check was caused by the current change, then recommend exactly one action. Use when a required check fails on a pull request, when asked \"is this failure mine?\", when a job passes locally but fails in CI, or before retrying a red build. Covers fetching the real log, reading the first error instead of the tail, classifying bug / flaky / environment / pipeline, comparing against the base branch and recent runs, reproducing with CI versions, and fixing a flaky test rather than re-running it forever.",
           "version": ""
         },
         {
