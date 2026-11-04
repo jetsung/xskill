@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-03T22:42:57.385Z",
+  "updated_at": "2026-11-04T04:00:09.088Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "8178d1939a203f691067073dcab2a3f1e14072d3",
+      "commit_hash": "edbecfa9099c4addae1f500cca1ac067204b30fd",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
