@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-05T04:22:18.041Z",
+  "updated_at": "2026-11-05T13:44:43.188Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3043,13 +3043,13 @@
     {
       "source": "antfu/skills",
       "url": "https://github.com/antfu/skills",
-      "commit_hash": "0c4e960984e268b5f6c36bf45f8d3395b2406ad7",
+      "commit_hash": "f63e9ec7bc85f67364b6596c2d29da87e83ce445",
       "skills": [
         {
           "name": "nuxt",
           "path": "skills/nuxt/SKILL.md",
           "description": "Nuxt full-stack Vue framework with SSR, auto-imports, and file-based routing. Use when working with Nuxt apps, server routes, useFetch, middleware, or hybrid rendering.",
-          "version": "2026.9.25"
+          "version": "2026.11.5"
         },
         {
           "name": "antfu-simplify",
@@ -3091,7 +3091,7 @@
           "name": "vite",
           "path": "skills/vite/SKILL.md",
           "description": "Vite build tool configuration, plugin API, SSR, and Vite 8 Rolldown migration. Use when working with Vite projects, vite.config.ts, Vite plugins, or building libraries/SSR apps with Vite.",
-          "version": "2026.9.25"
+          "version": "2026.11.5"
         },
         {
           "name": "vitest",
@@ -3109,13 +3109,13 @@
           "name": "antfu-issue-triage",
           "path": "skills/antfu-issue-triage/SKILL.md",
           "description": "Triage open issues and PRs of the current GitHub repo - find already-fixed, duplicate, and spam items, suggest labels, gauge demand from reactions and comments, then present a table of proposed actions and comments for confirmation before touching anything. Use when asked to triage, organize, clean up, or groom issues and PRs.",
-          "version": "2026.10.23"
+          "version": "2026.11.05"
         },
         {
           "name": "pnpm",
           "path": "skills/pnpm/SKILL.md",
           "description": "Node.js package manager with strict dependency resolution. Use when running pnpm specific commands, configuring workspaces via pnpm-workspace.yaml, or managing dependencies with catalogs, patches, overrides, config dependencies, or the global virtual store.",
-          "version": "2026.9.25"
+          "version": "2026.11.5"
         },
         {
           "name": "antfu",
