@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-04T23:00:26.945Z",
+  "updated_at": "2026-11-05T04:22:18.041Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "e9281af1a4b3b8624b882d59e829d2cbf9fb0d72",
+      "commit_hash": "96543145e9cb97711020b57b9d88f968062c4fc7",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -3043,7 +3043,7 @@
     {
       "source": "antfu/skills",
       "url": "https://github.com/antfu/skills",
-      "commit_hash": "7de210b51c8d48cc405a4eac3e17cbb1396c653b",
+      "commit_hash": "0c4e960984e268b5f6c36bf45f8d3395b2406ad7",
       "skills": [
         {
           "name": "nuxt",
@@ -3073,7 +3073,7 @@
           "name": "antfu-create-pr",
           "path": "skills/antfu-create-pr/SKILL.md",
           "description": "Create a reviewable GitHub pull request from the current branch with a Conventional Commits title, a concise evidence-based body, and before/after screenshots for UI changes. Use when asked to open, create, publish, or prepare a PR.",
-          "version": "2026.10.09"
+          "version": "2026.11.05"
         },
         {
           "name": "vue",
