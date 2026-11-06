@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-06T13:28:50.956Z",
+  "updated_at": "2026-11-06T22:32:52.670Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -83,7 +83,7 @@
     {
       "source": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
-      "commit_hash": "ca45fc496a3436251f191354091d557da31c15b5",
+      "commit_hash": "2c5958ecac7cee2b583967a2c4981d0f4a75c579",
       "skills": [
         {
           "name": "mcp-builder",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "60dcb901abbd87609d93d6281f1916c22b8bbd8c",
+      "commit_hash": "797337f33f73e35d08d82f840e21c4b8c4932d88",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -3532,7 +3532,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "3e4d5f0769e2857c8eb54f149cbf5e4f703fa04c",
+      "commit_hash": "a1ae53669d25e7ffc6946f623f18abb7fecd3bce",
       "skills": [
         {
           "name": "openspec-bulk-archive-change",
@@ -6890,7 +6890,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "b38be6a7f6350964d59328b52f0624e1d1d552d1",
+      "commit_hash": "d2ef2680594f9a17526a6e1a2e18b3d242c5d17b",
       "skills": [
         {
           "name": "google-workspace-ops",
