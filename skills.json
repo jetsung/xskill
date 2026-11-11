@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-11T03:51:54.841Z",
+  "updated_at": "2026-11-11T13:14:55.434Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "3a19f169cee1a6f02d386e0c0595c779b5f6eaaf",
+      "commit_hash": "eaaffd5d020b756a2777a4b1b161d2bdc126d9a0",
       "skills": [
         {
           "name": "java-add-graalvm-native-image-support",
@@ -3067,7 +3067,7 @@
     {
       "source": "antfu/skills",
       "url": "https://github.com/antfu/skills",
-      "commit_hash": "2b26163650610e2bd32261bef68b4093312cc6ff",
+      "commit_hash": "d524ed287eef22757297827ce42e3cad88abd20c",
       "skills": [
         {
           "name": "nuxt",
