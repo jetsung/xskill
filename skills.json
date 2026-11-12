@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-11T23:52:18.662Z",
+  "updated_at": "2026-11-12T04:59:30.187Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "eaaffd5d020b756a2777a4b1b161d2bdc126d9a0",
+      "commit_hash": "30a0d7465b14b05e05949d6588b99f7af0c537b4",
       "skills": [
         {
           "name": "sandbox-npm-install",
