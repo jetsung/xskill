@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-12T04:59:30.187Z",
+  "updated_at": "2026-11-12T14:19:14.312Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3315,7 +3315,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "commit_hash": "5863806dd4e15c63174bee4e7515a4256792ecfa",
       "skills": [
         {
           "name": "git-guardrails-claude-code",
