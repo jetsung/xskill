@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-13T13:40:06.733Z",
+  "updated_at": "2026-11-13T23:02:21.256Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "222eba62d518c27317e917c92e3ec1a7e6729455",
+      "commit_hash": "8ecd5b17f02fe5fbebf35eccd1867265eded811f",
       "skills": [
         {
           "name": "sandbox-npm-install",
@@ -3568,7 +3568,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "d12c2817776779e06891d68230773b3bb673b106",
+      "commit_hash": "ea635dd255f8686dcf48626bbcbe0e3fd59b6067",
       "skills": [
         {
           "name": "openspec-continue-change",
