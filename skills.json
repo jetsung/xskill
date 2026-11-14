@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-14T12:44:34.008Z",
+  "updated_at": "2026-11-14T21:50:04.038Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -83,7 +83,7 @@
     {
       "source": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
-      "commit_hash": "2c5958ecac7cee2b583967a2c4981d0f4a75c579",
+      "commit_hash": "1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064",
       "skills": [
         {
           "name": "doc-coauthoring",
