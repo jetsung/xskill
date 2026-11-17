@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-16T14:20:36.948Z",
+  "updated_at": "2026-11-17T01:18:58.933Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -83,7 +83,7 @@
     {
       "source": "anthropics/skills",
       "url": "https://github.com/anthropics/skills",
-      "commit_hash": "1780c5e5a552fd4d1c9d6a7b0cab26b0c2bef064",
+      "commit_hash": "e4bb5d960d87126ff3b3a8af1a104b7db67560ba",
       "skills": [
         {
           "name": "doc-coauthoring",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "dc0083dbe22133bfa7ce3500dee85e187e0cd47a",
+      "commit_hash": "a06ba06d11f41b996f8c246e2a452e1bf3a17950",
       "skills": [
         {
           "name": "sandbox-npm-install",
@@ -3568,7 +3568,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "ea635dd255f8686dcf48626bbcbe0e3fd59b6067",
+      "commit_hash": "8bd4b3557b5bf1d231cd2f165b28f24e2d90a2a0",
       "skills": [
         {
           "name": "openspec-continue-change",
@@ -6926,7 +6926,7 @@
     {
       "source": "affaan-m/ECC",
       "url": "https://github.com/affaan-m/ECC",
-      "commit_hash": "d2ef2680594f9a17526a6e1a2e18b3d242c5d17b",
+      "commit_hash": "8abdf329ecbc9315dc4e3334a5702782f70b8b02",
       "skills": [
         {
           "name": "messages-ops",
@@ -6950,6 +6950,12 @@
           "name": "perl-patterns",
           "path": "skills/perl-patterns/SKILL.md",
           "description": "Modern Perl 5.36+ idioms, best practices, and conventions for building robust, maintainable Perl applications. Use when writing or reviewing modern Perl 5.36+ code.",
+          "version": ""
+        },
+        {
+          "name": "yoruba-localization-testing",
+          "path": "skills/yoruba-localization-testing/SKILL.md",
+          "description": "Test Yoruba (yo) and English bilingual interfaces for tone marks, underdots, Unicode normalization, translation fallback, and accessibility.",
           "version": ""
         },
         {
@@ -6979,7 +6985,7 @@
         {
           "name": "security-review",
           "path": "skills/security-review/SKILL.md",
-          "description": "Use this skill when adding authentication, handling user input, working with secrets, creating API endpoints, or implementing payment/sensitive features. Provides comprehensive security checklist and patterns.",
+          "description": "Security review checklist and patterns for adding authentication, handling user input, managing secrets, creating API endpoints, or implementing payment and sensitive features.",
           "version": ""
         },
         {
@@ -7064,6 +7070,12 @@
           "name": "rust-testing",
           "path": "skills/rust-testing/SKILL.md",
           "description": "Rust testing patterns including unit tests, integration tests, async testing, property-based testing, mocking, and coverage. Follows TDD methodology. Use when writing Rust tests — unit, integration, async, property-based, or coverage.",
+          "version": ""
+        },
+        {
+          "name": "platform-factory",
+          "path": "skills/platform-factory/SKILL.md",
+          "description": "Build deterministic OCI images, SBOM/provenance evidence and hardened container or microVM runs from a compiled executable with the Platform Factory (pf) CLI, and keep its freeze lock in sync with a companion Claude Code hook. Use when a project contains .platform-factory/, when the user runs or asks about pf/platform-factory (detect, plan, freeze, build, verify, run, launch), or wants reproducible OCI builds without a Docker daemon.",
           "version": ""
         },
         {
@@ -7193,12 +7205,6 @@
           "version": ""
         },
         {
-          "name": "claude-devfleet",
-          "path": "skills/claude-devfleet/SKILL.md",
-          "description": "Orchestrate multi-agent coding tasks via Claude DevFleet — plan projects, dispatch parallel agents in isolated worktrees, monitor progress, and read structured reports. Use when dispatching parallel coding agents across isolated worktrees and tracking their reports.",
-          "version": ""
-        },
-        {
           "name": "energy-procurement",
           "path": "skills/energy-procurement/SKILL.md",
           "description": "Procure electricity and natural gas for commercial and industrial facilities: tariff and rate-schedule optimization, demand-charge mitigation, supplier RFPs, fixed/index/block-and-index hedging, renewable PPA and REC evaluation, and sustainability reporting. Use when procuring energy, optimizing utility tariffs, managing demand charges, evaluating PPAs, or building energy budgets and hedge strategies.",
@@ -7244,6 +7250,12 @@
           "name": "prisma-patterns",
           "path": "skills/prisma-patterns/SKILL.md",
           "description": "Prisma ORM patterns for TypeScript backends — schema design, query optimization, transactions, pagination, and critical traps like updateMany returning count not records, $transaction timeouts, migrate dev resetting the DB, @updatedAt skipped on bulk writes, and serverless connection exhaustion. Use when writing a Prisma schema or query, or debugging transactions, migrations, or serverless connection limits.",
+          "version": ""
+        },
+        {
+          "name": "devfleet",
+          "path": "skills/devfleet/SKILL.md",
+          "description": "Orchestrate multi-agent coding tasks via Claude DevFleet — plan projects, dispatch parallel agents in isolated worktrees, monitor progress, and read structured reports. Use when dispatching parallel coding agents across isolated worktrees and tracking their reports.",
           "version": ""
         },
         {
@@ -7319,6 +7331,12 @@
           "version": ""
         },
         {
+          "name": "short-video-distribution",
+          "path": "skills/short-video-distribution/SKILL.md",
+          "description": "Ship a finished vertical video to TikTok, YouTube Shorts, and Instagram Reels. Checks the file against each platform's limits, writes native captions and titles, handles privacy and disclosure choices, gets explicit approval, then publishes through whichever path the user has (a connected publishing MCP server, the platform APIs, or a manual upload sheet) and returns the live links. Use after a video is rendered or edited and the user wants it posted as a Short, Reel, or TikTok.",
+          "version": ""
+        },
+        {
           "name": "cisco-ios-patterns",
           "path": "skills/cisco-ios-patterns/SKILL.md",
           "description": "Cisco IOS and IOS-XE review patterns for show commands, config hierarchy, wildcard masks, ACL placement, interface hygiene, and safe change-window verification. Use when reading, writing, or reviewing Cisco IOS / IOS-XE configuration or planning a change window.",
@@ -7365,6 +7383,12 @@
           "path": "skills/api-connector-builder/SKILL.md",
           "description": "Build a new API connector or provider by matching the target repo's existing integration pattern exactly. Use when adding one more integration without inventing a second architecture.",
           "version": "1.0.0"
+        },
+        {
+          "name": "rails-security",
+          "path": "skills/rails-security/SKILL.md",
+          "description": "Ruby on Rails security practices for Rails 7.1+ and 8.x apps. Covers production configuration, authentication, authorization, strong parameters, SQL injection, XSS and output escaping, CSRF, file uploads, API security, credentials, untrusted boundaries, and dependency scanning. Use when reviewing or writing Rails authentication, authorization, input handling, uploads, or deployment configuration.",
+          "version": ""
         },
         {
           "name": "benchmark",
@@ -7418,6 +7442,12 @@
           "name": "pytorch-patterns",
           "path": "skills/pytorch-patterns/SKILL.md",
           "description": "PyTorch deep learning patterns and best practices for building robust, efficient, and reproducible training pipelines, model architectures, and data loading. Use when writing or reviewing PyTorch training loops, model architectures, or data loading, or when a run will not reproduce.",
+          "version": ""
+        },
+        {
+          "name": "ecc-contribution-review",
+          "path": "skills/ecc-contribution-review/SKILL.md",
+          "description": "Prepare an ECC skill contribution for review by organizing repository, install-surface, cross-harness, validation, security, and commit observations into a local proposal. Use when preparing a skill contribution for review.",
           "version": ""
         },
         {
@@ -7597,7 +7627,7 @@
         {
           "name": "kubernetes-patterns",
           "path": "skills/kubernetes-patterns/SKILL.md",
-          "description": "Kubernetes workload patterns, resource management, RBAC, probes, autoscaling, ConfigMap/Secret handling, and kubectl debugging for production-grade deployments. Use when writing or reviewing Kubernetes manifests, or debugging probes, RBAC, autoscaling, or resource limits.",
+          "description": "Kubernetes workload patterns, resource management, RBAC, probes, autoscaling, ConfigMap/Secret handling, and kubectl debugging for production-grade deployments. Use when writing or reviewing Kubernetes manifests, or debugging probes, RBAC, autoscaling, resource limits, or pods that keep getting evicted.",
           "version": ""
         },
         {
@@ -7837,7 +7867,7 @@
         {
           "name": "blender-motion-state-inspection",
           "path": "skills/blender-motion-state-inspection/SKILL.md",
-          "description": "Use this skill when inspecting Blender characters, rigs, poses, animation retargeting, ground contact, facing direction, or model-vs-motion alignment where screenshots alone are not enough.",
+          "description": "Inspects Blender characters, rigs, poses, animation retargeting, ground contact, facing direction, or model-vs-motion alignment where screenshots alone are not enough.",
           "version": ""
         },
         {
@@ -7903,13 +7933,13 @@
         {
           "name": "benchmark-optimization-loop",
           "path": "skills/benchmark-optimization-loop/SKILL.md",
-          "description": "Convert 'make it faster' requests into a bounded measured optimization loop — baseline first, generate one-hypothesis variants, benchmark each against a correctness gate, and promote the fastest safe variant with reproducible commands. Use when asked to speed something up, try many variants, run recursive optimization, benchmark latency/throughput/cost, or pick the best implementation by repeated measured tests.",
+          "description": "Turn a user's improvement goal into a bounded benchmark-guided loop: define success and hard constraints, establish a baseline, test one-hypothesis variants, and promote the best measured admissible result with reproducible commands. Use for repeated measured improvements to correctness, quality, task completion, reliability, speed, or cost, including recursive optimization and implementation comparisons.",
           "version": ""
         },
         {
           "name": "canary-watch",
           "path": "skills/canary-watch/SKILL.md",
-          "description": "Use this skill to monitor and verify a deployed URL after releases — checks HTTP endpoints, SSE streams, static assets, console errors, and performance regressions after deploys, merges, or dependency upgrades. Smoke / canary / post-deploy verification.",
+          "description": "Monitors and verifies deployed URLs after releases by checking HTTP endpoints, SSE streams, static assets, console errors, and performance regressions after deploys, merges, or dependency upgrades. Smoke, canary, and post-deploy verification.",
           "version": ""
         },
         {
@@ -7964,6 +7994,12 @@
           "name": "continuous-agent-loop",
           "path": "skills/continuous-agent-loop/SKILL.md",
           "description": "Patterns for continuous autonomous agent loops with quality gates, evals, and recovery controls. Use when running an agent loop that must self-check, gate on evals, and recover from failures.",
+          "version": ""
+        },
+        {
+          "name": "roundhouse-x402",
+          "path": "skills/roundhouse-x402/SKILL.md",
+          "description": "Discover x402-paid services and ERC-8004 agent identity via Roundhouse (open catalog, paid SQL, MCP server, rh-x402 CLI), and optionally settle through Roundhouse's Base mainnet facilitator. Use when searching the x402 bazaar/index, vetting a payee or wallet, querying settlement or agent data, configuring Roundhouse MCP, or pointing a paywall at a hosted facilitator on Base.",
           "version": ""
         },
         {
@@ -8027,6 +8063,12 @@
           "version": ""
         },
         {
+          "name": "godot-testing",
+          "path": "skills/godot-testing/SKILL.md",
+          "description": "Testing Godot 4 GDScript projects - a zero-dependency headless check scene, gdUnit4 and GUT suites, scene-runner tests, signal assertions, and CI commands. Use when adding tests to a Godot project, setting up CI, or proving a change did not break the game.",
+          "version": ""
+        },
+        {
           "name": "ml-adoption-playbook",
           "path": "skills/ml-adoption-playbook/SKILL.md",
           "description": "End-to-end methodology for AI agents and software engineers to add machine learning algorithms to existing non-ML codebases. Covers problem framing, data readiness, architectural decoupling, and baseline model integration. Use when adding a machine learning capability to a codebase that has none, from problem framing through a baseline model.",
@@ -8036,6 +8078,18 @@
           "name": "visa-doc-translate",
           "path": "skills/visa-doc-translate/SKILL.md",
           "description": "Translate visa document images (bank deposit, employment, income, and retirement certificates; HEIC, PNG, or JPG) into English via OCR and produce a bilingual PDF pairing the original image with a formatted certified-style translation. Use when a visa application needs a document translated to English, an official certificate OCR'd and translated, or a bilingual translation PDF for immigration paperwork.",
+          "version": ""
+        },
+        {
+          "name": "scientific-db-openalex-database",
+          "path": "skills/scientific-db-openalex-database/SKILL.md",
+          "description": "OpenAlex REST API workflows for cross-disciplinary literature search, DOI/PMID lookup, open-access links, citation counts, and reproducible search logs. Use when a task needs scholarly works from every field (not only biomedicine), or needs to resolve a DOI, PMID or OpenAlex ID to full metadata.",
+          "version": ""
+        },
+        {
+          "name": "leanrea",
+          "path": "skills/leanrea/SKILL.md",
+          "description": "Reverse engineers shipped software with bounded local CLI inspection. Covers PE headers, Electron archives, custom binary formats, SQLite databases, and JavaScript bundles while separating observed evidence from inference.",
           "version": ""
         },
         {
@@ -8228,6 +8282,12 @@
           "name": "data-throughput-accelerator",
           "path": "skills/data-throughput-accelerator/SKILL.md",
           "description": "Diagnose and accelerate large data movement — ingestion, backfill, export, ETL, warehouse loading, manifest catch-up, and table synchronization — by isolating the true bottleneck, benchmarking variants, and codifying the fastest path with a hard accounting block proving rows and timestamps cohere. Use when a pipeline or backfill is too slow and must get faster without losing data correctness.",
+          "version": ""
+        },
+        {
+          "name": "config-health",
+          "path": "skills/config-health/SKILL.md",
+          "description": "Runtime configuration integrity monitoring for Claude Code. Detects config drift, rule staleness, and hook wiring gaps at startup, with an optional per-tool mode. Complements delivery-gate with startup soft monitoring.",
           "version": ""
         },
         {
@@ -8539,7 +8599,7 @@
         {
           "name": "jira-integration",
           "path": "skills/jira-integration/SKILL.md",
-          "description": "Use this skill when retrieving Jira tickets, analyzing requirements, updating ticket status, adding comments, or transitioning issues. Provides Jira API patterns via MCP or direct REST calls.",
+          "description": "Retrieves Jira tickets, analyzes requirements, updates ticket status, adds comments, or transitions issues via MCP or direct REST API patterns.",
           "version": ""
         },
         {
@@ -8651,6 +8711,12 @@
           "version": ""
         },
         {
+          "name": "web-perimeter-owasp-2025-audit",
+          "path": "skills/web-perimeter-owasp-2025-audit/SKILL.md",
+          "description": "Passive, non-destructive web perimeter security auditing mapped to OWASP Top 10:2025 surface leads, CDN Unkeyed Header Web Cache Poisoning (X-Forwarded-Host), supply chain manifest exposure, git object dumping prevention (/.git/HEAD), cryptographic headers, and AI crawler boundary governance (llms.txt, robots.txt). Use when auditing production domains, configuring Cloudflare/Vercel/Nginx edge security, or preparing pre-launch perimeter checks.",
+          "version": ""
+        },
+        {
           "name": "redis-patterns",
           "path": "skills/redis-patterns/SKILL.md",
           "description": "Redis data structure patterns, caching strategies, distributed locks, rate limiting, pub/sub, and connection management for production applications. Use when adding caching, a distributed lock, rate limiting, or pub/sub with Redis, or when key design needs review.",
@@ -8753,6 +8819,12 @@
           "version": ""
         },
         {
+          "name": "godot-patterns",
+          "path": "skills/godot-patterns/SKILL.md",
+          "description": "Idiomatic Godot 4 GDScript patterns - static typing, scene and node design, signals, resources, autoloads, input, and lifecycle safety. Use when writing or reviewing GDScript, designing scenes, or deciding where game state should live.",
+          "version": ""
+        },
+        {
           "name": "codebase-onboarding",
           "path": "skills/codebase-onboarding/SKILL.md",
           "description": "Analyze an unfamiliar codebase and generate a structured onboarding guide with architecture map, key entry points, conventions, and a starter CLAUDE.md. Use when joining a new project or setting up Claude Code for the first time in a repo.",
@@ -8774,6 +8846,12 @@
           "name": "python-patterns",
           "path": "skills/python-patterns/SKILL.md",
           "description": "Pythonic idioms, PEP 8 standards, type hints, and best practices for building robust, efficient, and maintainable Python applications. Use when writing or reviewing Python code and idiomatic structure, typing, or PEP 8 is in question.",
+          "version": ""
+        },
+        {
+          "name": "terraform-patterns",
+          "path": "skills/terraform-patterns/SKILL.md",
+          "description": "Terraform and OpenTofu infrastructure-as-code patterns for project layout, remote state, modules, variables, secrets, safe plan/apply workflows, and CI. Use when writing or reviewing .tf files, structuring modules or environments, configuring backends and state locking, or debugging plan drift, state, and provider errors.",
           "version": ""
         },
         {
