@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-17T15:13:06.782Z",
+  "updated_at": "2026-11-18T00:15:02.732Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "a06ba06d11f41b996f8c246e2a452e1bf3a17950",
+      "commit_hash": "a255a193d1318e5a9ca3e9e575897f9a7845c099",
       "skills": [
         {
           "name": "sandbox-npm-install",
@@ -390,6 +390,12 @@
           "name": "dotnet-design-pattern-review",
           "path": "skills/dotnet-design-pattern-review/SKILL.md",
           "description": "Review the C#/.NET code for design pattern implementation and suggest improvements.",
+          "version": ""
+        },
+        {
+          "name": "polytype-middleware",
+          "path": "skills/polytype-middleware/SKILL.md",
+          "description": "Design or review the public API of a PolyType middleware library so it stays complete on net472 and netstandard2.0 while modern .NET callers use where T : IShapeable<T> with no witness. Use when adding generic methods, witness or TProvider overloads, extension members, or a #if NET / #if !NET split.",
           "version": ""
         },
         {
