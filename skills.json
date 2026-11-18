@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-11-18T14:50:15.106Z",
+  "updated_at": "2026-11-18T23:43:31.959Z",
   "sources": [
     {
       "source": "jetsung/skills",
       "url": "https://github.com/jetsung/skills",
-      "commit_hash": "1d5683cadda3eaf492ddf592a10df97ef82c5a49",
+      "commit_hash": "b349cccffcd71de0736482d4df653322dd54fab9",
       "skills": [
         {
           "name": "navi",
@@ -46,7 +46,7 @@
           "name": "model-update",
           "path": "skills/model-update/SKILL.md",
           "description": "从上游渠道获取模型列表并新增/更新到目标 AI 平台配置：读取 <CHANNEL>_BASE_URL 与 <CHANNEL>_API_KEY，请求 OpenAI 兼容 /models，缓存到 ~/.cache/models/<渠道>.jsonc， 由 AI 依据目标平台格式生成字段映射，再按模型 id 幂等合并、备份并校验写入。 当用户说「添加/更新 <渠道> 渠道到 <平台>」「把 XX 渠道的模型更新到 pi」「给 pi 加 XX 渠道」 或要求从上游渠道同步模型到某平台时使用。",
-          "version": "1.3.0"
+          "version": "1.7.0"
         },
         {
           "name": "atuin",
@@ -64,7 +64,7 @@
           "name": "flarum-publish",
           "path": "skills/flarum-publish/SKILL.md",
           "description": "通过 Flarum REST API 把文章发布为论坛讨论（主题）。当用户要求把内容/文件发布或投稿到 Flarum 论坛、给出 GitHub 项目链接要求整理成中文文章发帖、转存图片到论坛图床（fof/upload）时使用——即使未明说「Flarum」，只要是往论坛发帖即适用。可选：文章发布后，用户以关键词（如「整理教程」「生成使用教程」）触发，把项目整理为基础使用教程并回帖到该文章下（agent 不得主动触发）。",
-          "version": "1.18.0"
+          "version": "1.18.1"
         },
         {
           "name": "just",
@@ -75,8 +75,8 @@
         {
           "name": "model-channel-sync",
           "path": "skills/model-channel-sync/SKILL.md",
-          "description": "管理 AI 模型渠道（provider）配置：①提取真正可用的免费/零价模型（抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论）； ②以 pi 等平台配置为基准，同步/更新渠道、模型、APIKEY 到多个 agent 工具（pi、zcode、dsh、omp、opencode、mimocode、qoder、codebuddy、dbx 等）的配置文件。 凡用户提到\"获取/提取/列出 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、\"有哪些免费模型可用\"、 \"给 XX 渠道加免费模型\"、\"这个免费模型能用吗/测试一下\"、\"把模型更新到 pi/omp/opencode/mimocode/dsh/zcode/qoder/codebuddy/dbx\"、 \"以 pi 为基准更新 XX 渠道\"、\"同步渠道/模型/APIKEY 到 XX\"、\"更新 XX 的 APIKEY\"、 \"同步到 mimocode / 覆盖 mimocode 的提供商 / pi 同步到 mimocode\"时，都应使用此技能。 支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。",
-          "version": "1.7.0"
+          "description": "管理 AI 模型渠道（provider）配置：①提取真正可用的免费/零价模型（抓取 → 筛选 → 连通性实测 → 剔除不可用 → 给出结论）； ②以 pi 等平台配置为基准，同步/更新渠道、模型、APIKEY 到多个 agent 工具（pi、zcode、dsh、omp、opencode、mimocode、qoder、codebuddy、dbx、atomcode 等）的配置文件。 凡用户提到\"获取/提取/列出 XX 渠道免费模型\"、\"从价格判断免费模型\"、\"查价格为零的模型\"、\"有哪些免费模型可用\"、 \"给 XX 渠道加免费模型\"、\"这个免费模型能用吗/测试一下\"、\"把模型更新到 pi/omp/opencode/mimocode/dsh/zcode/qoder/codebuddy/dbx/atomcode\"、 \"以 pi 为基准更新 XX 渠道\"、\"同步渠道/模型/APIKEY 到 XX\"、\"更新 XX 的 APIKEY\"、 \"同步到 mimocode / 覆盖 mimocode 的提供商 / pi 同步到 mimocode\"时，都应使用此技能。 支持配置文件中所有 OpenAI 兼容渠道（openrouter、kilo、opencode、newapi、nvidia、atomgit 等）。",
+          "version": "1.11.0"
         }
       ]
     },
@@ -204,7 +204,7 @@
     {
       "source": "github/awesome-copilot",
       "url": "https://github.com/github/awesome-copilot",
-      "commit_hash": "a255a193d1318e5a9ca3e9e575897f9a7845c099",
+      "commit_hash": "1a8e8f1302a31ddb60089e2db15b21bbd148e8ff",
       "skills": [
         {
           "name": "sandbox-npm-install",
@@ -3176,7 +3176,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "39b723ceebf81474d0557c1fecd01eddab585563",
+      "commit_hash": "8c99fa36d90068c82d547f7c12a9d67a3e95f4ee",
       "skills": [
         {
           "name": "constraint-driven-development",
@@ -3224,6 +3224,12 @@
           "name": "frontend-ui-engineering",
           "path": "skills/frontend-ui-engineering/SKILL.md",
           "description": "Builds production-quality, accessible, responsive user-facing UIs. Use when building or modifying interfaces and pages, creating components, implementing layouts, meeting WCAG accessibility requirements, managing state, or when the output needs to look and feel production-quality rather than AI-generated.",
+          "version": ""
+        },
+        {
+          "name": "accessibility-engineering",
+          "path": "skills/accessibility-engineering/SKILL.md",
+          "description": "Audits existing interfaces for WCAG 2.2 AA conformance and remediates the violations found. Use when auditing a page or component for accessibility, running axe-core or pa11y, triaging a11y violations, or checking screen reader and contrast issues before shipping.",
           "version": ""
         },
         {
@@ -3574,7 +3580,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "f085c850f9440f497ccc76ecbc2859c09e0e0ac7",
+      "commit_hash": "e6539de023915e36848b351ea737ca8e192e8538",
       "skills": [
         {
           "name": "openspec-continue-change",
