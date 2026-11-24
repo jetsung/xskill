@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-24T03:38:54.986Z",
+  "updated_at": "2026-11-24T16:44:26.159Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3176,7 +3176,7 @@
     {
       "source": "addyosmani/agent-skills",
       "url": "https://github.com/addyosmani/agent-skills",
-      "commit_hash": "8c99fa36d90068c82d547f7c12a9d67a3e95f4ee",
+      "commit_hash": "e997ac5b9a74eab332d5e9793bb38a38c8cfdd74",
       "skills": [
         {
           "name": "performance-optimization",
@@ -3339,7 +3339,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "abeeaf95660ba9e8b7c753eb38f441ca707a8823",
+      "commit_hash": "d65391149dbb5fe76478e76fa8d5122b2aa5a70e",
       "skills": [
         {
           "name": "wait-what",
@@ -3536,7 +3536,7 @@
         {
           "name": "chief-of-staff",
           "path": "skills/in-progress/chief-of-staff/SKILL.md",
-          "description": "Pursue a long-running goal in a single session by co-ordinating subagents.",
+          "description": "Delegate the work to fresh subagents and remember what it taught you in a dated wiki, so the next session picks up the thread.",
           "version": ""
         },
         {
@@ -3580,7 +3580,7 @@
     {
       "source": "Fission-AI/OpenSpec",
       "url": "https://github.com/Fission-AI/OpenSpec",
-      "commit_hash": "0c737dc1b543249b38b0f4716816fcf493d894dd",
+      "commit_hash": "1f846e64b0dffa47e0590078cfc7121cc7f59f7b",
       "skills": [
         {
           "name": "openspec-new-change",
