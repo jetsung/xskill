@@ -155,7 +155,10 @@ pub fn run(skill: Option<&str>, source: Option<&str>, global: bool) -> Result<()
 
     if items.is_empty() {
         if let Some(filter_source) = source {
-            bail!("Source '{}' not found in cache.", filter_source);
+            bail!(
+                "Source '{}' not found in cache. For URL inputs the filter matches after normalization (trailing '/' and '.git' suffix are ignored); check the URL or try removing the .git suffix.",
+                filter_source
+            );
         } else {
             bail!("No skills found in cache.");
         }
@@ -561,12 +564,35 @@ fn update_lock_file(
 // Display helpers
 // ---------------------------------------------------------------------------
 
+/// 判断缓存来源是否命中 `--from` 过滤输入。
+///
+/// 先原样比较 `source` 字段（保持渠道名过滤行为），再归一化比较 `url`
+/// 字段（去尾部斜杠与 `.git` 后缀），使 `find -f <url>.git` 能命中缓存中
+/// 归一化形式的 URL 源（与 `url_cache_filename` 的归一化规则一致）。
+fn source_matches(filter: &str, source_cache: &crate::cache::SourceCache) -> bool {
+    if source_cache.source == filter {
+        return true;
+    }
+    if let Some(url) = &source_cache.url
+        && normalize_source_url(url) == normalize_source_url(filter)
+    {
+        return true;
+    }
+    false
+}
+
+/// 归一化用于比较的 URL：去尾部斜杠与 `.git` 后缀。
+fn normalize_source_url(s: &str) -> &str {
+    let s = s.trim_end_matches('/');
+    s.strip_suffix(".git").unwrap_or(s)
+}
+
 /// Collect FindItem entries from cache data, optionally filtered by source.
 fn collect_items(cache_data: &CacheData, source: Option<&str>) -> Vec<FindItem> {
     let mut items: Vec<FindItem> = Vec::new();
     for source_cache in &cache_data.sources {
         if let Some(filter_source) = source
-            && source_cache.source != filter_source
+            && !source_matches(filter_source, source_cache)
         {
             continue;
         }
@@ -919,6 +945,104 @@ mod tests {
         let cache = CacheData::default();
         let items = collect_items(&cache, None);
         assert!(items.is_empty());
+    }
+
+    // --- source_matches ---
+
+    fn make_source_cache(source: &str, url: Option<&str>) -> crate::cache::SourceCache {
+        crate::cache::SourceCache {
+            source: source.to_string(),
+            url: url.map(String::from),
+            registry_url: None,
+            commit_hash: String::new(),
+            skills: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn test_source_matches_channel_name() {
+        let sc = make_source_cache("antfu", Some("https://github.com/antfu/skills"));
+        assert!(source_matches("antfu", &sc));
+    }
+
+    #[test]
+    fn test_source_matches_url_with_git_suffix() {
+        // 缓存中 source/url 为归一化形式（无 .git），输入带 .git 后缀
+        let sc = make_source_cache("https://xxx.com/xxx/xxx", Some("https://xxx.com/xxx/xxx"));
+        assert!(source_matches("https://xxx.com/xxx/xxx.git", &sc));
+    }
+
+    #[test]
+    fn test_source_matches_url_without_git_suffix() {
+        let sc = make_source_cache("https://xxx.com/xxx/xxx", Some("https://xxx.com/xxx/xxx"));
+        assert!(source_matches("https://xxx.com/xxx/xxx", &sc));
+    }
+
+    #[test]
+    fn test_source_matches_url_with_trailing_slash() {
+        let sc = make_source_cache("https://xxx.com/xxx/xxx", Some("https://xxx.com/xxx/xxx"));
+        assert!(source_matches("https://xxx.com/xxx/xxx/", &sc));
+    }
+
+    #[test]
+    fn test_source_matches_url_field_only() {
+        // source 字段不匹配，但 url 字段归一化后命中
+        let sc = make_source_cache("some-channel", Some("https://xxx.com/xxx/xxx"));
+        assert!(source_matches("https://xxx.com/xxx/xxx.git", &sc));
+    }
+
+    #[test]
+    fn test_source_matches_empty_source_hit_by_url() {
+        // 名称冲突时 source 为空、仅 url 有值
+        let sc = make_source_cache("", Some("https://xxx.com/xxx/xxx"));
+        assert!(source_matches("https://xxx.com/xxx/xxx", &sc));
+    }
+
+    #[test]
+    fn test_source_matches_no_hit() {
+        let sc = make_source_cache("antfu", Some("https://github.com/antfu/skills"));
+        assert!(!source_matches("nonexistent", &sc));
+        assert!(!source_matches("https://example.com/other", &sc));
+        assert!(!source_matches("https://github.com/antfu/skills-x", &sc));
+    }
+
+    #[test]
+    fn test_source_matches_channel_name_takes_priority_over_url() {
+        // 渠道名原样命中优先，即使 url 不同
+        let sc = make_source_cache("myrepo", Some("https://github.com/other/repo"));
+        assert!(source_matches("myrepo", &sc));
+    }
+
+    #[test]
+    fn test_collect_items_filter_by_url_with_git_suffix() {
+        // 回归：URL 缓存中 source/url 为归一化形式，带 .git 的 --from 输入
+        // 必须仍能命中（修复前因严格字符串比较全部被过滤）
+        let cache = CacheData {
+            updated_at: "2026-07-18T12:00:00Z".to_string(),
+            sources: vec![SourceCache {
+                source: "https://example.com/org/repo".to_string(),
+                url: Some("https://example.com/org/repo".to_string()),
+                registry_url: None,
+                commit_hash: String::new(),
+                skills: vec![CachedSkill {
+                    name: "my-skill".to_string(),
+                    path: "skills/my-skill/SKILL.md".to_string(),
+                    description: String::new(),
+                    version: String::new(),
+                }],
+            }],
+        };
+        for input in [
+            "https://example.com/org/repo.git",
+            "https://example.com/org/repo",
+            "https://example.com/org/repo/",
+        ] {
+            let items = collect_items(&cache, Some(input));
+            assert_eq!(items.len(), 1, "input: {}", input);
+            assert_eq!(items[0].skill.name, "my-skill");
+        }
+        // 不相关的 URL 仍不命中
+        assert!(collect_items(&cache, Some("https://example.com/org/other")).is_empty());
     }
 
     #[test]

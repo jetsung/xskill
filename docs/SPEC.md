@@ -377,7 +377,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 * **适用范围**：
   * `cache update --from <url>`：存储缓存时归一化 source 名称。
   * `query --from <url>`：查询缓存时归一化匹配。
-  * `find --from <url>`：查询缓存时归一化匹配。
+  * `find --from <url>`：查询缓存时归一化匹配；TUI 技能列表过滤阶段同样按归一化 URL 比较（先原样匹配 source 名保持渠道名行为，再归一化比较 source 的 `url` 字段），带/不带 `.git` 后缀或尾部 `/` 的 URL 输入均能命中对应来源，不得因字符串形式差异把该来源的技能全部过滤掉。
   * URL 缓存文件名生成（`source_<md5>.json`）：MD5 计算前归一化 URL。
 * **目的**：确保同一仓库无论是否带 `.git` 后缀，都使用同一缓存文件，避免数据重复。
 
@@ -866,7 +866,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
 
 * **行为**：通过两步 TUI 交互式查找 skill（支持多选）和目标平台后批量安装。安装范围通过 `-g` 参数控制。同源 skill 仅 clone 一次仓库，避免重复拉取。
 * **参数**：
-  * `-f, --from`：指定源（遵循 [通用参数 -from] 规则），仅显示该源的 skills。支持 URL 方式，若 URL 不在 sources 中则自动拉取并缓存至 `~/.xskill/cache/source_<md5(url)>.json`，缓存有效期由 `cache.ttl` 控制（默认 24 小时）。URL 作为源时遵循 [URL 归一化规则]。
+  * `-f, --from`：指定源（遵循 [通用参数 -from] 规则），仅显示该源的 skills。支持 URL 方式，若 URL 不在 sources 中则自动拉取并缓存至 `~/.xskill/cache/source_<md5(url)>.json`，缓存有效期由 `cache.ttl` 控制（默认 24 小时）。URL 作为源时遵循 [URL 归一化规则]；TUI 列表过滤按归一化 URL 匹配（忽略 `.git` 后缀与尾部 `/` 差异），带/不带 `.git` 的 URL 输入均能列出该仓库的 skills。
   * `-s, --skill`：初始过滤查询（子串）。**不支持 `*` 通配符**——`find` 为交互式多选安装，批量安装全部 skill 请使用 `add -s '*'`。传入 `*` 时直接报错退出。
   * `-g, --global`：全局安装（`~/.agents`），不指定则安装到项目级（`.agents`）。
 * **TUI 显示规范**：
@@ -900,7 +900,7 @@ symlink 创建失败时，清理目标目录后回退为 `copy_dir_recursive` �
   * 若 `registry.enabled` 为 `true`：本地数据按上述缓存策略加载后，与注册中心数据合并（注册中心始终实时拉取）。
 * **边界情况**：
   * 缓存为空时输出 "No skills found in cache."。
-  * `--from` 指定的源不在缓存中时报错。
+  * `--from` 指定的源不在缓存中时报错，主文案为 `Source '<input>' not found in cache.`，并追加一行提示：URL 输入按归一化比较（尾部 `/` 与 `.git` 后缀被忽略），建议核对 URL 或去掉 `.git` 后缀重试。
   * 非交互终端时报错 "find requires an interactive terminal."
   * `-s '*'` 时报错："'find' does not support installing all skills. Use 'add -s "*"' for bulk install."
 

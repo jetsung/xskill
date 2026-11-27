@@ -10,14 +10,17 @@
 | claude | Claude Code | `.claude` | | `skills` | `CLAUDE.md` | `AGENTS.md` | ✗ | ✓ |
 | codebuddy | CodeBuddy | `.codebuddy` | | `skills` | `CODEBUDDY.md` | `AGENTS.md` | ✗ | ✓ |
 | codex | Codex | `.codex` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
-| commandcode | Command Code | `.commandcode` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✗ |
+| commandcode | Command Code | `.commandcode` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
 | dsh | DeepSeek Harness | `.dsh` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
+| junie | Junie CLI | `.junie` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✗ |
 | omp | Oh My Pi | `.omp/agent` | `.omp` | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
 | opencode | OpenCode | `.opencode` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
 | pi | Pi | `.pi/agent` | `.pi` | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
 | qoder | Qoder | `.qoder` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
 | qoder-cn | Qoder CN | `.qoder-cn` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
-| workbuddy | WorkBuddy | `.workbuddy` | | `skills` | `CODEBUDDY.md` | `AGENTS.md` | ✗ | ✓ |
+| trae | Trae | `.trae` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
+| trae-cn | Trae CN | `.trae-cn` | `.trae` | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
+| workbuddy | WorkBuddy | `.workbuddy` | | `skills` | `CODEBUDDY.md` | `AGENTS.md` | ✗ | ✗ |
 | zcode | ZCode | `.zcode` | | `skills` | `AGENTS.md` | `AGENTS.md` | ✓ | ✓ |
 | atomcode | AtomCode | `.atomcode` | | `skills` | `ATOMCODE.md` | `AGENTS.md` | ✓ | ✗ |
 | cline | Cline | `.cline` | | `skills` | `CLAUDE.md` | `AGENTS.md` | ✓ | ✗ |
@@ -45,6 +48,9 @@
 - `antigravity`（原 Gemini CLI，Google 已更名为 Antigravity CLI，配置目录沿用 `~/.gemini/`，全局配置位于 `~/.gemini/config/`）与 `gemini` 为同一平台，内置列表仅保留 `antigravity`。它是唯一的**作用域分叉**平台：项目级直接复用 `.agents/skills/` 规范目录（兼容层，add/link/restore 跳过软链接），全局级不兼容——安装到 `~/.agents/skills/` 后需软链接到 `~/.gemini/config/skills/`（`agents_compat=true`、`global_agents_compat=false`）。
 - `zoo`（Zoo Code）接手已停服的 Roo Code，配置目录沿用 `~/.roo/`。
 - `qoder-cn`（Qoder 中国版）与 `qoder`（国际版）为同一产品的不同发行版，配置目录分别为 `~/.qoder-cn/` 与 `~/.qoder/`，互不共享。
+- `trae`（Trae，字节跳动 AI IDE）支持项目级 `.trae/skills/` 与全局 `~/.trae/skills/`，agents 文件为项目根目录的 `AGENTS.md`，并兼容 `.agents/skills/` 规范目录（[官方文档](https://docs.trae.ai/ide/skills)）。
+- `trae-cn`（Trae 中国版）与 `trae`（国际版）为同一产品的不同发行版：项目级技能目录均为 `.trae/skills/`，全局配置目录分别为 `~/.trae-cn/` 与 `~/.trae/`，互不共享（[官方文档](https://docs.trae.cn/ide_skills)）。
 - `mimocode`（MiMo Code）全局配置目录为 `~/.config/mimocode/skills`，项目级为 `.mimocode/skills`（[官方文档](https://mimo.xiaomi.com/zh/mimocode/skills)）。
 - `agentty`（Agentty）全局配置目录为 `~/.agentty/skills`，项目级为 `.agentty/skills`，两者路径相同，无需 `local_path`；兼容 `.agents/` 规范目录（[官方文档](https://github.com/1ay1/agentty/blob/master/docs/website/skills.md)）。
 - `hermes`（Hermes Agent）全局配置目录为 `~/.hermes/skills`，项目级为 `.hermes/skills`，两者路径相同，无需 `local_path`；兼容 `.agents/` 规范目录。
+- `junie`（Junie CLI，JetBrains）全局配置目录为 `~/.junie/skills`，项目级为 `.junie/skills`，两者路径相同，无需 `local_path`；兼容 `.agents/` 规范目录，agents 文件为 `.junie/AGENTS.md`（[官方文档](https://junie.jetbrains.com/docs/agent-skills.html)）。

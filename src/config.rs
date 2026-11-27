@@ -208,7 +208,7 @@ pub fn default_platforms() -> HashMap<String, Platform> {
         (
             "commandcode",
             "Command Code",
-            false,
+            true,
             ".commandcode",
             None,
             "skills",
@@ -220,6 +220,18 @@ pub fn default_platforms() -> HashMap<String, Platform> {
             "DeepSeek Harness",
             true,
             ".dsh",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        // junie（Junie CLI，JetBrains）兼容 .agents/ 规范目录；
+        // agents 文件为 .junie/AGENTS.md
+        (
+            "junie",
+            "Junie CLI",
+            false,
+            ".junie",
             None,
             "skills",
             "AGENTS.md",
@@ -278,9 +290,30 @@ pub fn default_platforms() -> HashMap<String, Platform> {
             true,
         ),
         (
+            "trae",
+            "Trae",
+            true,
+            ".trae",
+            None,
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        // trae-cn（Trae 中国版）全局 ~/.trae-cn/，项目级沿用 .trae/
+        (
+            "trae-cn",
+            "Trae CN",
+            true,
+            ".trae-cn",
+            Some(".trae"),
+            "skills",
+            "AGENTS.md",
+            true,
+        ),
+        (
             "workbuddy",
             "WorkBuddy",
-            true,
+            false,
             ".workbuddy",
             None,
             "skills",
@@ -1065,7 +1098,7 @@ mod tests {
     #[test]
     fn test_default_platforms() {
         let platforms = default_platforms();
-        assert_eq!(platforms.len(), 28);
+        assert_eq!(platforms.len(), 31);
         assert!(platforms.contains_key("antigravity"));
         assert!(platforms.contains_key("claude"));
         assert!(platforms.contains_key("cline"));
@@ -1080,13 +1113,13 @@ mod tests {
         assert!(!platforms.contains_key("roo"));
         assert!(platforms.contains_key("zoo"));
 
-        // 默认启用 12 个常用渠道
+        // 默认启用 14 个常用渠道
         let enabled: Vec<_> = platforms
             .iter()
             .filter(|(_, p)| p.enabled)
             .map(|(k, _)| k.as_str())
             .collect();
-        assert_eq!(enabled.len(), 12);
+        assert_eq!(enabled.len(), 14);
         for key in [
             "claude",
             "codex",
@@ -1096,10 +1129,12 @@ mod tests {
             "codebuddy",
             "qoder",
             "qoder-cn",
+            "trae",
+            "trae-cn",
             "pi",
             "omp",
             "dsh",
-            "workbuddy",
+            "commandcode",
         ] {
             assert!(
                 platforms[key].enabled,
@@ -1183,7 +1218,7 @@ mod tests {
         assert_eq!(workbuddy.agents, "CODEBUDDY.md");
         assert_eq!(workbuddy.source, "AGENTS.md");
         assert!(!workbuddy.agents_compat);
-        assert!(workbuddy.enabled);
+        assert!(!workbuddy.enabled);
 
         // qoder-cn（Qoder 中国版）渠道：与 qoder 国际版配置一致，仅路径为 .qoder-cn，默认启用
         let qoder_cn = &platforms["qoder-cn"];
@@ -1195,14 +1230,35 @@ mod tests {
         assert!(qoder_cn.agents_compat);
         assert!(qoder_cn.enabled);
 
-        // commandcode 渠道：AGENTS.md 兼容，默认禁用
+        // trae（Trae 国际版）渠道：全局与项目级路径均为 .trae，兼容 .agents/ 规范目录，默认启用
+        let trae = &platforms["trae"];
+        assert_eq!(trae.name.as_deref(), Some("Trae"));
+        assert_eq!(trae.path, ".trae");
+        assert_eq!(trae.skills, "skills");
+        assert_eq!(trae.agents, "AGENTS.md");
+        assert_eq!(trae.source, "AGENTS.md");
+        assert!(trae.agents_compat);
+        assert!(trae.enabled);
+
+        // trae-cn（Trae 中国版）渠道：全局路径为 .trae-cn，项目级沿用 .trae，默认启用
+        let trae_cn = &platforms["trae-cn"];
+        assert_eq!(trae_cn.name.as_deref(), Some("Trae CN"));
+        assert_eq!(trae_cn.path, ".trae-cn");
+        assert_eq!(trae_cn.local_path.as_deref(), Some(".trae"));
+        assert_eq!(trae_cn.skills, "skills");
+        assert_eq!(trae_cn.agents, "AGENTS.md");
+        assert_eq!(trae_cn.source, "AGENTS.md");
+        assert!(trae_cn.agents_compat);
+        assert!(trae_cn.enabled);
+
+        // commandcode 渠道：AGENTS.md 兼容，默认启用
         let commandcode = &platforms["commandcode"];
         assert_eq!(commandcode.name.as_deref(), Some("Command Code"));
         assert_eq!(commandcode.path, ".commandcode");
         assert_eq!(commandcode.skills, "skills");
         assert_eq!(commandcode.agents, "AGENTS.md");
         assert!(commandcode.agents_compat);
-        assert!(!commandcode.enabled);
+        assert!(commandcode.enabled);
 
         // 兼容性标记与 docs/PLATFORMS.md 一致：atomcode ✓、cline ✅、claude ❌
         assert!(platforms["atomcode"].agents_compat);
@@ -1245,6 +1301,19 @@ mod tests {
         assert_eq!(hermes.agents, "AGENTS.md");
         assert!(hermes.agents_compat);
         assert!(!hermes.enabled);
+
+        // junie 渠道（Junie CLI，JetBrains）：全局与项目级路径相同，均为 .junie；
+        // 指令文件为 guidelines.md，兼容 .agents/ 规范目录
+        let junie = &platforms["junie"];
+        assert_eq!(junie.name.as_deref(), Some("Junie CLI"));
+        assert_eq!(junie.path, ".junie");
+        assert_eq!(junie.local_path, None);
+        assert_eq!(junie.effective_path(true), ".junie");
+        assert_eq!(junie.effective_path(false), ".junie");
+        assert_eq!(junie.skills, "skills");
+        assert_eq!(junie.agents, "AGENTS.md");
+        assert!(junie.agents_compat);
+        assert!(!junie.enabled);
 
         // local_path 未设置时，effective_path 在两种模式下都回退到 path
         let claude = &platforms["claude"];
@@ -1407,7 +1476,7 @@ mod tests {
         assert_eq!(config.cache.ttl, 86400);
         assert!(config.registry.enabled);
         assert_eq!(config.registry.url, DEFAULT_REGISTRY_URL);
-        assert_eq!(config.platforms.len(), 28);
+        assert_eq!(config.platforms.len(), 31);
         // init 时 proxy 键占位为空字符串（不生效，供用户填写）
         assert_eq!(config.proxy, Some(String::new()));
     }

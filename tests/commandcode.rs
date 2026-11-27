@@ -2,7 +2,7 @@
 //!
 //! 覆盖：
 //! - `xskill platforms list --all` 输出包含 Command Code 及其配置目录 `.commandcode`、agents 文件 `AGENTS.md`
-//! - commandcode 默认禁用，不应出现在 `xskill platforms`（非 --all）中
+//! - commandcode 默认启用，应出现在 `xskill platforms`（非 --all）中
 //! - `xskill link --agent commandcode` 因 `agents_compat=true` 被安全跳过（不报错、不创建 `.commandcode`），
 //!   与其它 agents_compat 渠道行为一致
 //! - 非法渠道名校验
@@ -206,19 +206,19 @@ fn test_commandcode_appears_in_platforms_detailed() {
 }
 
 #[test]
-fn test_commandcode_not_in_default_enabled_list() {
+fn test_commandcode_in_default_enabled_list() {
     let tmp = tempfile::tempdir().unwrap();
     let workdir = tmp.path();
     let env = isolated_config_env(workdir);
 
-    // 不带 --all 的 platforms 仅显示启用的渠道；commandcode 默认禁用，不应出现
+    // 不带 --all 的 platforms 仅显示启用的渠道；commandcode 默认启用，应出现
     let out = run_xskill(workdir, &["platforms"], &as_refs(&env));
     assert!(out.status.success());
 
     let stdout = String::from_utf8_lossy(&out.stdout);
     assert!(
-        !stdout.contains("Command Code"),
-        "commandcode is disabled by default and should NOT appear in `platforms` (non-detailed), got:\n{}",
+        stdout.contains("Command Code") && stdout.contains(".commandcode"),
+        "commandcode is enabled by default and should appear in `platforms`, got:\n{}",
         stdout
     );
 }

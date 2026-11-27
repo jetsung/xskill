@@ -4,7 +4,7 @@
 //! `agents_compat=false`（link 会真正创建软链，不走 Skipped 分支）。
 //!
 //! 覆盖（与 docs/PLATFORMS.md 一致）：
-//! - workbuddy 默认启用：出现在 `xskill platforms` 与 `platforms list` 中
+//! - workbuddy 默认不启用：不出现在默认 `xskill platforms` 中，`platforms list --all` 可见
 //! - 详细视图列：PATH=.workbuddy、AGENTS=.workbuddy/CODEBUDDY.md、SOURCE=.agents/AGENTS.md
 //! - `agents_compat=false`：`xskill link --agent workbuddy` 创建 skills 软链且可重复执行（幂等）
 
@@ -101,7 +101,7 @@ fn test_workbuddy_in_default_platforms_list() {
     let workdir = tmp.path();
     let env = isolated_config_env(workdir);
 
-    // 不带 --all 的 platforms 仅显示启用渠道；workbuddy 默认启用，应出现
+    // 不带 --all 的 platforms 仅显示启用渠道；workbuddy 默认不启用，不应出现
     let out = run_xskill(workdir, &["platforms"], &as_refs(&env));
     assert!(
         out.status.success(),
@@ -111,8 +111,22 @@ fn test_workbuddy_in_default_platforms_list() {
 
     let stdout = String::from_utf8_lossy(&out.stdout);
     assert!(
+        !stdout.contains("WorkBuddy"),
+        "workbuddy is disabled by default and should NOT appear in `platforms`, got:\n{}",
+        stdout
+    );
+
+    // --all 视图中 workbuddy 可见
+    let out = run_xskill(workdir, &["platforms", "list", "--all"], &as_refs(&env));
+    assert!(
+        out.status.success(),
+        "xskill platforms list --all failed: {}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    assert!(
         stdout.contains("WorkBuddy") && stdout.contains(".workbuddy"),
-        "workbuddy is enabled by default and should appear in `platforms`, got:\n{}",
+        "platforms list --all should include WorkBuddy, got:\n{}",
         stdout
     );
 }
@@ -123,17 +137,17 @@ fn test_workbuddy_appears_in_platforms_list_detailed() {
     let workdir = tmp.path();
     let env = isolated_config_env(workdir);
 
-    let out = run_xskill(workdir, &["platforms", "list"], &as_refs(&env));
+    let out = run_xskill(workdir, &["platforms", "list", "--all"], &as_refs(&env));
     assert!(
         out.status.success(),
-        "xskill platforms list failed: {}",
+        "xskill platforms list --all failed: {}",
         String::from_utf8_lossy(&out.stderr)
     );
 
     let stdout = String::from_utf8_lossy(&out.stdout);
     assert!(
         stdout.contains("WorkBuddy"),
-        "platforms list should list WorkBuddy, got:\n{}",
+        "platforms list --all should list WorkBuddy, got:\n{}",
         stdout
     );
     // 详细视图列：PATH=.workbuddy、SKILLS=skills、AGENTS=.workbuddy/CODEBUDDY.md（SOURCE 列已移除）

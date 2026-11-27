@@ -77,7 +77,7 @@ fn test_platforms_list_shows_only_enabled_detailed() {
         stdout
     );
     // 默认禁用渠道不应出现
-    for disabled in ["Kiro", "Command Code", "Kilo Code", "LangCLI"] {
+    for disabled in ["Kiro", "Kilo Code", "LangCLI", "WorkBuddy", "Junie CLI"] {
         assert!(
             !stdout.contains(disabled),
             "disabled platform ({}) should NOT appear in `platforms list`, got:\n{}",
