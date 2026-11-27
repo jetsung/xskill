@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-26T16:03:36.334Z",
+  "updated_at": "2026-11-27T01:19:13.767Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3079,8 +3079,14 @@
     {
       "source": "antfu/skills",
       "url": "https://github.com/antfu/skills",
-      "commit_hash": "4a6bb39e7b45e26402eb215393c51ccf5df1ca4c",
+      "commit_hash": "0ecc25a6dcc805074133f7315fb6965450c70990",
       "skills": [
+        {
+          "name": "antfu-upgrade-deps",
+          "path": "skills/antfu-upgrade-deps/SKILL.md",
+          "description": "Upgrade the dependencies of the current project with taze, migrate code for major versions by reading their changelogs, dedupe the lockfile, verify tests, lint, and typecheck, then open a PR. Use when asked to upgrade, update, or bump dependencies.",
+          "version": "2026.11.27"
+        },
         {
           "name": "antfu-query",
           "path": "skills/antfu-query/SKILL.md",
