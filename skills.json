@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-27T15:51:59.597Z",
+  "updated_at": "2026-11-28T00:52:25.226Z",
   "sources": [
     {
       "source": "jetsung/skills",
@@ -3339,7 +3339,7 @@
     {
       "source": "mattpocock/skills",
       "url": "https://github.com/mattpocock/skills",
-      "commit_hash": "6f7f7831a625f040a8e06a0e7954826b87ce775a",
+      "commit_hash": "bbadaa631c37af594e5a05c9cefacd9956136b18",
       "skills": [
         {
           "name": "wait-what",
